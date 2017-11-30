@@ -1,4 +1,4 @@
-0. set R Selenium
+# 0. set R Selenium
 =================
 
 ### terminal에서 chromedriver가 설치되어 있는 폴더로 이동 후 아래 명령을 실행
@@ -7,7 +7,7 @@
 -   $ java -Dwebdriver.chrome.driver="chromedriver" -jar
     selenium-server-standalone-3.5.3.jar -port 4445
 
-1. get sports news urls
+# 1. get sports news urls
 =======================
 
 ### import libraries
@@ -227,7 +227,7 @@
 
     rm(list = ls()[! ls() %in% c("newsDf", "main")])
 
-3. use javascript api to get replies fast ----
+# 3. use javascript api to get replies fast ----
 ==============================================
 
 ### sample url for comments api
