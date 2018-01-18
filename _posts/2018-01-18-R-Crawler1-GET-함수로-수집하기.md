@@ -54,14 +54,22 @@ content(x = resp, as = 'text')
 
 html tag의 기본적인 형태를 확인해보겠습니다. ![html tag](http://tutorial.techaltum.com/images/element.png)
 
-이제 tag를 다루는 기본 함수들에 대해서 확인하고 가겠습니다. 1. read\_html(x, encoding) : resp에 있는 html을 읽습니다. 이 때 encoding = "UTF-8"을 추가합니다. 1. html\_node(x, css, xpath) : 괄호 안에 할당된 키워드에 맞는 tag 중 맨 처음 1개만 가져옵니다. 1. html\_nodes(x, css, xpath) : 위에 해당하는 모든 tag를 가져옵니다. 1. html\_text(x) : tag 사이에 있는 텍스트만 가져옵니다. 1. html\_table(x) : html에서 표로 되어 있는 데이터를 그대로 가져올 수 있습니다.
+### tag를 다루는 기본 함수들
+
+1.  read\_html(x, encoding) : resp에 있는 html을 읽습니다. 이 때 encoding = "UTF-8"을 추가합니다.
+2.  html\_node(x, css, xpath) : 괄호 안에 할당된 키워드에 맞는 tag 중 맨 처음 1개만 가져옵니다.
+3.  html\_nodes(x, css, xpath) : 위에 해당하는 모든 tag를 가져옵니다.
+4.  html\_text(x) : tag 사이에 있는 텍스트만 가져옵니다.
+5.  html\_table(x) : html에서 표로 되어 있는 데이터를 그대로 가져올 수 있습니다.
 
 우리가 원하는 데이터인 "실시간 검색어"와 관련된 tag를 확인하는 방법을 알려드리겠습니다. 웹브라우저로 크롬을 사용하신다면 원하는 부분으로 마우스를 옮긴 후, 오른쪽 버튼을 클릭하고 "검사(Inspect)"를 선택합니다.
 
 먼저 `<ul class="ah_l" data-list="1to10" style="display: block;">`와 같은 tag를 확인할 수 있을 것입니다. 그리고 이 tag 아래에 `<li class="ah_item" ... >` tag들이 하위 tag로 붙어 있는 것이 보일 겁니다.
 
 html에서 특정 부분을 찾으려면 tag에서 xpath나 CSS Selector를 확인한 후, 위에 보여드린 함수의 xpath 또는 css 인자에 할당을 해주어야 합니다.
-- 속성명이 "id"나 "class"인 경우에는 아래와 같이 기호로 대체할 수 있습니다. - id 대신 '\#' (예, "div\#post\_title") - class 대신 '.' (예, "div.content")
+- 속성명이 "id"나 "class"인 경우에는 아래와 같이 기호로 대체할 수 있습니다.
+- id 대신 '\#' (예, "div\#post\_title")
+- class 대신 '.' (예, "div.content")
 
 ``` r
 # 전체 html 중에서 "실시간 검색어" 관련 tag만 추출하기
@@ -72,25 +80,25 @@ print(items)
 
     ## {xml_nodeset (40)}
     ##  [1] <span class="ah_k">이하율</span>
-    ##  [2] <span class="ah_k">셀럽파이브</span>
-    ##  [3] <span class="ah_k">김희중</span>
+    ##  [2] <span class="ah_k">김희중</span>
+    ##  [3] <span class="ah_k">셀럽파이브</span>
     ##  [4] <span class="ah_k">고원희</span>
-    ##  [5] <span class="ah_k">슬기로운 감빵생활 마지막회</span>
-    ##  [6] <span class="ah_k">정준영</span>
+    ##  [5] <span class="ah_k">정준영</span>
+    ##  [6] <span class="ah_k">슬기로운 감빵생활 마지막회</span>
     ##  [7] <span class="ah_k">금호타이어</span>
-    ##  [8] <span class="ah_k">정현</span>
-    ##  [9] <span class="ah_k">마더</span>
+    ##  [8] <span class="ah_k">마더</span>
+    ##  [9] <span class="ah_k">정현</span>
     ## [10] <span class="ah_k">선미</span>
-    ## [11] <span class="ah_k">리턴</span>
+    ## [11] <span class="ah_k">멜론티켓</span>
     ## [12] <span class="ah_k">김두한</span>
-    ## [13] <span class="ah_k">역린</span>
-    ## [14] <span class="ah_k">백원우</span>
-    ## [15] <span class="ah_k">셀레나고메즈</span>
-    ## [16] <span class="ah_k">엠카운트다운</span>
-    ## [17] <span class="ah_k">김이나</span>
-    ## [18] <span class="ah_k">멜론티켓</span>
-    ## [19] <span class="ah_k">아바타</span>
-    ## [20] <span class="ah_k">고장환</span>
+    ## [13] <span class="ah_k">리턴</span>
+    ## [14] <span class="ah_k">아바타</span>
+    ## [15] <span class="ah_k">역린</span>
+    ## [16] <span class="ah_k">셀레나고메즈</span>
+    ## [17] <span class="ah_k">저스틴비버</span>
+    ## [18] <span class="ah_k">백원우</span>
+    ## [19] <span class="ah_k">김이나</span>
+    ## [20] <span class="ah_k">엠카운트다운</span>
     ## ...
 
 ``` r
@@ -99,26 +107,26 @@ searchWords <- html_text(x = items)
 print(searchWords)
 ```
 
-    ##  [1] "이하율"                     "셀럽파이브"                
-    ##  [3] "김희중"                     "고원희"                    
-    ##  [5] "슬기로운 감빵생활 마지막회" "정준영"                    
-    ##  [7] "금호타이어"                 "정현"                      
-    ##  [9] "마더"                       "선미"                      
-    ## [11] "리턴"                       "김두한"                    
-    ## [13] "역린"                       "백원우"                    
-    ## [15] "셀레나고메즈"               "엠카운트다운"              
-    ## [17] "김이나"                     "멜론티켓"                  
-    ## [19] "아바타"                     "고장환"                    
-    ## [21] "이하율"                     "셀럽파이브"                
-    ## [23] "김희중"                     "고원희"                    
-    ## [25] "슬기로운 감빵생활 마지막회" "정준영"                    
-    ## [27] "금호타이어"                 "정현"                      
-    ## [29] "마더"                       "선미"                      
-    ## [31] "리턴"                       "김두한"                    
-    ## [33] "역린"                       "백원우"                    
-    ## [35] "셀레나고메즈"               "엠카운트다운"              
-    ## [37] "김이나"                     "멜론티켓"                  
-    ## [39] "아바타"                     "고장환"
+    ##  [1] "이하율"                     "김희중"                    
+    ##  [3] "셀럽파이브"                 "고원희"                    
+    ##  [5] "정준영"                     "슬기로운 감빵생활 마지막회"
+    ##  [7] "금호타이어"                 "마더"                      
+    ##  [9] "정현"                       "선미"                      
+    ## [11] "멜론티켓"                   "김두한"                    
+    ## [13] "리턴"                       "아바타"                    
+    ## [15] "역린"                       "셀레나고메즈"              
+    ## [17] "저스틴비버"                 "백원우"                    
+    ## [19] "김이나"                     "엠카운트다운"              
+    ## [21] "이하율"                     "김희중"                    
+    ## [23] "셀럽파이브"                 "고원희"                    
+    ## [25] "정준영"                     "슬기로운 감빵생활 마지막회"
+    ## [27] "금호타이어"                 "마더"                      
+    ## [29] "정현"                       "선미"                      
+    ## [31] "멜론티켓"                   "김두한"                    
+    ## [33] "리턴"                       "아바타"                    
+    ## [35] "역린"                       "셀레나고메즈"              
+    ## [37] "저스틴비버"                 "백원우"                    
+    ## [39] "김이나"                     "엠카운트다운"
 
 ``` r
 # 실시간 검색어가 2번 반복되고 있으므로 상위 20개만 추출하여 데이터 프레임으로 저장
@@ -138,25 +146,25 @@ read_html(x = resp, encoding = "UTF-8") %>%
 
     ##                   searchWords
     ## 1                      이하율
-    ## 2                  셀럽파이브
-    ## 3                      김희중
+    ## 2                      김희중
+    ## 3                  셀럽파이브
     ## 4                      고원희
-    ## 5  슬기로운 감빵생활 마지막회
-    ## 6                      정준영
+    ## 5                      정준영
+    ## 6  슬기로운 감빵생활 마지막회
     ## 7                  금호타이어
-    ## 8                        정현
-    ## 9                        마더
+    ## 8                        마더
+    ## 9                        정현
     ## 10                       선미
-    ## 11                       리턴
+    ## 11                   멜론티켓
     ## 12                     김두한
-    ## 13                       역린
-    ## 14                     백원우
-    ## 15               셀레나고메즈
-    ## 16               엠카운트다운
-    ## 17                     김이나
-    ## 18                   멜론티켓
-    ## 19                     아바타
-    ## 20                     고장환
+    ## 13                       리턴
+    ## 14                     아바타
+    ## 15                       역린
+    ## 16               셀레나고메즈
+    ## 17                 저스틴비버
+    ## 18                     백원우
+    ## 19                     김이나
+    ## 20               엠카운트다운
 
 위 코드에서 마지막에 오는 set\_colnames 함수는 magrittr 패키지에 속합니다. 이 함수를 추가하지 않으면 새로 생성된 데이터 프레임의 열이름에 '.'으로 설정됩니다.
 
