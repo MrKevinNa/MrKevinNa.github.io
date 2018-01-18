@@ -2,9 +2,9 @@ R로 웹데이터 수집하기
 ---------------------
 
 먼저 우리가 인터넷 페이지를 검색하는 방식을 떠올려봅시다!
-![웹페이지 접속하기](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)
+![](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)
 
-위와 같이 웹브라우저에 url을 입력하는 행위를 통해 *HTTP Request*를 던지면 웹서버로부터 *HTTP Response*를 받아 웹브라우저에 *HTML을 Rendering* 해줍니다.
+위와 같이 웹브라우저에 url을 입력하는 행위를 통해 **HTTP Request**를 던지면 웹서버로부터 **HTTP Response**를 받아 웹브라우저에 **HTML을 Rendering** 해줍니다.
 
 Web Crawler의 기본 과정은 원하는 사이트에 요청을 보내고 반응을 받은 후, html로부터 필요한 데이터를 정리하는 것입니다.
 
