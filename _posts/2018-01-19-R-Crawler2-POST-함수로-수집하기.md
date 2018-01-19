@@ -43,7 +43,9 @@ library(magrittr)
 
 ![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%202.png?raw=true)
 
-그런데 한 가지 복병이 생겼습니다! **Form Data**에 일부 항목값이 `(unable to decode value)`로 되어 있습니다. 기계가 문자를 인식하게 하기 위해 부호화(인코딩) 해준 것을 사람이 이해할 수 있도록 복호화(디코딩) 해주어야 하는데, 현재 상태로는 그렇게 되지 않는 것으로 보입니다. **Form Data** 오른쪽 끝에 `view URL encoded`를 클릭하면 아래 그림처럼 알기 어려운 문자들이 보입니다. 즉 기계가 문자를 인식할 수 있는 (인코딩 된) 상태인 것입니다. ![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%203.png?raw=true)
+그런데 한 가지 복병이 생겼습니다! **Form Data**에 일부 항목값이 `(unable to decode value)`로 되어 있습니다. 기계가 문자를 인식하게 하기 위해 부호화(인코딩) 해준 것을 사람이 이해할 수 있도록 복호화(디코딩) 해주어야 하는데, 현재 상태로는 그렇게 되지 않는 것으로 보입니다. **Form Data** 오른쪽 끝에 `view URL encoded`를 클릭하면 아래 그림처럼 알기 어려운 문자들이 보입니다. 즉 기계가 문자를 인식할 수 있는 (인코딩 된) 상태인 것입니다.
+
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%203.png?raw=true)
 
 여기서 한 가지 문제가 더 있는데요. (URL 인코딩은 일단 잊어버리고) 각 언어마다 기계가 인식할 수 있도록 인코딩하는 방식이 제각각이었고, 이를 통일하기 위해 국제표준이라 할 수 있는 **UTF-8**가 개발되었습니다. 웹페이지를 개발할 때 인코딩 방식으로 **UTF-8**을 쓰면 좋은데, 한국은 윈도우즈가 많이 사용되어서 그런지 윈도우즈에서 개발한 **EUC-KR** 또는 **CP949**를 사용하는 경우가 많습니다.
 
