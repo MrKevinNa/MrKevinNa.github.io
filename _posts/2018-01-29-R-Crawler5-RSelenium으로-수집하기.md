@@ -51,9 +51,11 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Conte
 
 이제 위에서 설치한 프로그램을 미리 실행시켜야 합니다. Windows 사용자는 **cmd**에서, Mac 사용자는 **terminal**에서 실행시키면 됩니다. 운영체제별로 cmd나 terminal을 열고 Chrome Driver가 설치된 폴더로 이동한 다음 아래와 같이 명령어를 실행합니다. `x.x.x`부분은 selenium server standalone version을 입력합니다.
 
--   Mac 사용자 (terminal에서 아래 명령 실행) `java -Dwebdriver.chrome.driver="chromedriver" -jar selenium-server-standalone-x.x.x.jar -port 4445`
+-   Mac 사용자 (terminal에서 아래 명령 실행)  
+`java -Dwebdriver.chrome.driver="chromedriver" -jar selenium-server-standalone-x.x.x.jar -port 4445`
 
--   Windows 사용자 (cmd에서 아래 명령 실행) `java -Dwebdriver.chrome.driver="chromedriver.exe" -jar selenium-server-standalone-x.x.x.jar -port 4445`
+-   Windows 사용자 (cmd에서 아래 명령 실행)  
+`java -Dwebdriver.chrome.driver="chromedriver.exe" -jar selenium-server-standalone-x.x.x.jar -port 4445`
 
 위 명령을 실행시켰을 때 로그 맨 아래에 `INFO - Selenium Server is up and running`이라고 뜨면 정상적으로 실행되고 있는 것입니다. 축하합니다!
 
