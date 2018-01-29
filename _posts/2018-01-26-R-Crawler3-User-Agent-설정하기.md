@@ -11,11 +11,6 @@
 # 패키지 불러오기
 library(httr)
 library(rvest)
-```
-
-    ## Loading required package: xml2
-
-``` r
 library(dplyr)
 ```
 

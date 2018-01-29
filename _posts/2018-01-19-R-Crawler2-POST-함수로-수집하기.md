@@ -9,11 +9,6 @@ POST 함수로 웹데이터 수집하기
 # 패키지 불러오기
 library(httr)
 library(rvest)
-```
-
-    ## Loading required package: xml2
-
-``` r
 library(dplyr)
 library(magrittr)
 ```

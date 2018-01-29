@@ -17,11 +17,6 @@ HTML을 보면 중간에 `<script>` tag가 있고, 그 아래로 프로그래밍
 # 필요한 라이브러리 불러오기
 library(httr)
 library(rvest)
-```
-
-    ## Loading required package: xml2
-
-``` r
 library(dplyr)
 library(stringr)
 ```
