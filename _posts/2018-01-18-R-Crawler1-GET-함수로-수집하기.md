@@ -6,7 +6,7 @@ R로 웹데이터 수집하기
 
 위와 같이 웹브라우저에 url을 입력하는 행위를 통해 **HTTP Request**를 던지면 웹서버로부터 **HTTP Response**를 받아 웹브라우저에 **HTML을 Rendering** 해줍니다.
 
-Web Crawler의 기본 과정은 원하는 사이트에 요청을 보내고 반응을 받은 후, html로부터 필요한 데이터를 정리하는 것입니다.
+Web Crawler의 기본 과정은 원하는 사이트에 요청을 보내고 응답을 받은 후, html로부터 필요한 데이터를 정리하는 것입니다.
 
 웹페이지를 "요청(Request)"하는 방법으로는 GET, POST 함수 등을 사용할 수 있습니다. 이번에는 GET 함수 사용법을 알아보겠습니다.
 
@@ -45,7 +45,7 @@ status_code(resp)
 content(x = resp, as = 'text')
 ```
 
-상태코드가 200이라 정상적으로 "반응(Response)"하였습니다. 그리고 html이 어지럽게 출력이 되었네요.
+상태코드가 200이라 정상적으로 "응답(Response)"하였습니다. 그리고 html이 어지럽게 출력이 되었네요.
 
 html tag의 기본적인 형태를 확인해보겠습니다. ![html tag](http://tutorial.techaltum.com/images/element.png)
 

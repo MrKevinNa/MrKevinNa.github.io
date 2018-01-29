@@ -27,7 +27,7 @@ library(magrittr)
 
 ![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%200.png?raw=true)
 
-**search.asp**을 클릭하면 우측에 새로운 화면이 열리는데 요청과 반응에 필요한 정보들을 확인할 수 있습니다.
+**search.asp**을 클릭하면 우측에 새로운 화면이 열리는데 요청과 응답에 필요한 정보들을 확인할 수 있습니다.
 - Request URL은 **POST** 함수에 할당할 URL입니다.
 - Request Method는 "POST"로 되어 있으니 **POST** 방식으로 요청을 해야 합니다.
 - Status Code는 "200"으로 정상입니다.
