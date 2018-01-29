@@ -28,10 +28,10 @@ Mac 사용자는 **macOS**만 선택해서 다운로드 받은 후 (별다른 �
 ``` r
 # Java 설치 경로(폴더) 설정하기 
 
-# for Windows (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)
+# for Windows (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)  
 Sys.setenv(JAVA_HOME = "C:/Program Files/Java/jre1.8.0_161/")
 
-# for Mac (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)
+# for Mac (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)  
 Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Contents/Home/jre")
 ```
 
@@ -69,11 +69,6 @@ RSelenium 실행하기
 library(RSelenium)
 library(httr)
 library(rvest)
-```
-
-    ## Loading required package: xml2
-
-``` r
 library(dplyr)
 library(stringr)
 library(magrittr)
@@ -87,92 +82,11 @@ remote <- remoteDriver(remoteServerAddr = "localhost",
 remote$open()
 ```
 
-    ## [1] "Connecting to remote server"
-    ## $applicationCacheEnabled
-    ## [1] FALSE
-    ## 
-    ## $rotatable
-    ## [1] FALSE
-    ## 
-    ## $mobileEmulationEnabled
-    ## [1] FALSE
-    ## 
-    ## $networkConnectionEnabled
-    ## [1] FALSE
-    ## 
-    ## $chrome
-    ## $chrome$chromedriverVersion
-    ## [1] "2.35.528157 (4429ca2590d6988c0745c24c8858745aaaec01ef)"
-    ## 
-    ## $chrome$userDataDir
-    ## [1] "/var/folders/j7/vm8qb29s2rl4c5zwhxg895t40000gn/T/.org.chromium.Chromium.sW8B2V"
-    ## 
-    ## 
-    ## $takesHeapSnapshot
-    ## [1] TRUE
-    ## 
-    ## $pageLoadStrategy
-    ## [1] "normal"
-    ## 
-    ## $databaseEnabled
-    ## [1] FALSE
-    ## 
-    ## $handlesAlerts
-    ## [1] TRUE
-    ## 
-    ## $hasTouchScreen
-    ## [1] FALSE
-    ## 
-    ## $version
-    ## [1] "63.0.3239.132"
-    ## 
-    ## $platform
-    ## [1] "Mac OS X"
-    ## 
-    ## $browserConnectionEnabled
-    ## [1] FALSE
-    ## 
-    ## $nativeEvents
-    ## [1] TRUE
-    ## 
-    ## $acceptSslCerts
-    ## [1] FALSE
-    ## 
-    ## $acceptInsecureCerts
-    ## [1] FALSE
-    ## 
-    ## $locationContextEnabled
-    ## [1] TRUE
-    ## 
-    ## $webStorageEnabled
-    ## [1] TRUE
-    ## 
-    ## $browserName
-    ## [1] "chrome"
-    ## 
-    ## $takesScreenshot
-    ## [1] TRUE
-    ## 
-    ## $javascriptEnabled
-    ## [1] TRUE
-    ## 
-    ## $cssSelectorsEnabled
-    ## [1] TRUE
-    ## 
-    ## $setWindowRect
-    ## [1] TRUE
-    ## 
-    ## $unexpectedAlertBehaviour
-    ## [1] ""
-    ## 
-    ## $id
-    ## [1] "76c34718454b9abd4fb73f284e776883"
-
 그리고나서 우리가 원하는 웹사이트에 접속해보겠습니다.
 
 ``` r
 # 리모트 브라우저에서 웹사이트 접속하기
-remote$navigate("http://naver.com")
+remote$navigate("http://www.naver.com")
 ```
 
 신기하게 네이버가 접속됩니다. 이쯤에서 Selenium이 어떻게 작동하는지 아주 조금이나마 감을 잡았을 것이라고 생각합니다.
@@ -214,7 +128,7 @@ read_html(html) %>%
     ## 19     미국 보스니아
     ## 20        국가장학금
 
-이번에는 더욱 신기한 것을 하나 더 보여드리고 마무리하도록 하겠습니다. 바로 네이버 로그인 과정을 Seleniumd에서 실행되도록 하는 것입니다. 그러니까 로그인 창에서 자신의 ID와 PW를 입력하고 로그인 버튼을 클릭하는 것이죠.
+이번에는 더욱 신기한 것을 하나 더 보여드리고 마무리하도록 하겠습니다. 바로 네이버 로그인 과정을 Selenium에서 실행되도록 하는 것입니다. 그러니까 로그인 창에서 자신의 ID와 PW를 입력하고 로그인 버튼을 클릭하는 것이죠.
 
 이를 위해 ID 입력칸, PW 입력칸, 그리고 로그인 버튼 등 각각의 tag element에서 CSS나 Xpath를 미리 확인해야 합니다. 이제는 원하는 tag element 찾는 것쯤은 식은 죽 먹기라고 할 수 있겠죠? 크롬 개발자도구의 Elements 창에서 타겟 tag element로 이동한 후 마우스 오른쪽 버튼을 클릭하면 **Copy** 메뉴가 있습니다. 그 하위 메뉴로 **Copy selector** 또는 **Copy Xpath**를 선택하면 각각 CSS Selector 및 Xpath를 복사해올 수 있습니다.
 
