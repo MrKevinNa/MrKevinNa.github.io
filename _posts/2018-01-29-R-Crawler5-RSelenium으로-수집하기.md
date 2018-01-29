@@ -19,7 +19,7 @@ RSelenium을 실행시키려면 몇 가지 프로그램을 미리 설치해야 �
 
 ![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Webpage%20for%20JDK.png?raw=true)
 
-Windows 사용자는 자신의 컴퓨터에서 [Windows 비트수를 먼저 확인](https://support.microsoft.com/ko-kr/help/13443/windows-which-operating-system)한 후에 해당 파일을 설치하시기 바랍니다. 64비트 사용자라면 64비트만 설치하셔도 되지만 32비트도 함께 설치하는 편이 좋다고 하니 참고하시기 바랍니다.
+Windows 사용자는 자신의 컴퓨터에서 [Windows 비트수를 먼저 확인](https://support.microsoft.com/ko-kr/help/13443/windows-which-operating-system)한 후에 해당 파일을 설치하시기 바랍니다. 64비트 사용자라면 64비트만 설치해도 되지만 32비트도 함께 설치하는 편이 좋다고 하니 참고하시기 바랍니다.
 
 Mac 사용자는 **macOS**만 선택해서 다운로드 받은 후 (별다른 설정을 건드릴 필요 없이) 그냥 따라가면서 설치하면 됩니다.
 
@@ -60,7 +60,7 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Conte
 RSelenium 실행하기
 ------------------
 
-여기까지 따라오느라 고생 많았습니다. RSelenium을 이용하여 아주 간단한 예제를 하나 실행해겠습니다.
+여기까지 따라오느라 고생 많았습니다. RSelenium을 이용하여 아주 간단한 예제를 하나 실행해보겠습니다.
 
 먼저 `RSelenium` 패키지가 설치되어 있는지 확인하고, 설치되었으면 `library()`로 불러옵니다. 그리고 `remoteDriver()`를 이용하여 리모트 브라우저를 하나 띄웁니다. 아래 명령어를 실행하면 빈 크롬 브라우저가 하나 생길 것입니다.
 
