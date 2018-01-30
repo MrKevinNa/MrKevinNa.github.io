@@ -4,6 +4,7 @@
 
 # Name of your site (displayed in the header)
 name: Kevin Seongho Na
+github: [metadata]
 
 # Short bio or description (displayed in the header)
 description: Marketing Data Analyst from Seoul, Korea
@@ -68,7 +69,6 @@ kramdown:
 # Set the Sass partials directory, as we're using @imports
 sass:
   style: :compressed # You might prefer to minify using :compressed
-
 # Exclude these files from your production _site
 exclude:
   - Gemfile
