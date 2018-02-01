@@ -51,7 +51,7 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Conte
 
 [Selenium Server Standalone](http://selenium-release.storage.googleapis.com/index.html)
 
-위 링크에 들어가서 가장 최신 버전의 파일을 다운로드합니다. 오늘(2018년 1월 29일) 기준으로는 3.8 버전이 가장 최신이군요. 3.8 폴더를 클릭하면 여러 가지 파일이 보일텐데요. 그 중에서 **selenium-server-standalon-3.8.1.jar**을 다운로드하면 됩니다. 파일은 적당한 장소에 저장하면 되는데요. 저는 WebDriver라는 폴더를 만들어서 그 안에 저장했습니다. 
+위 링크에 들어가서 가장 최신 버전의 파일을 다운로드합니다. 오늘(2018년 1월 29일) 기준으로는 3.8 버전이 가장 최신이군요. 3.8 폴더를 클릭하면 여러 가지 파일이 보일텐데요. 그 중에서 **selenium-server-standalon-3.8.1.jar**을 다운로드하고 적당한 장소에 저장하면 됩니다. 저는 WebDriver라는 폴더를 만들어서 그 안에 저장했습니다. 
 
 #### Chrome Driver 설치
 
