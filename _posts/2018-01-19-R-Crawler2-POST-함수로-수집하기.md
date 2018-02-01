@@ -52,6 +52,7 @@ library(magrittr)
 이번 예제에서 우리가 수집하려고 하는 웹페이지도 **EUC-KR** 방식을 사용하고 있습니다. 우리는 RStudio의 Global Options에서 기본 인코딩을 **UTF-8**으로 설정한 바 있습니다. 현재 R 환경에서 문자열을 인식하는 인코딩 방식을 확인해보겠습니다.
 
 ``` r
+# 인코딩 방식 확인
 localeToCharset()
 ```
 
@@ -62,6 +63,7 @@ localeToCharset()
 그럼 특정 문자열의 인코딩 방식을 확인해보겠습니다. `Encoding("문자열")` 함수를 이용합니다.
 
 ``` r
+# 문자열의 인코딩 확인
 Encoding("추천맛집")
 ```
 
@@ -72,6 +74,7 @@ Encoding("추천맛집")
 문제는 웹페이지가 **EUC-KR** 방식을 사용하고 있으므로 POST 함수의 인자로 한글을 입력할 때 **EUC-KR** 또는 **CP949**로 되어 있어야 한다는 것입니다. 특정 문자열의 인코딩 변경은 `iconv` 함수를 사용합니다.
 
 ``` r
+# 문자열의 인코딩 방식 변환
 iconv(x = "추천맛집", from = "UTF-8", to = "CP949")
 ```
 
@@ -97,6 +100,7 @@ dong <- iconv(x = "여의도동", from = "UTF-8", to = "CP949")
 **I** 함수는 이중 인코딩(double encoding)을 막기 위해 사용하는 것인데요. httr 패키지는 문자에 대해 URL 인코딩(escape이라고도 함)을 자동으로 해주는데, 문제는 "EUC-KR"인 경우 에러가 발생합니다. 대신에 웹페이지가 "UTF-8" 방식을 사용하고 있는 경우는 **I** 함수를 사용하지 않아도 된다고 합니다. (도움을 주신 분들께 감사드립니다. ^^)
 
 ``` r
+# html request
 resp <- POST(url = url, 
              encode = "form",
              body = list(searchWord = I(keyword),
@@ -107,9 +111,10 @@ resp <- POST(url = url,
 )
 ```
 
-resp의 상태코드를 확인해보겠습니다. 200이면 정상입니다.
+resp의 응답 상태코드를 확인해보겠습니다. 200이면 정상입니다.
 
 ``` r
+# 응답 상태코드 확인
 status_code(resp)
 ```
 
@@ -201,6 +206,7 @@ sInfo는 10개 상호에 해당하는 정보가 반복되고 있음을 알 수 �
 - 도로명주소 : 4, 8, 12와 같이 4로 나누어 나머지가 0인 위치에 있는 데이터
 
 ``` r
+# 기타 정보 벡터로 정리
 phone <- sInfo[(0:9) * 4 + 1]
 jibun <- sInfo[(0:9) * 4 + 2]
 roadn <- sInfo[(0:9) * 4 + 4]
@@ -209,6 +215,7 @@ roadn <- sInfo[(0:9) * 4 + 4]
 마지막으로 지금까지 수집한 벡터들로 데이터 프레임을 만듭니다.
 
 ``` r
+# 최종 데이터 프레임 생성
 result <- data.frame(shopn = shopn,
                      phone = phone,
                      jibun = jibun,
