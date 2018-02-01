@@ -39,13 +39,13 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Conte
 
 [Selenium Server Standalone](http://selenium-release.storage.googleapis.com/index.html)
 
-위 링크에 들어가서 가장 최신 버전의 파일을 다운로드합니다. 오늘(2018년 1월 29일) 기준으로는 3.8 버전이 가장 최신이군요. 3.8 폴더를 클릭하면 여러 가지 파일이 보일텐데요. 그 중에서 **selenium-server-standalon-3.8.1.jar**을 다운로드하면 됩니다. 파일은 적당한 장소에 저장하면 되는데요. 저는 WebDriver라는 폴더를 만들어서 그 안에 저장했습니다.
+위 링크에 들어가서 가장 최신 버전의 파일을 다운로드합니다. 오늘(2018년 1월 29일) 기준으로는 3.8 버전이 가장 최신이군요. 3.8 폴더를 클릭하면 여러 가지 파일이 보일텐데요. 그 중에서 **selenium-server-standalon-3.8.1.jar**을 다운로드하고 적당한 장소에 저장하면 됩니다. 저는 WebDriver라는 폴더를 만들어서 그 안에 저장했습니다.
 
 #### Chrome Driver 설치
 
 [Chrome Driver](https://sites.google.com/a/chromium.org/chromedriver/)
 
-마지막으로 Chrome Driver을 설치합니다. 역시 위 링크에 들어가면 최신 버전을 확인할 수 있습니다. 오늘 기준으로는 2.35가 가장 최신 버번입니다. 바로 아래 Downloads를 클릭한 후 원하는 버전을 선택하면 운영체제별로 zip 파일이 저장되어 있습니다. 압축을 해제하면 **chromedriver** 파일이 남습니다. 각자 맞는 파일을 선택해서 저장하도록 합니다. 저는 WebDriver라는 폴더에 옮겨 압축을 해제했습니다.
+마지막으로 Chrome Driver을 설치합니다. 역시 위 링크에 들어가면 최신 버전을 확인할 수 있습니다. 오늘 기준으로는 2.35가 가장 최신 버전입니다. 바로 아래 Downloads를 클릭한 후 원하는 버전을 선택하면 운영체제별로 zip 파일이 저장되어 있습니다. 압축을 해제하면 **chromedriver** 파일이 남습니다. 각자 맞는 파일을 선택해서 저장하도록 합니다. 저는 WebDriver라는 폴더에 옮겨 압축을 해제했습니다.
 
 ### Selenium Server 수동으로 실행
 
