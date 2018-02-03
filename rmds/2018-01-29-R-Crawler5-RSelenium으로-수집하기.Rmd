@@ -77,7 +77,7 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Conte
 
 먼저 `RSelenium` 패키지가 설치되어 있는지 확인하고, 설치되었으면 `library()`로 불러옵니다. 그리고 `remoteDriver()`를 이용하여 리모트 브라우저를 하나 띄웁니다. 아래 명령어를 실행하면 빈 크롬 브라우저가 하나 생길 것입니다. 
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, results=FALSE}
 # 필수 패키지 불러오기
 library(RSelenium)
 library(httr)

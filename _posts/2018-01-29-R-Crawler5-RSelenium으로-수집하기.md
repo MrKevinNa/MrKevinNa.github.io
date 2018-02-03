@@ -84,87 +84,6 @@ remote <- remoteDriver(remoteServerAddr = "localhost",
 remote$open()
 ```
 
-    ## [1] "Connecting to remote server"
-    ## $applicationCacheEnabled
-    ## [1] FALSE
-    ## 
-    ## $rotatable
-    ## [1] FALSE
-    ## 
-    ## $mobileEmulationEnabled
-    ## [1] FALSE
-    ## 
-    ## $networkConnectionEnabled
-    ## [1] FALSE
-    ## 
-    ## $chrome
-    ## $chrome$chromedriverVersion
-    ## [1] "2.35.528157 (4429ca2590d6988c0745c24c8858745aaaec01ef)"
-    ## 
-    ## $chrome$userDataDir
-    ## [1] "/var/folders/t1/ykb3d37j2vs3dsm9db3jv_4r0000gn/T/.org.chromium.Chromium.I6845e"
-    ## 
-    ## 
-    ## $takesHeapSnapshot
-    ## [1] TRUE
-    ## 
-    ## $pageLoadStrategy
-    ## [1] "normal"
-    ## 
-    ## $databaseEnabled
-    ## [1] FALSE
-    ## 
-    ## $handlesAlerts
-    ## [1] TRUE
-    ## 
-    ## $hasTouchScreen
-    ## [1] FALSE
-    ## 
-    ## $version
-    ## [1] "63.0.3239.132"
-    ## 
-    ## $platform
-    ## [1] "Mac OS X"
-    ## 
-    ## $browserConnectionEnabled
-    ## [1] FALSE
-    ## 
-    ## $nativeEvents
-    ## [1] TRUE
-    ## 
-    ## $acceptSslCerts
-    ## [1] FALSE
-    ## 
-    ## $acceptInsecureCerts
-    ## [1] FALSE
-    ## 
-    ## $locationContextEnabled
-    ## [1] TRUE
-    ## 
-    ## $webStorageEnabled
-    ## [1] TRUE
-    ## 
-    ## $browserName
-    ## [1] "chrome"
-    ## 
-    ## $takesScreenshot
-    ## [1] TRUE
-    ## 
-    ## $javascriptEnabled
-    ## [1] TRUE
-    ## 
-    ## $cssSelectorsEnabled
-    ## [1] TRUE
-    ## 
-    ## $setWindowRect
-    ## [1] TRUE
-    ## 
-    ## $unexpectedAlertBehaviour
-    ## [1] ""
-    ## 
-    ## $id
-    ## [1] "5fb385631ffe9804af2c42b0159ceb32"
-
 그리고나서 우리가 원하는 웹사이트에 접속해보겠습니다.
 
 ``` r
@@ -191,25 +110,25 @@ read_html(html) %>%
 
     ##              searchWords
     ## 1            레이버 데이
-    ## 2     한국사능력검정시험
-    ## 3       신촌세브란스병원
-    ## 4  신촌세브란스병원 화재
-    ## 5                 미스티
-    ## 6                   태양
+    ## 2        미워도 다시한번
+    ## 3     한국사능력검정시험
+    ## 4       신촌세브란스병원
+    ## 5  신촌세브란스병원 화재
+    ## 6                 미스티
     ## 7                 민효린
     ## 8                 오민석
-    ## 9               영화순위
-    ## 10              메가박스
-    ## 11                   nba
-    ## 12            나혼자산다
-    ## 13                  영화
-    ## 14            롯데시네마
-    ## 15  한국세무사회자격시험
-    ## 16              신과함께
-    ## 17                  코코
-    ## 18                  돈꽃
-    ## 19              오버워치
-    ## 20       그것이 알고싶다
+    ## 9    한국사 검정능력시험
+    ## 10                   nba
+    ## 11              메가박스
+    ## 12              영화순위
+    ## 13            나혼자산다
+    ## 14              신과함께
+    ## 15                  영화
+    ## 16            롯데시네마
+    ## 17              오버워치
+    ## 18              윤식당 2
+    ## 19                  돈꽃
+    ## 20  한국세무사회자격시험
 
 이번에는 더욱 신기한 것을 하나 더 보여드리고 마무리하도록 하겠습니다. 바로 네이버 로그인 과정을 Selenium에서 실행되도록 하는 것입니다. 그러니까 로그인 창에서 자신의 ID와 PW를 입력하고 로그인 버튼을 클릭하는 것이죠.
 
