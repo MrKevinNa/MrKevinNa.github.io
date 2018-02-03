@@ -17,9 +17,9 @@ RSelenium을 실행시키려면 몇 가지 프로그램을 미리 설치해야 �
 
 위 링크를 따라 들어가면 아래 그림과 같이 웹페이지가 보입니다. JDK는 여러 버전이 있지만 이번에는 "8u161" 버전을 설치해보도록 하겠습니다. 아래 그림에서 **Accept License Agreement**를 체크한 후 각자 자신의 버전에 맞는 파일을 선택합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Webpage%20for%20JDK.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/RSelenium/Webpage%20for%20JDK.png?raw=true)
 
-Windows 사용자는 자신의 컴퓨터에서 [Windows 비트수를 먼저 확인](https://support.microsoft.com/ko-kr/help/13443/windows-which-operating-system)한 후에 해당 파일을 설치하시기 바랍니다. 64비트 사용자라면 64비트만 설치해도 되지만 32비트도 함께 설치하는 편이 좋다고 하니 참고하시기 바랍니다.
+Windows 사용자는 자신의 컴퓨터에서 [Windows 비트수를 먼저 확인](https://support.microsoft.com/ko-kr/help/13443/windows-which-operating-system)한 후에 해당 파일을 설치하시기 바랍니다. 64비트 사용자라면 64비트만 설치하셔도 되지만 32비트도 함께 설치하는 편이 좋다고 하니 참고하시기 바랍니다.
 
 Mac 사용자는 **macOS**만 선택해서 다운로드 받은 후 (별다른 설정을 건드릴 필요 없이) 그냥 따라가면서 설치하면 됩니다.
 
@@ -28,10 +28,10 @@ Mac 사용자는 **macOS**만 선택해서 다운로드 받은 후 (별다른 �
 ``` r
 # Java 설치 경로(폴더) 설정하기 
 
-# for Windows (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)  
+# for Windows (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)
 Sys.setenv(JAVA_HOME = "C:/Program Files/Java/jre1.8.0_161/")
 
-# for Mac (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)  
+# for Mac (아래 경로는 예시이므로 자신의 컴퓨터에서 확인하시기 바랍니다!)
 Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Contents/Home/jre")
 ```
 
@@ -45,24 +45,24 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_161.jdk/Conte
 
 [Chrome Driver](https://sites.google.com/a/chromium.org/chromedriver/)
 
-마지막으로 Chrome Driver을 설치합니다. 역시 위 링크에 들어가면 최신 버전을 확인할 수 있습니다. 오늘 기준으로는 2.35가 가장 최신 버전입니다. 바로 아래 Downloads를 클릭한 후 원하는 버전을 선택하면 운영체제별로 zip 파일이 저장되어 있습니다. 압축을 해제하면 **chromedriver** 파일이 남습니다. 각자 맞는 파일을 선택해서 저장하도록 합니다. 저는 WebDriver라는 폴더에 옮겨 압축을 해제했습니다.
+마지막으로 Chrome Driver을 설치합니다. 역시 위 링크에 들어가면 최신 버전을 확인할 수 있습니다. 오늘 기준으로는 2.35가 가장 최신 버번입니다. 바로 아래 Downloads를 클릭한 후 원하는 버전을 선택하면 운영체제별로 zip 파일이 저장되어 있습니다. 압축을 해제하면 **chromedriver** 파일이 남습니다. 각자 맞는 파일을 선택해서 저장하도록 합니다. 저는 WebDriver라는 폴더에 옮겨 압축을 해제했습니다.
 
 ### Selenium Server 수동으로 실행
 
 이제 위에서 설치한 프로그램을 미리 실행시켜야 합니다. Windows 사용자는 **cmd**에서, Mac 사용자는 **terminal**에서 실행시키면 됩니다. 운영체제별로 cmd나 terminal을 열고 Chrome Driver가 설치된 폴더로 이동한 다음 아래와 같이 명령어를 실행합니다. `x.x.x`부분은 selenium server standalone version을 입력합니다.
 
--   Mac 사용자 (terminal에서 아래 명령 실행)  
-`java -Dwebdriver.chrome.driver="chromedriver" -jar selenium-server-standalone-x.x.x.jar -port 4445`
+-   Mac 사용자 (terminal에서 아래 명령 실행)
+    `java -Dwebdriver.chrome.driver="chromedriver" -jar selenium-server-standalone-x.x.x.jar -port 4445`
 
--   Windows 사용자 (cmd에서 아래 명령 실행)  
-`java -Dwebdriver.chrome.driver="chromedriver.exe" -jar selenium-server-standalone-x.x.x.jar -port 4445`
+-   Windows 사용자 (cmd에서 아래 명령 실행)
+    `java -Dwebdriver.chrome.driver="chromedriver.exe" -jar selenium-server-standalone-x.x.x.jar -port 4445`
 
 위 명령을 실행시켰을 때 로그 맨 아래에 `INFO - Selenium Server is up and running`이라고 뜨면 정상적으로 실행되고 있는 것입니다. 축하합니다!
 
 RSelenium 실행하기
 ------------------
 
-여기까지 따라오느라 고생 많았습니다. RSelenium을 이용하여 아주 간단한 예제를 하나 실행해보겠습니다.
+여기까지 따라오느라 고생 많았습니다. RSelenium을 이용하여 아주 간단한 예제를 하나 실행해겠습니다.
 
 먼저 `RSelenium` 패키지가 설치되어 있는지 확인하고, 설치되었으면 `library()`로 불러옵니다. 그리고 `remoteDriver()`를 이용하여 리모트 브라우저를 하나 띄웁니다. 아래 명령어를 실행하면 빈 크롬 브라우저가 하나 생길 것입니다.
 
@@ -84,11 +84,92 @@ remote <- remoteDriver(remoteServerAddr = "localhost",
 remote$open()
 ```
 
+    ## [1] "Connecting to remote server"
+    ## $applicationCacheEnabled
+    ## [1] FALSE
+    ## 
+    ## $rotatable
+    ## [1] FALSE
+    ## 
+    ## $mobileEmulationEnabled
+    ## [1] FALSE
+    ## 
+    ## $networkConnectionEnabled
+    ## [1] FALSE
+    ## 
+    ## $chrome
+    ## $chrome$chromedriverVersion
+    ## [1] "2.35.528157 (4429ca2590d6988c0745c24c8858745aaaec01ef)"
+    ## 
+    ## $chrome$userDataDir
+    ## [1] "/var/folders/t1/ykb3d37j2vs3dsm9db3jv_4r0000gn/T/.org.chromium.Chromium.I6845e"
+    ## 
+    ## 
+    ## $takesHeapSnapshot
+    ## [1] TRUE
+    ## 
+    ## $pageLoadStrategy
+    ## [1] "normal"
+    ## 
+    ## $databaseEnabled
+    ## [1] FALSE
+    ## 
+    ## $handlesAlerts
+    ## [1] TRUE
+    ## 
+    ## $hasTouchScreen
+    ## [1] FALSE
+    ## 
+    ## $version
+    ## [1] "63.0.3239.132"
+    ## 
+    ## $platform
+    ## [1] "Mac OS X"
+    ## 
+    ## $browserConnectionEnabled
+    ## [1] FALSE
+    ## 
+    ## $nativeEvents
+    ## [1] TRUE
+    ## 
+    ## $acceptSslCerts
+    ## [1] FALSE
+    ## 
+    ## $acceptInsecureCerts
+    ## [1] FALSE
+    ## 
+    ## $locationContextEnabled
+    ## [1] TRUE
+    ## 
+    ## $webStorageEnabled
+    ## [1] TRUE
+    ## 
+    ## $browserName
+    ## [1] "chrome"
+    ## 
+    ## $takesScreenshot
+    ## [1] TRUE
+    ## 
+    ## $javascriptEnabled
+    ## [1] TRUE
+    ## 
+    ## $cssSelectorsEnabled
+    ## [1] TRUE
+    ## 
+    ## $setWindowRect
+    ## [1] TRUE
+    ## 
+    ## $unexpectedAlertBehaviour
+    ## [1] ""
+    ## 
+    ## $id
+    ## [1] "5fb385631ffe9804af2c42b0159ceb32"
+
 그리고나서 우리가 원하는 웹사이트에 접속해보겠습니다.
 
 ``` r
 # 리모트 브라우저에서 웹사이트 접속하기
-remote$navigate("http://www.naver.com")
+remote$navigate("http://naver.com")
 ```
 
 신기하게 네이버가 접속됩니다. 이쯤에서 Selenium이 어떻게 작동하는지 아주 조금이나마 감을 잡았을 것이라고 생각합니다.
@@ -108,27 +189,27 @@ read_html(html) %>%
   set_colnames("searchWords")
 ```
 
-    ##          searchWords
-    ## 1             김의겸
-    ## 2             손연재
-    ## 3             안미나
-    ## 4             박수현
-    ## 5  제네시스 g80 디젤
-    ## 6               염력
-    ## 7           갤럭시s9
-    ## 8             케이팝
-    ## 9             쎄쎄쎄
-    ## 10     청와대 대변인
-    ## 11            서현진
-    ## 12            리한나
-    ## 13          무한도전
-    ## 14       가려진 시간
-    ## 15               hot
-    ## 16            스윙스
-    ## 17            슈가맨
-    ## 18       영화 환절기
-    ## 19     미국 보스니아
-    ## 20        국가장학금
+    ##              searchWords
+    ## 1            레이버 데이
+    ## 2     한국사능력검정시험
+    ## 3       신촌세브란스병원
+    ## 4  신촌세브란스병원 화재
+    ## 5                 미스티
+    ## 6                   태양
+    ## 7                 민효린
+    ## 8                 오민석
+    ## 9               영화순위
+    ## 10              메가박스
+    ## 11                   nba
+    ## 12            나혼자산다
+    ## 13                  영화
+    ## 14            롯데시네마
+    ## 15  한국세무사회자격시험
+    ## 16              신과함께
+    ## 17                  코코
+    ## 18                  돈꽃
+    ## 19              오버워치
+    ## 20       그것이 알고싶다
 
 이번에는 더욱 신기한 것을 하나 더 보여드리고 마무리하도록 하겠습니다. 바로 네이버 로그인 과정을 Selenium에서 실행되도록 하는 것입니다. 그러니까 로그인 창에서 자신의 ID와 PW를 입력하고 로그인 버튼을 클릭하는 것이죠.
 
