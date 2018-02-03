@@ -29,31 +29,31 @@ Open API가 무료로 제공된다고 해도 **일별 호출수**를 제한하�
 
 1. 공공데이터 포털 메인화면 상단 검색창에 **나라장터**를 입력합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/공공데이터포털_메인화면.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/공공데이터포털_메인화면.png?raw=true)
 
 1. 검색 결과에서 검색창 바로 아래 전체, 파일데이터, 오픈API, 표준데이터 메뉴가 보일 것입니다. 이 중에서 **오픈API**를 선택하고 아래 목록에서 **조달청_낙찰정보**를 클릭합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_OpenAPI_리스트.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_OpenAPI_리스트.png?raw=true)
 
 1. 조달청_낙찰정보 상세화면이 열리면 아래 그림에서 보이는 것처럼 **활용신청**을 클릭합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_낙찰정보_API.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_낙찰정보_API.png?raw=true)
 
 1. 개발계정 신청화면으로 이동하면, 나머지 항목은 그대로 둔 채 화면 아래쪽에 있는 **상세기능정보**로 이동하여 상세기능 중 필요한 항목을 선택합니다. 모두 선택해도 됩니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_낙찰정보_API_Key_신청1.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_낙찰정보_API_Key_신청1.png?raw=true)
 
 1. 상세기능을 다 선택했다면 **라이센스표시**에서 **동의합니다**를 선택한 후, **신청**버튼을 클릭합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_낙찰정보_API_Key_신청2.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_낙찰정보_API_Key_신청2.png?raw=true)
 
 1. 위 과정을 모두 거치면 아래 이미지와 같이 개발계정 신청이 완료됩니다. 웹페이지 가운데에 확인창을 클릭하면 **마이페이지 > 개발계정** 화면으로 이동하여 (이미 승인받은 다른 항목이 있다면) 승인받은 목록을 한 번에 확인할 수 있습니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_낙찰정보_API_Key_신청3.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_낙찰정보_API_Key_신청3.png?raw=true)
 
 1. **마이페이지 > 개발계정**에서 방금 신청한 **나라장터 낙찰정보서비스**를 클릭하면 **개발계정 상세보기** 화면으로 이동하는데, 여기에서 **인증키**를 확인할 수 있습니다. 나중에 데이터를 요청할 때 사용해야 하므로 복사한 다음 R에서 적당한 객체명을 붙여 할당해놓습니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_낙찰정보_API_Key_확인.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_낙찰정보_API_Key_확인.png?raw=true)
 
 한 가지 중요한 것은, 위 이미지에서 **참고문서**를 잘 읽어봐야 한다는 것입니다. 일단은 적당한 폴더에 저장합니다. 나중에 따로 설명하도록 하겠습니다.
 
@@ -123,7 +123,7 @@ cat(url)
 
 각자의 인증키를 넣은 url을 조립했으면 출력된 결과를 복사해서 웹브라우저 주소창에 붙여넣기 해보겠습니다. 그러면 아래와 같은 이미지가 보일 것입니다. 이 형태가 **XML**입니다. XML은 HTML과 비슷해보이지만 사용자 입장에서는 필요한 데이터만 군더더기 없이 깔끔하게 제공되기 때문에 HTML보다 다루기 쉽다는 장점이 있습니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/조달청_나라장터_낙찰정보_XML_예시.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Open_API/조달청_나라장터_낙찰정보_XML_예시.png?raw=true)
 
 위 이미지의 맨 아래를 보면 전체 건수가 4,513건임을 알 수 있습니다. 그리고 현재 2건의 데이터가 화면에 보이며, 그 2건은 `<item>` 태그로 묶여서 각각 18개의 세부 항목이 제공되고 있습니다.
 
