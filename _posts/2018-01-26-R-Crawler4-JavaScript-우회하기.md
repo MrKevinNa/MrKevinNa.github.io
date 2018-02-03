@@ -41,19 +41,19 @@ library(stringr)
 
 저도 잘 모르는 걸 설명하려니 어렵네요. 아무튼 다시 크롬 개발자도구의 **Network** 탭으로 돌아가서, 세 번째 줄 메뉴에 있는 **XHR**로 이동하면 첫 번째 그림처럼 보일 것입니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%206.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%206.png?raw=true)
 
 이제 새로고침을 하면 두 번째 그림처럼 몇 가지 항목이 생성되는데 중간에 **AJAX**가 있고 **POST()** 방식으로 요청한다는 것을 확인할 수 있습니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%207.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%207.png?raw=true)
 
 그리고 **AJAX**를 선택하면 오른쪽에서 Request와 Response에 관한 세부사항을 확인할 수 있는데요. **General**에서 **Request URL**을 복사하여 `POST()`의 `url`인자에 할당합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%209.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%209.png?raw=true)
 
 그리고 나서 **Form Data**가 보일 때까지 화면을 아래로 내린 다음 인자명과 인자값을 복사해서 `POST()`의 `body`인자에 리스트 형태로 할당해주면 됩니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%208.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%208.png?raw=true)
 
 ``` r
 # HTML 요청하기
@@ -330,7 +330,6 @@ write.xlsx(x = hitterStat,
 ```
 
 이상으로 JavaScript를 우회하여 웹데이터를 수집하는 방법에 대해 알아봤습니다. 다음 포스트는 이번에 저장한 데이터를 가지고 여러 가지 그래프를 그려봄으로써 다양한 인사이트를 얻는 탐색적 데이터 분석(EDA)에 대해서 정리해보겠습니다.
-
 
 [1] XHR에 대한 자세한 내용은 [여기](https://developer.mozilla.org/ko/docs/Glossary/XHR_(XMLHttpRequest))를 확인해보시기 바랍니다
 
