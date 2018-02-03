@@ -11,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![MLR logo](https://github.com/MrKevinNa/MLwR/blob/master/image/MLwR%20logo.png?raw=true)
+![MLR logo]({{ "/image/MLwR%20logo.png" }})
 
 ## 개요
 
