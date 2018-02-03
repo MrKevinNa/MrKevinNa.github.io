@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, out.width = '750px', dpi = 300)
 
 ## R로 웹데이터 수집하기
 먼저 우리가 인터넷 페이지를 검색하는 방식을 떠올려봅시다!  
-![웹페이지 접속하기](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)
+![웹페이지 접속하기](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)^[참조 : https://ruslanspivak.com/lsbaws-part1/]
 
 위와 같이 웹브라우저에 url을 입력하는 행위를 통해 **HTTP Request**를 던지면 웹서버로부터 **HTTP Response**를 받아 웹브라우저에 **HTML을 Rendering** 해줍니다.
 
@@ -56,7 +56,7 @@ content(x = resp, as = 'text')
 상태코드가 200이라 정상적으로 "응답(Response)"하였습니다. 그리고 html이 어지럽게 출력이 되었네요. 
 
 html tag의 기본적인 형태를 확인해보겠습니다. 
-![html tag](http://tutorial.techaltum.com/images/element.png)
+![html tag](http://tutorial.techaltum.com/images/element.png)^[참조 : http://tutorial.techaltum.com/htmlTags.html]
 
 ### tag를 다루는 기본 함수들
 1. read_html(x, encoding) : resp에 있는 html을 읽습니다. 이 때 encoding = "UTF-8"을 추가합니다.

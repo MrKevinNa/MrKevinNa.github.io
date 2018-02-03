@@ -2,7 +2,7 @@ R로 웹데이터 수집하기
 ---------------------
 
 먼저 우리가 인터넷 페이지를 검색하는 방식을 떠올려봅시다!
-![](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)
+![웹페이지 접속하기](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)[1]
 
 위와 같이 웹브라우저에 url을 입력하는 행위를 통해 **HTTP Request**를 던지면 웹서버로부터 **HTTP Response**를 받아 웹브라우저에 **HTML을 Rendering** 해줍니다.
 
@@ -25,12 +25,8 @@ library(magrittr)
 
 ### html을 가져오는 순서
 
-네이버에서 제공되고 있는 실시간 검색어를 가져오는 간단한 예로 시작을 해보겠습니다.
-1.  네이버에 접속해서 url을 확인합니다.
-2.  httr 패키지의 GET 함수 인자로 url을 할당해줍니다.
-3.  위 과정에서 가져온 response의 상태와 html의 구조를 텍스트로 확인합니다.
-    -   상태를 확인하려면 status\_code 함수를 사용합니다. (200이면 정상!)
-    -   html의 구조를 출력하려면 content 함수를 사용합니다.
+네이버에서 제공되고 있는 실시간 검색어를 가져오는 간단한 예로 시작을 해보겠습니다. 1. 네이버에 접속해서 url을 확인합니다. 1. httr 패키지의 GET 함수 인자로 url을 할당해줍니다. 1. 위 과정에서 가져온 response의 상태와 html의 구조를 텍스트로 확인합니다.
+- 상태를 확인하려면 status\_code 함수를 사용합니다. (200이면 정상!) - html의 구조를 출력하려면 content 함수를 사용합니다.
 
 ``` r
 url <- "https://www.naver.com"
@@ -47,7 +43,7 @@ content(x = resp, as = 'text')
 
 상태코드가 200이라 정상적으로 "응답(Response)"하였습니다. 그리고 html이 어지럽게 출력이 되었네요.
 
-html tag의 기본적인 형태를 확인해보겠습니다. ![html tag](http://tutorial.techaltum.com/images/element.png)
+html tag의 기본적인 형태를 확인해보겠습니다. ![html tag](http://tutorial.techaltum.com/images/element.png)[2]
 
 ### tag를 다루는 기본 함수들
 
@@ -74,26 +70,26 @@ print(items)
 ```
 
     ## {xml_nodeset (40)}
-    ##  [1] <span class="ah_k">이하율</span>
-    ##  [2] <span class="ah_k">김희중</span>
-    ##  [3] <span class="ah_k">셀럽파이브</span>
-    ##  [4] <span class="ah_k">고원희</span>
-    ##  [5] <span class="ah_k">정준영</span>
-    ##  [6] <span class="ah_k">슬기로운 감빵생활 마지막회</span>
-    ##  [7] <span class="ah_k">금호타이어</span>
-    ##  [8] <span class="ah_k">마더</span>
-    ##  [9] <span class="ah_k">정현</span>
-    ## [10] <span class="ah_k">선미</span>
-    ## [11] <span class="ah_k">멜론티켓</span>
-    ## [12] <span class="ah_k">김두한</span>
-    ## [13] <span class="ah_k">리턴</span>
-    ## [14] <span class="ah_k">아바타</span>
-    ## [15] <span class="ah_k">역린</span>
-    ## [16] <span class="ah_k">셀레나고메즈</span>
-    ## [17] <span class="ah_k">저스틴비버</span>
-    ## [18] <span class="ah_k">백원우</span>
-    ## [19] <span class="ah_k">김이나</span>
-    ## [20] <span class="ah_k">엠카운트다운</span>
+    ##  [1] <span class="ah_k">신촌세브란스병원</span>
+    ##  [2] <span class="ah_k">신촌세브란스병원 화재</span>
+    ##  [3] <span class="ah_k">제주공항</span>
+    ##  [4] <span class="ah_k">조선명탐정 3</span>
+    ##  [5] <span class="ah_k">민효린</span>
+    ##  [6] <span class="ah_k">미스티</span>
+    ##  [7] <span class="ah_k">오민석</span>
+    ##  [8] <span class="ah_k">영화순위</span>
+    ##  [9] <span class="ah_k">nba</span>
+    ## [10] <span class="ah_k">오버워치 리그</span>
+    ## [11] <span class="ah_k">롯데시네마</span>
+    ## [12] <span class="ah_k">오버워치</span>
+    ## [13] <span class="ah_k">그것이 알고싶다</span>
+    ## [14] <span class="ah_k">영화</span>
+    ## [15] <span class="ah_k">블리자드</span>
+    ## [16] <span class="ah_k">윤식당 2</span>
+    ## [17] <span class="ah_k">나혼자산다</span>
+    ## [18] <span class="ah_k">염력</span>
+    ## [19] <span class="ah_k">메가박스</span>
+    ## [20] <span class="ah_k">cgv</span>
     ## ...
 
 ``` r
@@ -102,26 +98,26 @@ searchWords <- html_text(x = items)
 print(searchWords)
 ```
 
-    ##  [1] "이하율"                     "김희중"                    
-    ##  [3] "셀럽파이브"                 "고원희"                    
-    ##  [5] "정준영"                     "슬기로운 감빵생활 마지막회"
-    ##  [7] "금호타이어"                 "마더"                      
-    ##  [9] "정현"                       "선미"                      
-    ## [11] "멜론티켓"                   "김두한"                    
-    ## [13] "리턴"                       "아바타"                    
-    ## [15] "역린"                       "셀레나고메즈"              
-    ## [17] "저스틴비버"                 "백원우"                    
-    ## [19] "김이나"                     "엠카운트다운"              
-    ## [21] "이하율"                     "김희중"                    
-    ## [23] "셀럽파이브"                 "고원희"                    
-    ## [25] "정준영"                     "슬기로운 감빵생활 마지막회"
-    ## [27] "금호타이어"                 "마더"                      
-    ## [29] "정현"                       "선미"                      
-    ## [31] "멜론티켓"                   "김두한"                    
-    ## [33] "리턴"                       "아바타"                    
-    ## [35] "역린"                       "셀레나고메즈"              
-    ## [37] "저스틴비버"                 "백원우"                    
-    ## [39] "김이나"                     "엠카운트다운"
+    ##  [1] "신촌세브란스병원"      "신촌세브란스병원 화재"
+    ##  [3] "제주공항"              "조선명탐정 3"         
+    ##  [5] "민효린"                "미스티"               
+    ##  [7] "오민석"                "영화순위"             
+    ##  [9] "nba"                   "오버워치 리그"        
+    ## [11] "롯데시네마"            "오버워치"             
+    ## [13] "그것이 알고싶다"       "영화"                 
+    ## [15] "블리자드"              "윤식당 2"             
+    ## [17] "나혼자산다"            "염력"                 
+    ## [19] "메가박스"              "cgv"                  
+    ## [21] "신촌세브란스병원"      "신촌세브란스병원 화재"
+    ## [23] "제주공항"              "조선명탐정 3"         
+    ## [25] "민효린"                "미스티"               
+    ## [27] "오민석"                "영화순위"             
+    ## [29] "nba"                   "오버워치 리그"        
+    ## [31] "롯데시네마"            "오버워치"             
+    ## [33] "그것이 알고싶다"       "영화"                 
+    ## [35] "블리자드"              "윤식당 2"             
+    ## [37] "나혼자산다"            "염력"                 
+    ## [39] "메가박스"              "cgv"
 
 ``` r
 # 실시간 검색어가 2번 반복되고 있으므로 상위 20개만 추출하여 데이터 프레임으로 저장
@@ -139,28 +135,32 @@ read_html(x = resp, encoding = "UTF-8") %>%
   set_colnames("searchWords")
 ```
 
-    ##                   searchWords
-    ## 1                      이하율
-    ## 2                      김희중
-    ## 3                  셀럽파이브
-    ## 4                      고원희
-    ## 5                      정준영
-    ## 6  슬기로운 감빵생활 마지막회
-    ## 7                  금호타이어
-    ## 8                        마더
-    ## 9                        정현
-    ## 10                       선미
-    ## 11                   멜론티켓
-    ## 12                     김두한
-    ## 13                       리턴
-    ## 14                     아바타
-    ## 15                       역린
-    ## 16               셀레나고메즈
-    ## 17                 저스틴비버
-    ## 18                     백원우
-    ## 19                     김이나
-    ## 20               엠카운트다운
+    ##              searchWords
+    ## 1       신촌세브란스병원
+    ## 2  신촌세브란스병원 화재
+    ## 3               제주공항
+    ## 4           조선명탐정 3
+    ## 5                 민효린
+    ## 6                 미스티
+    ## 7                 오민석
+    ## 8               영화순위
+    ## 9                    nba
+    ## 10         오버워치 리그
+    ## 11            롯데시네마
+    ## 12              오버워치
+    ## 13       그것이 알고싶다
+    ## 14                  영화
+    ## 15              블리자드
+    ## 16              윤식당 2
+    ## 17            나혼자산다
+    ## 18                  염력
+    ## 19              메가박스
+    ## 20                   cgv
 
 위 코드에서 마지막에 오는 set\_colnames 함수는 magrittr 패키지에 속합니다. 이 함수를 추가하지 않으면 새로 생성된 데이터 프레임의 열이름에 '.'으로 설정됩니다.
 
 이상 GET 함수를 이용하여 "네이버 실시간 검색어"를 수집하는 방법을 알아보았습니다. 다음에는 url이 바뀌지 않아 원하는 텍스트 데이터를 수집하지 못할 때 사용하는 POST 함수에 대해서 알아보겠습니다.
+
+[1] 참조 : <https://ruslanspivak.com/lsbaws-part1/>
+
+[2] 참조 : <http://tutorial.techaltum.com/htmlTags.html>

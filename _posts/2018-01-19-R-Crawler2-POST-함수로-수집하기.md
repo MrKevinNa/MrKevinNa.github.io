@@ -19,33 +19,32 @@ library(magrittr)
 
 화면 아무 곳에서나 오른쪽 클릭을 한 후 "검사(Inspect)"를 선택하면 개발자도구가 열립니다. 개발자도구 맨 상단 메뉴 중 **Network**로 이동합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Image.png?raw=true)
+\[\]({{ '/images/Chrome\_DevTools/Chrome%20Developer%20Tools%20Image.png' }})
 
 그 상태에서 개발자도구 왼쪽 상단에서 **clear**와 **recording network log**를 클릭합니다. clear는 빈 원에 직선이 사선으로 그어저 있는 모양이고, recording network log는 회색의 원 모양입니다. recording 중일 때 빨간색으로 바뀝니다.
 
 이제 새로고침(F5) 합니다. 그러면 뭔가 바쁘게 움직이는 걸 볼 수 있습니다. 하단에 새로 생긴 목록에서 맨 처음 나오는 **search.asp**에 주목합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%200.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%200.png?raw=true)
 
 **search.asp**을 클릭하면 우측에 새로운 화면이 열리는데 요청과 응답에 필요한 정보들을 확인할 수 있습니다.
 - Request URL은 **POST** 함수에 할당할 URL입니다.
 - Request Method는 "POST"로 되어 있으니 **POST** 방식으로 요청을 해야 합니다.
 - Status Code는 "200"으로 정상입니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%201.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%201.png?raw=true)
 
 맨 아래로 이동하여 **Form Data**를 확인합니다. POST 함수로 웹페이지 정보를 수집할 때 Form Data를 리스트의 인자로 할당하기 때문에 이 정보들이 필요합니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%202.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%202.png?raw=true)
 
 그런데 한 가지 복병이 생겼습니다! **Form Data**에 일부 항목값이 `(unable to decode value)`로 되어 있습니다. 기계가 문자를 인식하게 하기 위해 **부호화(Percent-Encoding)** 해준 것을 사람이 이해할 수 있도록 **복호화(Percent-Decoding)** 해주어야 하는데, 현재 상태로는 그렇게 되지 않는 것으로 보입니다. **Form Data** 오른쪽 끝에 `view URL encoded`를 클릭하면 아래 그림처럼 알기 어려운 문자들이 보입니다. 즉, 기계가 문자를 인식할 수 있는 **(%-인코딩 된)** 상태인 것입니다.
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%203.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%203.png?raw=true)
 
 여기서 한 가지 문제가 더 있는데요. (%-인코딩은 일단 잊어버리고) 각 언어마다 기계가 인식할 수 있도록 인코딩하는 방식이 제각각이었고, 이를 통일하기 위해 국제표준이라 할 수 있는 **UTF-8**이 개발되었습니다. 웹페이지를 개발할 때 인코딩 방식으로 **UTF-8**을 쓰면 좋은데, 한국은 윈도우즈가 많이 사용되어서 그런지 윈도우즈에서 개발한 **EUC-KR** 또는 **CP949**를 사용하는 경우가 많습니다.
 
-![한글 인코딩](https://byjason.github.io/images/posts/character_encoding.png)
-- \[참조\] <https://byjason.github.io/2016-08-30/web-scraping-with-r(1)/>
+![한글 인코딩](https://byjason.github.io/images/posts/character_encoding.png)[1]
 
 위 그림에서 보면 **EUC-KR**은 **CP949**에 포함되는 부분집합임을 알 수 있으며, **UTF-8**과 교집합으로 **ASCII**가 있습니다. **ASCII**는 미국에서 알파벳과 숫자 및 주요 기호들을 1 byte로 표현한 것입니다. 따라서 어떤 인코딩 방식을 사용해도 영문과 숫자, 기호들은 멀쩡하게 보이는 것입니다.
 
@@ -252,3 +251,5 @@ print(result)
 이상으로 **POST** 함수를 이용하여 웹데이터를 수집하는 방법을 알아보았습니다. 이번 포스팅에서는 1페이지에 출력된 웹데이터 수집만 소개해드렸는데요. 조회 조건에 맞는 데이터가 많아서 2페이지로 넘어가는 경우, 모든 데이터를 수집하는 방법은 [페이지 네비게이션 활용하기](https://mrkevinna.github.io/%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%ED%99%9C%EC%9A%A9%ED%95%98%EA%B8%B0/) 포스팅을 참조하시기 바랍니다.
 
 다음에는 User-agent를 추가하여 웹크롤러가 아닌 사람이 요청(Request)하는 것처럼 보이는 방법에 대해서 간단하게 알아보겠습니다.
+
+[1] 참조 : <https://byjason.github.io/2016-08-30/web-scraping-with-r(1)/>
