@@ -11,8 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, out.width = '750px', dpi = 300)
 ```
 
-## R로 웹데이터 수집하기
-먼저 우리가 인터넷 페이지를 검색하는 방식을 떠올려봅시다!^[참조 : https://ruslanspivak.com/lsbaws-part1/]
+R을 활용하여 웹데이터를 수집하는 크롤링에 대해서 몇 번에 걸쳐 소개해드리겠습니다. 먼저 우리가 인터넷 페이지를 검색하는 방식을 떠올려봅시다. 괜찮은 이미지가 있어 이걸로 대신하겠습니다.^[참조 : https://ruslanspivak.com/lsbaws-part1/]
 
 ![웹페이지 접속하기](https://ruslanspivak.com/lsbaws-part1/LSBAWS_HTTP_request_response.png)
 

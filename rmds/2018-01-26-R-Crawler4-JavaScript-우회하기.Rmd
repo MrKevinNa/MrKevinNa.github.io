@@ -11,9 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, out.width = '750px', dpi = 300)
 ```
 
-## 왜 JavaScript가 문제인가?
-
-웹크롤링을 하다 보면 분명히 응답 상태코드가 "200"으로 정상인데 찾는 tag element가 없는 경우가 많습니다. 이런 경우, **JavaScript**를 의심해볼 수 있습니다 (사실 저는 JavaScript에 대해 1도 모릅니다).
+왜 JavaScript가 문제가 될까요? 웹크롤링을 하다 보면 분명히 응답 상태코드가 "200"으로 정상인데 찾는 tag element가 없는 경우가 많습니다. 이런 경우, **JavaScript**를 의심해볼 수 있습니다 (사실 저는 JavaScript에 대해 1도 모릅니다).
 
 HTML을 보면 중간에 `<script>` tag가 있고, 그 아래로 프로그래밍 코드가 보이는 경우가 있습니다. 만약 우리가 찾는 tag가 `<script>`에 영향을 받으면 관련 HTML이 뒤늦게 불려오기 때문에 HTML Response이 정상이어도 찾는 tag element가 포함되어 있지 않는 것입니다. (혹시 제가 잘못 기술한 부분이 있다면 피드백을 부탁 드립니다!)
 

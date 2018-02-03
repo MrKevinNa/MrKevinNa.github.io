@@ -11,9 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, out.width = '750px', dpi = 300)
 ```
 
-## 왜 User Agent를 설정해주어야 하나?
-
-몇몇 웹사이트들은 User Agent(UA)를 보고 사람이 요청하는 것이 아니라고 판단되면 제대로 응답을 하지 않습니다. 이럴 때 UA를 설정해주는 것만으로도 간단하게 해결되는 경우가 있습니다.
+왜 User Agent를 설정해주어야 할까요? 어떤 웹사이트는 HTML Request의 User Agent(UA)를 보고 사람이 요청하는 것이 아니라고 판단되면 제대로 응답을 하지 않습니다. 이럴 때 UA를 설정해주는 것만으로도 간단하게 해결되는 경우가 있습니다.
 
 크롬의 개발자도구에서 UA를 확인한 후 **GET** 함수나 **POST** 함수 인자로 추가 설정해주면 됩니다. 또는 [UserAgentString.com](http://useragentstring.com/)에서 손쉽게 확인할 수 있습니다. 
 
