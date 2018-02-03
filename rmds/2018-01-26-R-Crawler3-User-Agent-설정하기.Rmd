@@ -30,9 +30,9 @@ library(dplyr)
 
 먼저 [네이버 부동산](http://land.naver.com/)으로 접속하고, 개발자도구의 네트워크 탭으로 이동합니다. 하단에 아무런 내용이 없다면 새로고침(F5) 합니다. 그러면 하단에 여러 항목들이 생길 것입니다. 
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%204.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%204.png?raw=true)
 
-![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome%20Developer%20Tools%20Network%205.png?raw=true)
+![](https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/images/Chrome_DevTools/Chrome%20Developer%20Tools%20Network%205.png?raw=true)
 
 여기에서 가장 위에 위치한 **land.naver.com**을 클릭합니다. 그럼 오른쪽에 상세 내용이 보이는데 화면을 맨 아래로 이동하여 **Request Headers**의 **User-Agent**를 확인합니다. 바로 여기에서 보여지는 값이 이 컴퓨터로 접속할 때 서버로 전달되는 User Agent 입니다. 이 값을 복사하여 **httr** 패키지의 **user_agent()**의 인자로 할당합니다.
 
