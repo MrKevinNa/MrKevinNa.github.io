@@ -178,7 +178,7 @@ head(x = aptList, n = 10)
 aptList <- aptList[as.numeric(rownames(aptList)) %% 2 == 1, ]
 ```
 
-그리고 불필요한 컬럼(`현장확인 사진`)과 문자열(`\n`, `\t`, `네이버부동산에서 보기`)을 삭제하겠습니다.
+그리고 불필요한 컬럼(`현장확인 사진`)과 문자열(`집주인`, `\n`, `\t`, `네이버부동산에서 보기`)을 삭제하겠습니다.
 
 ``` r
 # 4번째 컬럼 삭제
@@ -186,7 +186,7 @@ aptList <- aptList[, -4]
 
 # 매물명 컬럼에서 "네이버부동산에서 보기" 지우기
 aptList$매물명 <- str_replace_all(string = aptList$매물명, 
-                               pattern = "[\n\t]+네이버부동산에서 보기",
+                               pattern = "(집주인)*[\n\t]+|네이버부동산에서 보기",
                                replacement = "")
 ```
 
