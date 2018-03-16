@@ -152,7 +152,7 @@ status_code(resp)
 # 예를 들어, 입찰공고번호(bidntceno)만 추출!
 read_xml(resp) %>% 
   xml_nodes("item") %>% 
-  xml_node("bidntceno") %>% 
+  xml_node("bidNtceNo") %>% 
   xml_text()
 ```
 
