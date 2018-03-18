@@ -180,7 +180,7 @@ x2 <- x[is.na(x) == FALSE]
 length(x2)
 
 # 두 객체의 교집합의 길이를 확인합니다. 
-identical(x = x, y = y)
+identical(x = x1, y = x2)
 
 # 만약 두 객체가 정확하게 겹친다면 교집합의 길이는 x1 또는 x2와 같게 됩니다.
 intersect(x = x1, y = x2) %>% length()
