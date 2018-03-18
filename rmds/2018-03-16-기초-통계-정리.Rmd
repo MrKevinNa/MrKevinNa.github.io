@@ -197,7 +197,7 @@ x <- rnorm(n = 1000, mean = 0, sd = 1)
 boxplot.stats(x = x)
 
 # 이상치를 NA로 변경한 후 삭제합니다. 
-x[x == boxplot.stats(x)$out] <- NA
+x[x %in% boxplot.stats(x)$out] <- NA
 x <- x[complete.cases(x)]
 length(x = x)
 ```
