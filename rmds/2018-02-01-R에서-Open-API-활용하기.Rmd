@@ -69,20 +69,20 @@ Open API가 무료로 제공된다고 해도 **일별 호출수**를 제한하�
 
 ```{r}
 # 공통부분
-main <- "http://apis.data.go.kr/1230000/ScsbidInfoService/"
+main <- 'http://apis.data.go.kr/1230000/ScsbidInfoService/'
 
-# "물품" 지정
-item <- "getScsbidListSttusThng"
+# '물품' 지정
+item <- 'getScsbidListSttusThng'
 ```
 
 ```{r eval=FALSE}
 # 인증키 (ServiceKey)
-key <- "여기에 인증키를 복사해서 붙여넣습니다"
+key <- '여기에 인증키를 복사해서 붙여넣습니다'
 ```
 
 ```{r echo=FALSE}
 # 인증키 (ServiceKey)
-key <- "e5rYGavudWWkTkvxiFH7tJlfSSDX9EczjpD1k2zvLcrt5qJjIAKkX5aNRYj8wqxapIYlJZ0XwQ4ZY%2BKNFn5TEQ%3D%3D"
+key <- 'e5rYGavudWWkTkvxiFH7tJlfSSDX9EczjpD1k2zvLcrt5qJjIAKkX5aNRYj8wqxapIYlJZ0XwQ4ZY%2BKNFn5TEQ%3D%3D'
 ```
 
 ```{r}
@@ -107,12 +107,12 @@ endDate <- 20180131
 # 각각의 요소를 묶을 때 사용되는 구분자(?, &)를 주의깊게 확인할 것!
 url <- paste0(main,
               item,
-              paste0("?ServiceKey=", key),
-              paste0("&numOfRows=", rows),
-              paste0("&pageNo=", page),
-              paste0("&inqryDiv=", inqry),
-              paste0("&inqryBgnDt=", bgnDate),
-              paste0("&inqryEndDt=", endDate)
+              paste0('?ServiceKey=', key),
+              paste0('&numOfRows=', rows),
+              paste0('&pageNo=', page),
+              paste0('&inqryDiv=', inqry),
+              paste0('&inqryBgnDt=', bgnDate),
+              paste0('&inqryEndDt=', endDate)
               )
 
 # 조립한 url 출력
@@ -149,10 +149,10 @@ status_code(resp)
 ```{r}
 # 낙찰리스트 정리하기
 # 낙찰리스트는 body > items > item의 하위 태그로 제공되고 있음
-# 예를 들어, 입찰공고번호(bidntceno)만 추출!
+# 예를 들어, 입찰공고번호(bidNtceNo)만 추출!
 read_xml(resp) %>% 
-  xml_nodes("item") %>% 
-  xml_node("bidNtceNo") %>% 
+  xml_nodes('item') %>% 
+  xml_node('bidNtceNo') %>% 
   xml_text()
 ```
 
@@ -160,7 +160,7 @@ read_xml(resp) %>%
 
 ```{r}
 # 반복되는 부분을 items 객체에 할당
-items <- read_xml(resp) %>% xml_nodes("item")
+items <- read_xml(resp) %>% xml_nodes('item')
 
 # 필요 항목만 추출하는 사용자 정의 함수 생성
 getXmlText <- function(x, var) {
@@ -173,7 +173,7 @@ getXmlText <- function(x, var) {
 
 ```{r}
 # 태그로 텍스트 데이터 얻기 예제
-입찰공고번호 <- getXmlText(items, "bidNtceNo")
+입찰공고번호 <- getXmlText(items, 'bidNtceNo')
 print(입찰공고번호)
 ```
 
@@ -182,15 +182,15 @@ print(입찰공고번호)
 ```{r}
 # 데이터 프레임으로 정리하기
 df <- data.frame(
-  공고번호 = getXmlText(items, "bidNtceNo"),
-  입찰공고명 = getXmlText(items, "bidNtceNm"),
-  참가업체수 = getXmlText(items, "prtcptCnum"),
-  낙찰업체명 = getXmlText(items, "bidwinnrNm"),
-  사업자번호 = getXmlText(items, "bidwinnrBizno"),
-  대표자명   = getXmlText(items, "bidwinnrCeoNm"),
-  업체주소   = getXmlText(items, "bidwinnrAdrs"),
-  전화번호   = getXmlText(items, "bidwinnrTelNo"),
-  낙찰금액   = getXmlText(items, "sucsfbidAmt")
+  공고번호   = getXmlText(items, 'bidNtceNo'),
+  입찰공고명 = getXmlText(items, 'bidNtceNm'),
+  참가업체수 = getXmlText(items, 'prtcptCnum'),
+  낙찰업체명 = getXmlText(items, 'bidwinnrNm'),
+  사업자번호 = getXmlText(items, 'bidwinnrBizno'),
+  대표자명   = getXmlText(items, 'bidwinnrCeoNm'),
+  업체주소   = getXmlText(items, 'bidwinnrAdrs'),
+  전화번호   = getXmlText(items, 'bidwinnrTelNo'),
+  낙찰금액   = getXmlText(items, 'sucsfbidAmt')
 )
 ```
 
@@ -203,7 +203,7 @@ df <- data.frame(
 ```{r}
 # 전체 건수 확인
 totalCnt <- read_xml(resp) %>% 
-  xml_node("totalCount") %>% 
+  xml_node('totalCount') %>% 
   xml_text() %>% 
   as.numeric()
 print(totalCnt)
@@ -230,31 +230,31 @@ for (i in 1:pages) {
   url <- paste0(
     main,
     item,
-    paste0("?ServiceKey=", key),
-    paste0("&numOfRows=", rows),
-    paste0("&pageNo=", i),
-    paste0("&inqryDiv=", inqry),
-    paste0("&inqryBgnDt=", bgnDate),
-    paste0("&inqryEndDt=", endDate)
+    paste0('?ServiceKey=', key),
+    paste0('&numOfRows=', rows),
+    paste0('&pageNo=', i),
+    paste0('&inqryDiv=', inqry),
+    paste0('&inqryBgnDt=', bgnDate),
+    paste0('&inqryEndDt=', endDate)
   )
   
   # url로 요청하기
   resp <- GET(url)
   
   # 반복되는 부분을 items 객체에 할당
-  items <- read_xml(resp) %>% xml_nodes("item")
+  items <- read_xml(resp) %>% xml_nodes('item')
   
   # 데이터 프레임으로 정리하기
   df <- data.frame(
-    공고번호   = getXmlText(items, "bidNtceNo"),
-    입찰공고명 = getXmlText(items, "bidNtceNm"),
-    참가업체수 = getXmlText(items, "prtcptCnum"),
-    낙찰업체명 = getXmlText(items, "bidwinnrNm"),
-    사업자번호 = getXmlText(items, "bidwinnrBizno"),
-    대표자명   = getXmlText(items, "bidwinnrCeoNm"),
-    업체주소   = getXmlText(items, "bidwinnrAdrs"),
-    전화번호   = getXmlText(items, "bidwinnrTelNo"),
-    낙찰금액   = getXmlText(items, "sucsfbidAmt")
+    공고번호   = getXmlText(items, 'bidNtceNo'),
+    입찰공고명 = getXmlText(items, 'bidNtceNm'),
+    참가업체수 = getXmlText(items, 'prtcptCnum'),
+    낙찰업체명 = getXmlText(items, 'bidwinnrNm'),
+    사업자번호 = getXmlText(items, 'bidwinnrBizno'),
+    대표자명   = getXmlText(items, 'bidwinnrCeoNm'),
+    업체주소   = getXmlText(items, 'bidwinnrAdrs'),
+    전화번호   = getXmlText(items, 'bidwinnrTelNo'),
+    낙찰금액   = getXmlText(items, 'sucsfbidAmt')
   )
   
   # 행 기준 추가
