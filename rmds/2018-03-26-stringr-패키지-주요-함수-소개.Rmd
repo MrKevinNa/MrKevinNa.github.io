@@ -48,7 +48,7 @@ round(x = mean(x)^2, digits = 4L)
 x %>% 
   mean() %>% 
   .^2 %>% 
-  round(digits = 2L)
+  round(digits = 4L)
 
 ```
 
