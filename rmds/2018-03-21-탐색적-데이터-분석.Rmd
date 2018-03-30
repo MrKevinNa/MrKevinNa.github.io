@@ -1,7 +1,7 @@
 ---
-title: "탐색적 데이터 분석 (EDA)"
-author: "Dr.Kevin"
-date: "3/27/2018"
+title: '탐색적 데이터 분석 (EDA)'
+author: 'Dr.Kevin'
+date: '3/27/2018'
 output: 
   md_document:
     variant: markdown_github
@@ -11,144 +11,44 @@ output:
 knitr::opts_chunk$set(echo = TRUE, out.width = '750px', dpi = 300)
 ```
 
-일반적으로 데이터 분석 모델링에 앞서 **탐색적 데이터 분석(Explorative Data Analysis)**을 수행합니다. 이 과정에서 분석하려는 데이터의 특성을 다각도로 살펴봄으로써 데이터와 좀 더 친해질 수 있습니다. 아울러 간단한 인사이트도 얻을 수 있습니다.
+일반적으로 데이터 분석 모델링에 앞서 **탐색적 데이터 분석(Explorative Data Analysis)**을 수행합니다. 이 과정에서 분석하려는 데이터를 다각도로 살펴봄으로써 데이터와 좀 더 친해질 수 있습니다. 아울러 간단한 인사이트도 얻을 수 있습니다.
 
-EDA에는 딱 정해진 과정이 없다고 합니다만, 저는 주로 관심 있는 데이터에 대해 그래프를 그려봄으로써 데이터가 어떤 형태를 띄고 있는지 살펴봅니다. 이번에는 2017년도 프로야구 타자 스탯을 가지고 간단하고 재미있는 EDA를 소개해드리고자 합니다.^[이 내용은 리비전컨설팅 전용준 대표님의 **탐색적분석R**을 사전 승인 받아 재편성한 것임을 알려드립니다.]
+EDA에는 정해진 과정이 없다고 합니다만, 저는 주로 관심 있는 데이터에 대해 그래프를 그려봄으로써 데이터가 어떤 형태를 띄고 있는지 살펴봅니다. 이번에는 2017년도 프로야구 타자 스탯을 가지고 간단하고 재미있는 EDA를 소개해드리고자 합니다.^[이 내용은 리비전컨설팅 전용준 대표님의 **탐색적분석R**을 사전 승인 받아 재편성한 것이 포함되어 있음을 알려드립니다.]
 
-## 외부 데이터 읽어오기
-
-먼저 R 외부에 저장되어 있는 `csv`, `txt`, `xlsx` 파일을 읽어오는 방법을 알아보겠습니다. R에서는 이 외에도 `SAS`나 `SPSS` 등 다양한 프로그램 데이터들도 읽어올 수 있으니 관심있는 분들은 따로 찾아보기 바랍니다. 
-
-이번 포스팅에서 사용할 데이터는 지난 [**R Crawler4 JavaScript 우회하기**](https://mrkevinna.github.io/R-Crawler4-JavaScript-%EC%9A%B0%ED%9A%8C%ED%95%98%EA%B8%B0/) 포스팅에서 수집한 `xlsx` 파일입니다. 제가 이 파일을 `csv`와 `txt` 파일로도 변환하여 저의 [GitHub](https://github.com/MrKevinNa/MrKevinNa.github.io/tree/master/rmds/data)에 올렸으니 필요하신 분은 다운로드하기 바랍니다. 
-
-### 외부 데이터 불러오기① : csv 파일
-
-`csv` 파일은 `read.csv()` 함수로 읽습니다. 주요 인자 설정은 다음과 같습니다.
-
-  - `header = TRUE` : 첫 번째 행을 컬럼명으로 인식합니다. 기본 설정이므로 생략해도 됩니다.  
-  - `sep = ','` : 데이터 구분자를 콤마(,)로 지정합니다. 기본 설정이므로 생략해도 됩니다.  
-  - `stringsAsFactors = FALSE` : TRUE로 하면, 문자열 벡터를 요인(Factor) 타입으로 불러입니다.  
-  - `fileEncoding = 'UTF-8'` : UTF-8으로 인코딩된 파일을 불러옵니다. OS에 상관없이 파일 인코딩 방식에 맞춰 불러와야 한글이 깨지지 않습니다.  
-
-그럼 파일의 인코딩 방식을 확인하는 방법을 소개해 드리겠습니다. 
-```{r}
-# csv 파일이 저장된 경로를 지정합니다. (로컬 컴퓨터에 저장되어 있는 경우도 가능!)
-filepath <- 'https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/rmds/data/2017_Baseball_hitter_stat.csv'
-
-# readr 패키지의 guess_encoding() 함수로 파일의 인코딩 방식을 확인합니다.
-readr::guess_encoding(file = filepath)
-```
-
-이 함수를 실행하면 대상 파일에서 추정되는 인코딩 방식과 그 확률을 나타냅니다. 일반적으로 확률값이 가장 큰 인코딩 방식으로 정해서 사용하면 됩니다. 실행 결과 `UTF-8`이 `100%`인 것으로 출력되었습니다. 그러므로 Windows 사용자는 반드시 `fileEncoding = 'UTF-8'`을 지정해주어야 하고 Mac 사용자는 기본 인코딩 설정이 `UTF-8`이므로 생략해도 됩니다. 만약 대상 파일의 인코딩 방식이 `EUC-KR`인 경우라면, 이번에는 반대로 Mac 사용자는 반드시 `fileEncoding = 'EUC-KR'`을 지정해주어야 하고 Windows 사용자는 생략해도 됩니다. 인코딩에 대해서 익숙하지 않으면 상당히 혼란을 헷갈리는 부분이니 이번 기회에 꼭 확인하기 바랍니다. 
+맨 처음 해야 할 일은 분석할 `xlsx` 데이터를 `read_excel()` 함수로 읽은 후 `hitters` 객체에 저장하는 것입니다. 이전 포스팅에서 설명드린 바와 같이 `read_excel()` 함수를 실행하면 티블 타입의 객체를 반환합니다. 티블은 데이터프레임의 단점을 보완하기 위해 최근에 도입된 객체 타입인데요. 티블이 가진 몇 가지 장점 중 하나는 `print(object)` 함수를 실행했을 때, 전체 데이터를 보여주는 대신 `head(x = object, n = 10L)` 함수를 실행한 것처럼 처음 10 행만 보여줍니다. 이러한 점이 편리하기도 하지만 저로서는 전체 데이터를 보는 것이 더 익숙해서 그런지 생각보다 불편했습니다. 이를 보완하려면 아래와 같이 옵션을 추가해주면 됩니다. 
 
 ```{r}
-# 불러올 파일이 저장된 경로를 지정합니다. 
-filepath <- 'https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/rmds/data/2017_Baseball_hitter_stat.csv'
+# 티블 객체를 출력할 때 보여주는 행의 개수를 설정할 수 있습니다. 
+# 전체 행을 다 보고 싶으면 아래와 같이 설정합니다. 
+options(tibble.print_max = Inf)
 
-# csv 파일을 읽고, dtCsv에 할당합니다. 
-dtCsv <- read.csv(file = filepath,
-                  stringsAsFactors = FALSE,
-                  fileEncoding = "UTF-8")
-
-# 첫 10행만 미리보기 합니다.
-head(x = dtCsv, n = 10L)
-
-# 데이터의 구조를 파악합니다.
-str(object = dtCsv)
+# 최소 20 행, 최대 50행까지 출력하기를 원하면 아래와 같이 설정합니다. 
+options(tibble.print_max = 50, tibble.print_min = 20)
 ```
-
-### 외부 데이터 불러오기② : txt 파일
-
-`txt` 파일은 `read.table()` 함수로 읽습니다. `read.csv()` 함수와 주요 인자 설정이 비슷하지만 일부 차이점이 있습니다. 
-
-  - `header = TRUE` : 기본 설정 값이 `FALSE`이므로 첫 번째 행을 컬럼명으로 인식하려면 반드시 지정해주어야 합니다.  
-  - `sep = '\t'` : 데이터 구분자를 탭(tab)으로 지정합니다. 기본 설정이므로 생략해도 됩니다.  
-  - `stringsAsFactors = FALSE` : `read.csv()`와 같습니다.  
-  - `fileEncoding = 'UTF-8'` : `read.csv()`와 같습니다.  
-
-```{r}
-# 불러올 파일이 저장된 경로를 지정합니다. 
-filepath <- 'https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/rmds/data/2017_Baseball_hitter_stat.txt'
-
-# txt 파일을 읽고, dtTxt에 할당합니다.
-dtTxt <- read.table(file = filepath,
-                    header = TRUE,
-                    stringsAsFactor = FALSE,
-                    fileEncoding = 'UTF-8')
-
-# 첫 10행만 미리보기 합니다.
-head(x = dtTxt, n = 10L)
-
-# 데이터의 구조를 파악합니다.
-str(object = dtTxt)
-```
-
-### 외부 데이터 불러오기③ : xslx 파일
-
-`csv`는 엑셀에서 열리지만 콤마(,)로 구분된 텍스트 파일이라는 것을 알고 있다면 `txt` 파일과 크게 다를 바가 없습니다. GitHub에서는 이 두 가지 타입의 파일을 `raw` 형태로 브라우져에 렌더링해주고 바로 읽을 수 있게 해줍니다만, `xslx`은 복잡한(?) 엑셀 파일이므로 브라우져에서 확인할 수 없습니다. 따라서 `csv`나 `txt` 파일을 불러온 것처럼 할 수 없으므로, 처음에 알려드린 GitHub Repository에서 다운로드한 후 적당한 폴더에 저장하기 바랍니다. 저는 현재 작업경로에 `data`라는 폴더를 새로 만든 후 그 안에 `xlsx` 파일을 저장하였습니다. 
-
-```{r}
-# GitHub Repository에서 xlsx 파일을 다운로드 합니다.
-# https://github.com/MrKevinNa/MrKevinNa.github.io/blob/master/rmds/data/2017_Baseball_hitter_stat.xlsx
-
-# 현재 작업경로에 데이터를 저장할 폴더(data)가 있는지 확인하고 없으면 새로 만듭니다.
-folder <- './data/'
-if (dir.exists(paths = folder) == FALSE) dir.create(path = folder)
-
-# 다운로드한 xlsx 파일을 탐색기(또는 파인더)에서 data 폴더로 이동시킨 후
-# 해당 파일이 들어있는지 확인합니다. 
-list.files(path = folder, pattern = 'xlsx')
-```
-
-`xlsx` 파일이 `data` 폴더에 있는 것을 확인했으므로 이제 파일을 읽어옵니다. `xlsx` 파일은 `readxl` 패키지의 `read_excel()` 함수로 읽습니다. 주요 인자는 다음과 같습니다.  
-
-  - `path` : 파일이 저장되어 있는 폴더와 파일명을 지정합니다.  
-  - `sheet = NULL` : 데이터가 저장된 sheet가 여러 개일 경우 해당 sheet 이름을 지정합니다.  
-  - `col_names = TRUE` : 첫 번째 행을 컬럼명으로 인식합니다. 기본값이 `TRUE`입니다.  
 
 ```{r}
 # 필요 패키지를 불러옵니다. 
 library(readxl)
 
-# xlsx 파일을 읽어, dtXls에 할당합니다. 
-dtXls <- read_excel(path = './data/2017_Baseball_hitter_stat.xlsx', sheet = NULL)
-
-# 첫 10행만 미리보기 합니다.
-head(x = dtXls, n = 10L)
-
-# 데이터의 구조를 파악합니다.
-str(object = dtXls)
-```
-
-지금까지 3가지 방법으로 데이터를 불러온 뒤 저장한 객체들이 서로 같은지 `identical()` 함수를 이용하여 확인해보겠습니다. 
-
-```{r}
-# csv 파일을 불러온 객체와 txt 파일을 블러온 객체가 같은지 확인합니다. 
-identical(dtCsv, dtTxt)
-
-# csv 파일을 불러온 객체와 xlsx 파일을 블러온 객체가 같은지 확인합니다. 
-identical(dtCsv, dtXls)
-```
-
-`csv`와 `txt` 파일을 불러온 결과 객체는 서로 같았으나 `xlsx`와는 다르다는 것을 확인할 수 있었습니다. 그 이유는 `read_excel()` 함수는 결과 객체를 데이터프레임(data.frame)이 아닌 티블(tibble)로 반환하기 때문입니다. 티블은 데이터프레임의 일종이지만 데이터프레임이 가지고 있는 여러 가지 단점을 보완한 객체 타입입니다.^[티블에 대한 간략한 설명은 관련 비네트를 참조하시기 바랍니다. RStudio에서 `vignette("tibble")`을 입력한 후 실행하면 `Help` 창에서 관련 내용을 확인할 수 있습니다.]
-
-편의상 `dtXls`를 데이터프레임으로 변환하도록 하겠습니다. 
-
-```{r}
-# 데이터프레임으로 변환하기
-dtXls <- as.data.frame(x = dtXls)
+# xlsx 파일을 읽어, dataXls에 할당합니다. 
+hitters <- read_excel(path = './data/2017_Baseball_hitter_stat.xlsx', sheet = NULL)
 ```
 
 ## 프로야구 타자 스탯을 활용한 EDA
 
-이제 `dtXls` 객체를 활용하여 다양한 프로야구 타자 스탯 데이터를 여러 방향을 살펴보겠습니다. 전체 데이터의 구조와 각 열(컬럼)별 형태 및 요약 통계량을 살펴봅니다. 필요한 경우 텍스트 데이터를 수정합니다. 아울러 분석가가 원하는 파생변수도 생성할 수 있으며, 다양한 그래프를 그려봄으로써 분석하려는 데이터가 어떤 내용을 담고 있는지 인사이트를 얻을 수 있습니다. 
+이제 일련의 과정을 거쳐 `hitters` 데이터를 다각도로 살펴봄으로써 이 데이터가 담고 있는 인사이트를 확인해보도록 하겠습니다.  
+
+  - 전체 데이터의 구조와 각 열(컬럼)별 형태 및 요약 통계량을 살펴봅니다.  
+  - 필요한 경우, **stringr** 패키지의 함수들을 이용하여 텍스트 데이터를 수정합니다.  
+  - 분석가가 원하는 파생변수도 생성합니다.  
+  - 산점도, 상자수염그림, 히스토그램 등 다양한 그래프를 그려봅니다.  
 
 ### 데이터 구조 파악하기
 
-먼저 데이터의 구조를 파악하는데 필요한 함수 몇 가지를 소개해드립니다.  
+데이터의 구조를 파악하는데 필요한 함수 몇 가지를 소개해드립니다.  
 
   - str() : 객체의 구조를 출력합니다. 데이터프레임의 경우, 컬럼명과 속성 등을 출력합니다.  
-  - head() : `n`인자에 숫자를 할당하면, 데이터의 처음 n줄을 출력합니다.
+  - head() : `n`인자에 숫자를 할당하면, 데이터의 처음 n줄을 출력합니다.  
   - tail() : `n`인자에 숫자를 할당하면, 데이터의 마지막 n줄을 출력합니다.  
   - dim() : 객체의 차원을 출력합니다. 데이터프레임의 경우, 행과 열의 수를 각각 출력합니다.  
   - nrow() : 데이터프레임의 행의 수를 출력합니다.  
@@ -156,54 +56,54 @@ dtXls <- as.data.frame(x = dtXls)
 
 ```{r}
 # 데이터프레임의 전체적인 구조(structure)를 확인합니다.
-str(object = dtXls)
+str(object = hitters)
 
 # 처음 5줄을 확인합니다. 
-head(x = dtXls, n = 5L)
+head(x = hitters, n = 5L)
 
 # 마지막 5줄을 확인합니다.
-tail(x = dtXls, n = 5L)
+tail(x = hitters, n = 5L)
 
 # 행과 열의 수를 확인합니다. 
-dim(x = dtXls)
+dim(x = hitters)
 
 # 행의 수를 확인합니다. 
-nrow(x = dtXls)
+nrow(x = hitters)
 
 # 열의 수를 확인합니다. 
-ncol(x = dtXls)
+ncol(x = hitters)
 ```
 
 이번에는 행 이름과 열 이름을 확인하고 변경하는 방법을 소개하겠습니다. 역시 관련 함수를 먼저 정리해보았습니다.  
 
-  - rownames() : 행 이름을 벡터 형태로 출력합니다. 할당 연산자(`<-`) 우측에 벡터를 지정하면 해당 벡터로 행 이름을 변경할 수 있습니다.  
-  - colnames() : 열 이름을 벡터 형태로 출력합니다. 할당 연산자(`<-`) 우측에 벡터를 지정하면 해당 벡터로 열 이름을 변경할 수 있습니다.  
+  - rownames() : 행 이름을 벡터 형태로 출력합니다. 할당 연산자(`<-`) 우측에 행과 같은 길이를 갖는 벡터를 지정하면 해당 벡터로 행 이름을 변경할 수 있습니다.  
+  - colnames() : 열 이름을 벡터 형태로 출력합니다. 할당 연산자(`<-`) 우측에 열과 같은 길이를 갖는 벡터를 지정하면 해당 벡터로 열 이름을 변경할 수 있습니다.  
   - dimnames() : 행과 열 이름을 리스트 형태로 출력합니다. 할당 연산자(`<-`) 우측에 행과 열 이름 벡터를 순서대로 리스트 형태로 지정하면 행과 열 이름을 한 번에 변경할 수 있습니다.  
 
 이번 포스팅에서는 행과 열 이름을 각각 확인하는 것만 소개하도록 하겠습니다. 
 
 ```{r}
 # 행 이름을 확인합니다. 
-rownames(x = dtXls)
+rownames(x = hitters)
 
 # 열 이름을 확인합니다. 
-colnames(x = dtXls)
+colnames(x = hitters)
 
 # 행과 열 이름을 순서대로 확인합니다.
-dimnames(x = dtXls)
+dimnames(x = hitters)
 ```
 
 이제 각 열(컬럼) 벡터의 속성과 기초 통계량을 확인해보겠습니다. 지난 포스팅에서 `summary()` 함수를 소개했는데요. 이 함수를 이용하면 숫자형 벡터는 최소값, 1분위수, 중앙값, 평균, 3분위수, 최대값을 출력해주고, 문자형 벡터는 전체 길이와 속성(Class, Mode)를 출력합니다. 아울러 범주형 벡터는 빈도수 높은 레벨을 내림차순 정렬하여 상위 6개만 출력합니다. 
 
 ```{r}
 # 불필요한 열(순위)을 삭제합니다.
-dtXls <- dtXls[, -1]
+hitters <- hitters[, -1]
 
 # 팀명을 범주형 벡터로 변환합니다. 
-dtXls$팀명 <- as.factor(dtXls$팀명)
+hitters$팀명 <- as.factor(hitters$팀명)
 
 # 각 열별 요약 통계량을 출력합니다. 
-summary(object = dtXls)
+summary(object = hitters)
 ```
 
 **선수명**은 문자형 벡터라 전체 길이(292)와 `Class` 및 `Mode`를 출력하였습니다. **팀명**은 범주형 벡터라 빈도수가 높은 팀을 내림차순하여 상위 6개 팀만 출력하였습니다. 나머지 열은 모두 숫자형 벡터라 6가지 요약 통계량을 각각 출력하였습니다. 
@@ -214,14 +114,14 @@ summary(object = dtXls)
 
 ```{r}
 # 선수명에 공백이 있는지 확인합니다. 
-dtXls$선수명 %>% str_subset(pattern = ' ')
+hitters$선수명 %>% str_subset(pattern = ' ')
 ```
 
 선수명에 공백이 없음을 확인하였습니다. 만약 선수명에 공백이 있었다면 아래 코드로 공백을 제거할 수 있습니다. 
 
 ```{r}
 # 선수명에 공백을 제거합니다.
-dtXls$선수명 <- dtXls$선수명 %>%
+hitters$선수명 <- hitters$선수명 %>%
   str_replace_all(pattern = ' ', replacement = '')
 ```
 
@@ -231,7 +131,7 @@ dtXls$선수명 <- dtXls$선수명 %>%
 
 ```{r}
 # 특정 팀에 속한 선수명을 출력합니다.
-dtXls[dtXls$팀명 == 'KIA', '선수명']
+hitters[hitters$팀명 == 'KIA', '선수명']
 ```
 
 이 중에서 관심 있는 선수들만 골라서 `관심선수`라는 새로운 열(컬럼)을 생성합니다. 
@@ -240,54 +140,66 @@ dtXls[dtXls$팀명 == 'KIA', '선수명']
 # 관심선수 명단을 벡터에 할당합니다. 
 관심선수 <- c('이명기', '김주찬', '버나디나', '최형우', '나지완', '안치홍', '이범호', '김민식', '김선빈')
 
-# 전체 데이터에서 관심선수이 경우 '1', 아니면 '0'을 가지는 새로운 열(컬럼)을 생성합니다. 
-dtXls$관심선수 <- ifelse(test = dtXls$선수명 %in% 관심선수, yes = '1', no = '0')
+# 관심선수인 경우 '1', 아니면 '0'을 갖는 새로운 열(컬럼)을 생성합니다. 
+hitters$관심선수 <- ifelse(test = hitters$선수명 %in% 관심선수, yes = '1', no = '0')
 
 # 관심선수의 스탯만 출력합니다. 
-dtXls[dtXls$관심선수 == '1', ]
+hitters[hitters$관심선수 == '1', ]
 ```
 
 ### 산점도 그려보기 
 
-어느 정도 데이터 전처리가 마무리 되었으니 이제 그래프를 그려보겠습니다. 우선 산점도를 그려볼텐데요. 분석 대상인 데이터의 컬럼이 `p`개인 `p`차원 데이터에서 2개를 선별하여 2차원 평면에 그려봄으로써 데이터가 어떻게 분포하는지 확인할 수 있습니다. 
+어느 정도 데이터 전처리가 마무리 되었으니 이제 **산점도**를 그려보겠습니다. 산점도를 활용하면 분석 대상인 데이터의 컬럼의 수가 `p`인 즉, `p`차원 데이터에서 `2`개를 선별하여 2차원 평면에 그려봄으로써 데이터가 어떻게 분포하는지 확인할 수 있습니다. 
 
 ```{r}
+# 한글이 깨지지 않도록 설정합니다. 
+par(family = 'NanumGothic')
+
 # 타수와 타율을 기준으로 산점도를 그려봅니다. 
-plot(x = dtXls$타수,
-     y = dtXls$타율,
+plot(x = hitters$타수,
+     y = hitters$타율,
      main = '타수와 타율 간 관계',
      xlab = '타수',
      ylab = '타율',
-     family = "NanumGothic")
+     family = 'NanumGothic')
 ```
 
-타수가 적은 선수들 중 일부가 높은 타율을 보이므로 분석 대상에서 제외하는 것이 좋습니다. 타수로 도수분포표를 만든 후 일부 데이터를 삭제하도록 하겠습니다. 
+타수가 적은 선수들 중 일부가 비정상적으로 높은 타율을 보이므로 분석 대상에서 제외하는 것이 좋습니다. 타수로 도수분포표를 만든 후 일부 데이터를 삭제하도록 하겠습니다. 
 
 ```{r}
 # 타수의 빈도를 확인합니다.
-table(dtXls$타수)
+table(hitters$타수)
 
 # 타수 빈도의 최소값과 최대값을 확인합니다. 
-range(dtXls$타수)
+range(hitters$타수)
 
 # 타수의 계급폭을 50으로 지정합니다. 
-breaks <- seq(from = min(dtXls$타수), 
-              to = max(dtXls$타수),
+breaks <- seq(from = min(hitters$타수), 
+              to = max(hitters$타수),
               by = 50)
 
 # 계급을 확인합니다. 
-cat("breaks :", breaks, "\n")
+cat('breaks :', breaks, '\n')
 
-# 도수분포표를 만들고 확인합니다. 
-cut4ab1 <- cut(x = dtXls$타수, breaks = breaks, include.lowest = TRUE, right = FALSE)
+# 도수분포표를 만듭니다.
+cut4ab1 <- cut(x = hitters$타수,
+               breaks = breaks,
+               include.lowest = TRUE,
+               right = FALSE)
+
+# 각 계급별의 빈도수를 확인합니다. 
 table(cut4ab1)
 ```
 
-`cut()` 함수를 사용하여 도수분포표를 만들 때, 이번 예제의 경우 `550`을 초과하는 데이터를 포함하지 않는 단점이 있습니다. `seq()` 함수를 이용하여 `breaks`를 만들 때 최대값을 넘는 값을 만들지 못하기 때문입니다. 이를 보완하려면 **Hmics** 패키지의 `cut2()` 함수를 이용하면 됩니다. 
+`cut()` 함수를 사용하여 도수분포표를 만들 때, 이번 예제의 경우 `550`을 초과하는 데이터를 포함하지 않는 단점이 있습니다. 그 이유는 `seq()` 함수를 이용하여 `breaks`를 만들 때 최대값을 넘는 값을 만들지 못하기 때문입니다. 이러한 문제점을 보완하려면 **Hmics** 패키지의 `cut2()` 함수를 이용하면 됩니다. 
 
 ```{r}
 # cut2() 함수를 사용하여 550을 초과하는 데이터도 포함시킵니다. 
-cut4ab2 <- Hmisc::cut2(x = dtXls$타수, cuts = breaks, minmax = TRUE)
+cut4ab2 <- Hmisc::cut2(x = hitters$타수,
+                       cuts = breaks,
+                       minmax = TRUE)
+
+# 빈도수를 확인합니다. 
 table(cut4ab2)
 
 # prop.table() 함수를 이용하여 상대도수를 확인합니다. 
@@ -300,27 +212,27 @@ table(cut4ab2) %>% prop.table() %>% round(digits = 2L) %>% cumsum()
 50타수 미만인 타자가 117명으로 전체 타자 중에서 약 40%의 비중을 차지하는 것을 알 수 있습니다. 산점도에서도 50타수 이하는 타율의 변동폭이 매우 크므로 50타수 이상인 타자들만 따로 선별하여 추가 분석을 진행하도록 하겠습니다. 
 
 ```{r}
-# 50 타수 이상인 타자만 추출하여 dtXls50 객체에 할당합니다. 
-dtXls50 <- dtXls[dtXls$타수 >= 50, ]
+# 50 타수 이상인 타자만 추출하여 hitters50 객체에 할당합니다. 
+hitters50 <- hitters[hitters$타수 >= 50, ]
 
 # 새로운 데이터프레임의 차원을 확인합니다. 
-dim(x = dtXls50)
+dim(x = hitters50)
 ```
 
-전체 행(선수)가 175명으로 줄어들었습니다. 이제 이 데이터로 다시 산점도를 그려보겠습니다. 그리고 타수와 타율 간 선형관계를 확인하고자 단순선형회귀선을 추가하겠습니다.
+전체 행(선수)가 175명으로 줄어들었습니다. 이제 이 데이터로 다시 산점도를 그려보겠습니다. 그리고 타수와 타율 간 선형관계를 확인하고자 단순선형회귀선을 추가해보겠습니다.
 
 ```{r}
 # 타수와 타율을 기준으로 산점도를 그려봅니다. 
-plot(x = dtXls50$타수,
-     y = dtXls50$타율,
+plot(x = hitters50$타수,
+     y = hitters50$타율,
      main = '타수와 타율 간 관계 (50타수 이상 타자)',
      xlab = '타수',
      ylab = '타율',
-     family = "NanumGothic")
+     family = 'NanumGothic')
 
 # 타수와 타율 간 선형관계를 확인하고자 단순선형회귀선을 추가합니다.
-abline(reg = lm(formula = 타율 ~ 타수, data = dtXls50),
-       col = "red",
+abline(reg = lm(formula = 타율 ~ 타수, data = hitters50),
+       col = 'red',
        lty = 2)
 ```
 
@@ -328,13 +240,13 @@ abline(reg = lm(formula = 타율 ~ 타수, data = dtXls50),
 
 ```{r}
 # 두 변수 간 상관계수를 구합니다. 
-cor.test(x = dtXls50$타수, y = dtXls50$타율)
+cor.test(x = hitters50$타수, y = hitters50$타율)
 
 # 상관계수의 제곱을 출력합니다. 
-cor(x = dtXls50$타수, y = dtXls50$타율) %>% .^2
+cor(x = hitters50$타수, y = hitters50$타율) %>% .^2
 ```
 
-두 변수 간 피어슨 상관계수를 계산해보니 약 0.614이며, 이 때 p-value는 0이라 할 수 있으므로 두 변수 간 강한 양의 상관관계가 있다고 추정할 수 있습니다. 상관계수를 제곱하면 이 선형회귀식의 결정계수는 약 0.377이 됩니다. 
+두 변수 간 피어슨 상관계수를 계산해보니 약 `0.614`이며, 이 때 p-value는 `0`이라 할 수 있으므로 두 변수 간 강한 양의 상관관계가 있다고 추정할 수 있습니다. 상관계수를 제곱하면 이 선형회귀식의 결정계수(R-squared)는 약 `0.377`이 됩니다. 
 
 위와 같이 두 변수를 할당하면 산점도를 그리고 상관계수와 상관계수의 제곱을 출력하는 사용자 정의 함수를 생성해보겠습니다. 
 
@@ -361,7 +273,7 @@ checkCorPlot <- function(var1, var2) {
        main = paste0(var1name, ' & ', var2name, ' 간 관계'),
        xlab = var1name, 
        ylab = var2name,
-       family = "NanumGothic")
+       family = 'NanumGothic')
   
   # 상관계수를 계산합니다. 
   # cor.test()를 실행하면, 결과 객체로 리스트를 반환합니다. 
@@ -388,37 +300,37 @@ checkCorPlot <- function(var1, var2) {
   
   # 산점도에 선형회귀선을 추가합니다. 
   reg <- lm(formula = var2 ~ var1)
-  abline(reg = reg, col = "red", lty = 2)
+  abline(reg = reg, col = 'red', lty = 2)
 }
 
 # 화면을 2행 * 2열로 분할합니다. 
 par(mfrow = c(2, 2))
 
 # 입력변수를 바꿔가면서 산점도를 그려봅니다. 
-checkCorPlot(var1 = dtXls50$홈런, var2 = dtXls50$타율)
-checkCorPlot(var1 = dtXls50$삼진, var2 = dtXls50$타율)
-checkCorPlot(var1 = dtXls50$타점, var2 = dtXls50$타율)
-checkCorPlot(var1 = dtXls50$득점, var2 = dtXls50$타율)
+checkCorPlot(var1 = hitters50$홈런, var2 = hitters50$타율)
+checkCorPlot(var1 = hitters50$삼진, var2 = hitters50$타율)
+checkCorPlot(var1 = hitters50$타점, var2 = hitters50$타율)
+checkCorPlot(var1 = hitters50$득점, var2 = hitters50$타율)
 
 # 분할된 화면을 원래대로 (1행 * 1열) 되돌려 놓습니다. 
 par(mfrow = c(1, 1))
 ```
 
-위와 같은 방법으로는 분석가가 하나씩 지정해주기 전까지 한꺼번에 두 변수 간 관계를 알아보기 어렵습니다. 이런 문제는 `pairs()` 함수를 사용하여 쉽게 해결할 수 있습니다. 이 함수에 데이터프레임을 할당하면 모든 숫자형 벡터들을 2개씩 골라 산점도를 그려줍니다. 
+위와 같은 방법으로는 분석가가 관심 있는 열을 하나씩 지정해주기 전에는 다른 변수들 간 관계를 알아보기 어렵습니다. 이런 문제는 `pairs()` 함수를 사용하여 쉽게 해결할 수 있습니다. 이 함수에 데이터프레임을 할당하면 모든 숫자형 벡터들을 2개씩 골라 산점도를 그려줍니다. 
 
 ```{r}
 # 여러 숫자형 벡터 간 산점도를 한꺼번에 출력합니다. 
-pairs(x = dtXls50[, c(6:12, 14)])
+pairs(x = hitters50[, c(6:12, 14)])
 ```
 
 두 숫자형 벡터 간 공분산과 상관계수 행렬를 구하면 관계의 정도를 숫자로 확인할 수 있습니다. 공분산은 두 개의 변수가 변화하는 정도는 알 수 있으나 서로 비교하기 어려우므로, 공분산을 각각의 표준편차로 나누어 표준화한 상관계수 행렬을 구하면 상관관계의 정도를 서로 비교할 수 있습니다. 
 
 ```{r}
 # 공분산 행렬을 출력합니다. 
-cov(x = dtXls50[, c(6:12, 14)])
+cov(x = hitters50[, c(6:12, 14)])
 
 # 상관계수 행렬을 출력합니다. 
-cor(x = dtXls50[, c(6:12, 14)])
+cor(x = hitters50[, c(6:12, 14)])
 ```
 
 `pairs()` 함수의 패널을 분석가가 임의로 정할 수 있습니다. 대각원소의 오른쪽 위를 상삼각행렬이라고 하고, 왼쪽 아래를 하삼각행렬이라고 하는데, 이번 예제에서는 상삼각행렬을 산점도 대신 상관계수와 p-value를 출력하도록 변경해보겠습니다.^[보다 상세한 내용은 [관련 블로그](http://r-nold.blogspot.kr/2014/11/scatter-plot-matrices-in-r.html)를 참조하시기 바랍니다.]
@@ -428,58 +340,58 @@ cor(x = dtXls50[, c(6:12, 14)])
 panel.cor <- function(x, y, digits = 2, cex.cor, ...) {
     
     # 그래프를 출력할 범위를 지정합니다. 
-    usr <- par("usr")
+    usr <- par('usr')
     on.exit(expr = par(usr))
     par(usr = c(0, 1, 0, 1))
     
     # 상관계수를 계산합니다. 
     r <- cor(x = x, y = y)
     txt1 <- format(x = c(r, 0.123456789), digits = digits)[1]
-    txt1 <- paste("r : ", txt1, sep = "")
+    txt1 <- paste('r : ', txt1, sep = '')
     text(x = 0.5, y = 0.6, labels = txt1, cex = 1.0)
     
     # p-value를 계산합니다. 
     p <- cor.test(x = x, y = y)$p.value
     txt2 <- format(x = c(p, 0.123456789), digits = digits)[1]
-    txt2 <- paste("p : ", txt2, sep = "")
-    if(p < 0.01) txt2 <- paste("p : ", "< 0.01", sep = "")
+    txt2 <- paste('p : ', txt2, sep = '')
+    if(p < 0.01) txt2 <- paste('p : ', '< 0.01', sep = '')
     text(x = 0.5, y = 0.4, labels = txt2, cex = 1.0)
 }
 
 # 위에서 생성한 사용자 정의 함수를 활용하여 산점도 행렬을 그려봅니다. 
-pairs(x = dtXls50[, c(6:12, 14)], upper.panel = panel.cor)
+pairs(x = hitters50[, c(6:12, 14)], upper.panel = panel.cor)
 ```
 
 ### 파생변수 만들기
 
-탐색적 데이터 분석을 하다보면 (혹은 데이터 전처리를 할 때) 기존 데이터를 변형하여 새로운 파생변수들을 생성해야 하는 경우가 상당히 많습니다. 아래에는 제가 임의대로 만든 몇 가지 비율 변수들입니다. 아마도 많이 생소하실 거예요. ^^
+탐색적 데이터 분석을 하다보면 (혹은 데이터 전처리를 할 때) 기존 데이터를 변형하여 새로운 파생변수들을 생성해야 하는 경우가 상당히 많습니다. 아래에는 제가 임의대로 만든 몇 가지 비율 변수들입니다. 아마도 많이 생소하실 거예요.
 
 ```{r}
 # 숫자형 벡터의 절대 규모를 그대로 쓰는 대신 타수로 나눈 비율값으로 
 # 구성된 새로운 데이터프레임을 생성합니다. 
-dtXls51 <- data.frame(타율 = dtXls50$타율,
-                      홈런율 = dtXls50$홈런 / dtXls50$타수,
-                      득점률 = dtXls50$득점 / dtXls50$타수,
-                      타점률 = dtXls50$타점 / dtXls50$타수,
-                      볼넷률 = dtXls50$볼넷 / dtXls50$타수,
-                      삼진율 = dtXls50$삼진 / dtXls50$타수,
-                      도루율 = dtXls50$도루 / dtXls50$타수)
+hitters51 <- data.frame(타율 = hitters50$타율,
+                        홈런율 = hitters50$홈런 / hitters50$타수,
+                        득점률 = hitters50$득점 / hitters50$타수,
+                        타점률 = hitters50$타점 / hitters50$타수,
+                        볼넷률 = hitters50$볼넷 / hitters50$타수,
+                        삼진율 = hitters50$삼진 / hitters50$타수,
+                        도루율 = hitters50$도루 / hitters50$타수)
 
 # 산점도 행렬을 그립니다. 
-pairs(x = dtXls51, upper.panel = panel.cor)
+pairs(x = hitters51, upper.panel = panel.cor)
 ```
 
-새로 만든 파생변수들로 산점도 행렬을 그려보니 절대 규모로 그린 것이 훨씬 좋네요. 이번에는 쓸데없는 걸 한 것 같습니다. 
+새로 만든 파생변수들로 산점도 행렬을 그려보니 원래 열(컬럼)로 한 것이 훨씬 낫습니다. 이번에는 쓸데없는 걸 한 것 같습니다. 
 
 ### 숫자형 벡터 정렬하기
 
-숫자형 벡터를 오름차순 또는 내림차순으로 정렬한 후 해당 벡터로만 산점도를 그려봄으로써 새로운 사실과 마주하기도 합니다. 이번 예제에서는 타율을 오름차순으로 정렬한 후 산점도를 그려보겠습니다. 
+숫자형 벡터를 오름차순 또는 내림차순으로 정렬한 후, 해당 벡터만으로 산점도를 그려봄으로써 새로운 사실과 마주하기도 합니다. 이번 예제에서는 타율을 오름차순으로 정렬한 후 산점도를 그려보겠습니다. 
 ```{r}
 # 올림차순, 내림차순으로 정렬하여 산점도를 그려봅니다. 
-plot(x = sort(dtXls50$타율), family = "NanumGothic")
+plot(x = sort(hitters50$타율), family = 'NanumGothic')
 
 # quantile() 함수를 이용하여 기준선을 몇 개 추가합니다. 
-baseline <- quantile(x = dtXls50$타율,
+baseline <- quantile(x = hitters50$타율,
                      probs = c(0.90, 0.75, 0.50, 0.25),
                      na.rm = TRUE) %>% 
   round(digits = 3L)
@@ -488,7 +400,7 @@ baseline <- quantile(x = dtXls50$타율,
 for (i in 1:length(baseline)) {
   
   # 빨간색 점선으로 기준선을 그립니다. 
-  abline(h = baseline[i], col = "red", lty = 3)
+  abline(h = baseline[i], col = 'red', lty = 3)
   
   # 기준선 위에 기준값을 추가합니다. 
   text(x = 20,
@@ -500,7 +412,7 @@ for (i in 1:length(baseline)) {
 }
 ```
 
-타율 기준으로 오름차순 정렬하여 산점도를 그려보니 전체적인 그림은 S자 형태를 보이지만 25%에서 90% 사이는 거의 직선으로 분포하고 있음을 알 수 있습니다. 최상위에 위치하는 소수의 타자들은 정말 뛰어난 업적을 거두는 것으로 확인할 수 있습니다. 궁금하신 분들은 홈런, 삼진 이런 스탯들을 가지고 그래프를 그려보세요. ^^
+타율 기준으로 오름차순 정렬하여 산점도를 그려보니 전체적인 그림은 S형 곡선으로 보이지만 `25%`에서 `90%` 사이는 거의 직선으로 형태를 띄고 있음을 알 수 있습니다. 최상위에 위치하는 소수의 타자들은 정말 뛰어난 결과를 거두는 것으로 확인할 수 있습니다. 궁금하신 분들은 홈런, 삼진 이런 스탯들을 가지고 그래프를 그려보세요.
 
 ### 산점도에 몇 가지 정보 추가하기
 
@@ -508,116 +420,206 @@ for (i in 1:length(baseline)) {
 
 ```{r}
 # 타율과 홈런 데이터로 산점도를 그립니다. 
-plot(x = dtXls50$타율, y = dtXls50$홈런, family = "NanumGothic")
+plot(x = hitters50$타율,
+     y = hitters50$홈런,
+     main = '타율과 홈런 간의 관계',
+     xlab = '타율',
+     ylab = '홈런',
+     family = 'NanumGothic')
 
 # 각각의 평균으로 수직선과 수평선을 그려서 2행 * 2열 매트릭스로 표현합니다. 
-abline(v = mean(dtXls50$타율), h = mean(dtXls50$홈런), lty = 2, col = "red")
+abline(v = mean(hitters50$타율),
+       h = mean(hitters50$홈런),
+       lty = 2,
+       col = 'red')
 
-# 관심선수만 산점도 위에 빨간점으로 표시해보겠습니다. 
-dtXlsFP <- dtXls[dtXls$관심선수 == "1", ]
-points(x = dtXlsFP$타율, y = dtXlsFP$홈런, col = "red", pch = 16, lwd = 2)
-text(x = dtXlsFP$타율, y = dtXlsFP$홈런, labels = dtXlsFP$선수명,
-     col = "blue", pos = 2, cex = 0.8, font = 2, family = "NanumGothic")
+# 관심선수만 추출합니다. 
+hittersFP <- hitters[hitters$관심선수 == '1', ]
+
+# 관심선수만 산점도 위에 빨간점으로 추가합니다. 
+points(x = hittersFP$타율,
+       y = hittersFP$홈런,
+       col = 'red',
+       pch = 16,
+       lwd = 2)
+
+# 관심선수만 점 왼쪽에 파란색으로 이름을 출력합니다. 
+text(x = hittersFP$타율,
+     y = hittersFP$홈런,
+     labels = hittersFP$선수명,
+     col = 'blue',
+     pos = 2,
+     cex = 0.8,
+     font = 2,
+     family = 'NanumGothic')
 ```
 
-작년 우승팀답게 KIA 타이거즈의 주전선수 9명 중에서 상위 50% 타자들의 평균 타율보다 낮은 선수는 딱 2명입니다. 이범호 선수는 거의 평균이라고 보면, 안방마님으로 중요한 역할을 수행한 김민식 선수만 타율이 낮다고 볼 수 있습니다. 우연의 일치인지 상위 50% 타자들의 평균 홈런 개수보다 낮은 선수도 2명인데요. 그 중 한 명은 타격왕 김선빈 선수이니 홈런 개수 적은 게 문제될 일은 없고, 나머지 한 명은 안방마님이니 공격 스탯이 좀 낮아도 전혀 문제가 없겠죠. 
+작년 우승팀답게 KIA 타이거즈의 주전선수 9명 중에서 상위 `50%` 타자들의 평균 타율보다 낮은 선수는 딱 2명입니다. 이범호 선수는 거의 평균이라고 보면, 안방마님으로 중요한 역할을 수행한 김민식 선수만 타율이 낮다고 볼 수 있습니다. 우연의 일치인지 상위 `50%` 타자들의 평균 홈런 개수보다 낮은 선수도 2명인데요. 그 중 한 명은 타격왕 김선빈 선수이니 홈런 개수 적은 게 문제될 일은 없고, 나머지 한 명은 안방마님이니 공격 스탯이 좀 낮아도 전혀 문제가 없겠죠. 
 
 이번에는 팀명을 기준으로 다른 팀 선수들도 살펴보도록 하겠습니다. 
 
 ```{r}
 # 산점도와 가로/세로 기준선을 새로 그립니다.
-plot(x = dtXls50$타율, y = dtXls50$홈런, family = "NanumGothic")
-abline(v = mean(dtXls50$타율), h = mean(dtXls50$홈런), lty = 2, col = "red")
+plot(x = hitters50$타율,
+     y = hitters50$홈런,
+     family = 'NanumGothic')
+
+abline(v = mean(hitters50$타율),
+       h = mean(hitters50$홈런),
+       lty = 2,
+       col = 'red')
 
 # 이번에는 LG 선수만 빨간점으로 표시하고 이름을 추가해봅니다. 
 # 지난해 1군에 등록된 선수가 많으니 288 타석 이상인 선수만 선별합니다. 
-dtXlsLG <- dtXls50[dtXls50$팀명 == 'LG' & dtXls50$타석 >= 288, ]
-points(x = dtXlsLG$타율, y = dtXlsLG$홈런, col = "red", pch = 16, lwd = 2)
-text(x = dtXlsLG$타율, y = dtXlsLG$홈런, labels = dtXlsLG$선수명,
-     col = "blue", pos = 3, cex = 0.8, font = 2, family = "NanumGothic")
+hittersLG <- hitters50[hitters50$팀명 == 'LG' & hitters50$타석 >= 288, ]
+
+# 산점도를 그립니다.
+points(x = hittersLG$타율,
+       y = hittersLG$홈런,
+       col = 'red',
+       pch = 16,
+       lwd = 2)
+
+# 이번에틑 선수명을 점 위에 출력해보겠습니다. 
+text(x = hittersLG$타율,
+     y = hittersLG$홈런,
+     labels = hittersLG$선수명,
+     col = 'blue',
+     pos = 3,
+     cex = 0.8,
+     font = 2,
+     family = 'NanumGothic')
 ```
 
-2017년에는 모두 144 경기를 치뤘으니 주전이라면 최소한 경기당 평균 2회 타석에 들어선다고 가정하고 선수를 선별한 결과 모두 8명이 선택되었습니다. 박용택과 정성훈을 제외하고는 대체로 평균 타율 주위에 분포하고 있음을 알 수 있습니다. 그나마 평균을 넘은 선수 4명 중 올해 다른 팀에서 뛰고 있는 선수가 2명이나 되네요. 포수 스탯은 부럽습니다. ㅎㅎ
+2017년에는 모두 `144` 경기를 치뤘으니 주전이라면 최소한 경기당 평균 2회 타석에 들어선다고 가정하고 선수를 선별한 결과 모두 8명이 선택되었습니다. 박용택과 정성훈을 제외하고는 대체로 평균 타율 주위에 분포하고 있음을 알 수 있습니다. 그나마 평균을 넘은 선수 4명 중 올해 다른 팀에서 뛰고 있는 선수가 2명이나 되네요. 포수 스탯은 부럽습니다. ㅎㅎ
 
 다음으로는 장타율과 출루율 기준으로 저의 관심선수들이 어떻게 활약(?)했는지 확인해보도록 하겠습니다. 
 
 ```{r}
 # 장타율과 출루율 기준으로 산점도와 가로/세로 기준선을 그립니다. 
-plot(x = dtXls50$장타율, y = dtXls50$출루율, family = "NanumGothic")
-abline(v = mean(dtXls50$장타율), h = mean(dtXls50$출루율), col = "red", lty = 2)
+plot(x = hitters50$장타율,
+     y = hitters50$출루율,
+     family = 'NanumGothic')
+
+abline(v = mean(hitters50$장타율),
+       h = mean(hitters50$출루율),
+       col = 'red',
+       lty = 2)
 
 # 관심선수를 빨간점으로 표시하고 이름을 추가합니다.
-points(x = dtXlsFP$장타율, y = dtXlsFP$출루율, pch = 16, lwd = 2, col = "red")
-text(x = dtXlsFP$장타율, y = dtXlsFP$출루율, labels = dtXlsFP$선수명, 
-     col = 'blue', pos = 4, cex = 0.8, font = 2, family = "NanumGothic")
+points(x = hittersFP$장타율,
+       y = hittersFP$출루율,
+       pch = 16,
+       lwd = 2,
+       col = 'red')
+
+# 이번에는 선수명을 점 오른쪽에 출력하겠습니다.
+text(x = hittersFP$장타율,
+     y = hittersFP$출루율,
+     labels = hittersFP$선수명, 
+     col = 'blue',
+     pos = 4,
+     cex = 0.8,
+     font = 2,
+     family = 'NanumGothic')
 ```
 
-프로야구 타자의 주요 스탯 중 OPS가 있는데요. OPS는 장타율과 출루율의 합계로 산출되는 스탯입니다. OPS가 0.9 이상이면 수위타자라고 평가받습니다. 이번에는 산점도에서 각 점들을 OPS 기준으로 색을 달리할 수 있도록 그라데이션을 추가해보겠습니다. 
+프로야구 타자의 주요 스탯 중 **OPS**가 있는데요. OPS는 장타율과 출루율의 합계로 산출되는 스탯입니다. OPS가 `0.9` 이상이면 수위타자라고 평가받습니다. 이번에는 산점도에서 각 점들을 OPS 기준으로 색을 달리할 수 있도록 그라데이션을 추가해보겠습니다. 
 
 ```{r}
 # 장타율과 출루율 기준으로 산점도와 가로/세로 기준선을 그립니다. 
-plot(x = dtXls50$장타율, y = dtXls50$출루율, pch = 16, col = "gray80", 
-     main = "2017 프로야구 타자 장타율 vs 출루율", family = "NanumGothic")
-abline(v = mean(dtXls50$장타율), h = mean(dtXls50$출루율), col = "red", lty = 2)
+plot(x = hitters50$장타율,
+     y = hitters50$출루율,
+     pch = 16,
+     col = 'gray80', 
+     main = '2017 프로야구 타자 장타율 vs 출루율',
+     xlab = '장타율',
+     ylab = '출루율',
+     family = 'NanumGothic')
+
+abline(v = mean(hitters50$장타율),
+       h = mean(hitters50$출루율),
+       col = 'red',
+       lty = 2)
 
 # OPS 높을수록 채우기 색상을 진하게 표시합니다. 
 opsLvls <- c(0.8, 0.9, 1.0)
 opsCols <- c('gray60', 'gray40', 'gray20')
 
 for (i in 1:length(opsLvls)) {
-  points(x = dtXls50$장타율[dtXls50$OPS >= opsLvls[i]], 
-         y = dtXls50$출루율[dtXls50$OPS >= opsLvls[i]], 
-         pch = 16, col = opsCols[i])
+  points(x = hitters50$장타율[hitters50$OPS >= opsLvls[i]], 
+         y = hitters50$출루율[hitters50$OPS >= opsLvls[i]], 
+         pch = 16,
+         col = opsCols[i])
 }
 
 # 관심선수만 이름을 출력합니다.
-points(x = dtXlsFP$장타율, y = dtXlsFP$출루율, col = 'black')
-text(x = dtXlsFP$장타율, y = dtXlsFP$출루율, labels = dtXlsFP$선수명, 
-     col = 'blue', pos = 1, cex = 0.8, font = 2, family = "NanumGothic")
+points(x = hittersFP$장타율,
+       y = hittersFP$출루율,
+       col = 'black')
+
+# 선수명을 점 아래에 출력합니다. 
+text(x = hittersFP$장타율,
+     y = hittersFP$출루율,
+     labels = hittersFP$선수명, 
+     col = 'blue',
+     pos = 1,
+     cex = 0.8,
+     font = 2,
+     family = 'NanumGothic')
 
 # 범례를 추가합니다. 범례의 위치는 산점도를 그려보면서 정하면 됩니다. 
-legend(x = max(dtXls50$장타율) * 0.9, 
-       y = min(dtXls50$출루율) * 1.2,
-       legend = c("OPS < 0.8", "OPS >= 0.8", "OPS >= 0.9", "OPS >= 1.0"),
-       col = c("gray80", "gray60", "gray40", "gray20"),
-       pch = 16, cex = 0.8, bty = 'n')
+legend(x = max(hitters50$장타율) * 0.9, 
+       y = min(hitters50$출루율) * 1.2,
+       legend = c('OPS < 0.8', 'OPS >= 0.8', 'OPS >= 0.9', 'OPS >= 1.0'),
+       col = c('gray80', 'gray60', 'gray40', 'gray20'),
+       pch = 16,
+       cex = 0.8,
+       bty = 'n')
 ```
 
 ### 히스토그램으로 분포 확인하기
 
-이번 예제에서는 타자 OPS 기준으로 히스토그램을 그리고 전체 분포를 살펴봅니다. 수위타자의 기준이 되는 0.9에 기준선을 빨간색으로 추가하여 시각적으로 표현할 수 있습니다. 
+이번 예제에서는 타자 OPS 기준으로 히스토그램을 그리고 전체 분포를 살펴봅니다. 수위타자의 기준이 되는 `0.9`에 기준선을 빨간색으로 추가하여 시각적으로 표현할 수 있습니다. 
 
 ```{r}
 # 데이터의 범위를 확인합니다. 
-range(dtXls50$OPS)
+range(hitters50$OPS)
 
 # 최대값과 최소값의 차이를 적당한 개수로 나눠서 게급값을 정합니다.
-range(dtXls50$OPS) %>% diff() / 15
+range(hitters50$OPS) %>% diff() / 15
 
-# 계급 구분값을 만듭니다. 
+# 최대값과 최소값을 이용하여 계급 구분값을 만듭니다. 
+breaks <- seq(from = min(hitters50$OPS),
+              to = max(hitters50$OPS),
+              by = 0.05)
+
 # 이렇게 하는 경우 마지막 구분값을 초과하는 값은 포함되지 않으므로 
 # 맨 마지막 구분값에 by 만큼의 숫자를 더하여 추가해줍니다. 
-breaks <- seq(from = min(dtXls50$OPS), to = max(dtXls50$OPS), by = 0.05)
 breaks <- c(breaks, breaks[length(breaks)] + 0.05)
 
 # 히스토그램을 그립니다. 
-hist(x = dtXls50$OPS, breaks = breaks, ylim = c(0, 35), labels = TRUE)
-abline(v = 0.9, col = "red")
+hist(x = hitters50$OPS,
+     breaks = breaks,
+     ylim = c(0, 35),
+     labels = TRUE)
+
+abline(v = 0.9, col = 'red')
 ```
 
 두 개의 히스토그램을 겹쳐서 그리면 두 숫자형 벡터의 분포를 비교할 수 있습니다. OPS를 구성하는 장타율과 출루율에 대해서 히스토그램을 겹쳐서 그려보겠습니다. 이 때 주의할 점은 각각의 계급값이 같아야 막대가 예쁘게(?) 그려진다는 것입니다. 
 
 ```{r}
 # 장타율과 출루율의 범위를 확인합니다. 
-range(dtXls50$장타율)
-range(dtXls50$출루율)
+range(hitters50$장타율)
+range(hitters50$출루율)
 
 # 두 범위의 최소값과 최대값으로 적당한 계급값을 정합니다. 
-(max(dtXls50$장타율) - min(dtXls50$장타율)) / 20
+(max(hitters50$장타율) - min(hitters50$장타율)) / 20
 
 # 계급 구분값을 만들고 마지막에 숫자를 추가합니다. 
-breaks <- seq(from = min(dtXls50$장타율) %>% round(digits = 1L),
-              to = max(dtXls50$장타율) %>% round(digits = 1L),
+breaks <- seq(from = min(hitters50$장타율) %>% round(digits = 1L),
+              to = max(hitters50$장타율) %>% round(digits = 1L),
               by = 0.025)
 
 # 이번 예제에서는 첫 구분값 미만인 값이 포함되지 않으므로 
@@ -625,20 +627,30 @@ breaks <- seq(from = min(dtXls50$장타율) %>% round(digits = 1L),
 breaks <- c(breaks[1] - 0.025, breaks)
 
 # 장타율 데이터로 첫 번째 히스토그램을 그립니다. 
-hist(x = dtXls50$장타율, breaks = breaks, col = "gray60",
-     xlim = range(breaks), ylim = c(0, 50),
-     xlab = '장타율 및 출루율', ylab = '빈도수',
-     main = "장타율과 출루율 히스토그램 비교", family = "NanumGothic")
+hist(x = hitters50$장타율,
+     breaks = breaks,
+     col = 'gray60',
+     xlim = range(breaks),
+     ylim = c(0, 50),
+     xlab = '장타율 및 출루율',
+     ylab = '빈도수',
+     main = '장타율과 출루율 히스토그램 비교',
+     family = 'NanumGothic')
 
-# 두 번째 히스토그램에 "add = TRUE"를 추가하면 기존 히스토그램에 겹쳐집니다. 
-hist(x = dtXls50$출루율, breaks = breaks, col = "gray80", add = TRUE)
+# 두 번째 히스토그램에 'add = TRUE'를 추가하면 기존 히스토그램에 겹쳐집니다. 
+hist(x = hitters50$출루율,
+     breaks = breaks,
+     col = 'gray80',
+     add = TRUE)
 
 # 범례를 추가합니다. 
 legend(x = 0.6,
        y = 50,
        legend = c('장타율', '출루율'),
        col = c('gray60', 'gray80'),
-       pch = 15, cex = 1.0, bty = 'n')
+       pch = 15,
+       cex = 1.0,
+       bty = 'n')
 ```
 
 ### 상자수염그림으로 그룹별 분포 확인하기
@@ -647,8 +659,10 @@ legend(x = 0.6,
 
 ```{r}
 # 팀별 타율 분포를 비교합니다. 
-boxplot(formula = 타율 ~ 팀명, data = dtXls50,
-        xlab = "팀명", ylab = "타율",
+boxplot(formula = 타율 ~ 팀명,
+        data = hitters50,
+        xlab = '팀명',
+        ylab = '타율',
         main = '팀별 타율 분포 비교')
 ```
 
@@ -656,7 +670,7 @@ boxplot(formula = 타율 ~ 팀명, data = dtXls50,
 
 ```{r}
 # '기아 타이거즈' 선수 중 타율이 가장 높은 선수명을 확인해봅니다.
-dtXls50 %>% 
+hitters50 %>% 
   dplyr::filter(팀명 == 'KIA' & 타율 == max(타율)) %>% 
   select('선수명')
 ```
@@ -665,16 +679,18 @@ dtXls50 %>%
 
 ```{r}
 # 팀별 홈런 분포를 비교합니다. 
-boxplot(formula = 홈런 ~ 팀명, data = dtXls50,
-        xlab = "팀명", ylab = "타율",
-        main = '팀별 타율 분포 비교')
+boxplot(formula = 홈런 ~ 팀명,
+        data = hitters50,
+        xlab = '팀명',
+        ylab = '홈런',
+        main = '팀별 홈런 분포 비교')
 ```
 
 역시 홈런하면 SK 와이번즈입니다. 중위수도 가장 높고 홈런왕도 배출했습니다. 지난해 홈런왕이 누군지 다 아시죠? 
 
 ```{r}
 # 'SK 와이번즈' 선수 중 가장 많은 홈런을 친 선수명을 확인해봅니다.
-dtXls50 %>% 
+hitters50 %>% 
   dplyr::filter(팀명 == 'SK' & 홈런 == max(홈런)) %>% 
   select('선수명')
 ```
@@ -687,7 +703,7 @@ dtXls50 %>%
 
 ```{r}
 # 관심 있는 선수 스탯을 팀별로 요약하여 새로운 데이터프레임을 만듭니다. 
-teamStat <- dtXls %>% 
+teamStat <- hitters %>% 
   select(c('팀명', '타석', '타수', '안타', '홈런', '득점', '타점')) %>% 
   group_by(팀명) %>% 
   summarize(등록 = n(),
@@ -714,10 +730,15 @@ str(object = teamStat)
 teamStat <- teamStat[order(teamStat$타율), ]
 
 # 오름차순 산점도를 그려봅니다. 
-plot(x = teamStat$타율, ylim = c(0.265, 0.305), family = "NanumGothic")
+plot(x = teamStat$타율,
+     ylim = c(0.265, 0.305),
+     family = 'NanumGothic')
 
 # 팀명을 점 아래에 출력합니다. 
-text(x = teamStat$타율, labels = teamStat$팀명, pos = 1, family = "NanumGothic")
+text(x = teamStat$타율,
+     labels = teamStat$팀명,
+     pos = 1,
+     family = 'NanumGothic')
 ```
 
 이번에는 팀별 홈련 개수를 막대그래프로 그려서 확인해보겠습니다. 
@@ -731,14 +752,18 @@ teamStat <- teamStat[order(teamStat$홈런), ]
 bp <- barplot(height = teamStat$홈런,
               names.arg = teamStat$팀명,
               border = FALSE,
-              main = "팀별 홈런 개수 비교",
-              family = "NanumGothic",
-              col = ifelse(test = teamStat$팀명 %in% c("KIA", "두산"),
-                           yes = "orange",
-                           no = "gray80"))
+              main = '팀별 홈런 개수 비교',
+              family = 'NanumGothic',
+              col = ifelse(test = teamStat$팀명 %in% c('KIA', '두산'),
+                           yes = 'orange',
+                           no = 'gray80'))
 
 # 팀별 홈런 개수를 막대에 출력합니다. 
-text(x = bp, y = teamStat$홈런, labels = teamStat$홈런, cex = 1, pos = 1)
+text(x = bp,
+     y = teamStat$홈런,
+     labels = teamStat$홈런,
+     cex = 1,
+     pos = 1)
 ```
 
 역시 비룡군단입니다. 홈런 개수가 월등히 많네요. 올해도 많은 홈런을 기대해봅니다. 
@@ -754,11 +779,11 @@ teamStat <- teamStat[order(teamStat$인당홈런), ]
 bp <- barplot(height = teamStat$인당홈런,
               names.arg = teamStat$팀명,
               border = FALSE,
-              main = "팀별 인당홈런 개수 비교",
-              family = "NanumGothic",
-              col = ifelse(test = teamStat$팀명 %in% c("KIA", "두산"),
-                           yes = "orange",
-                           no = "gray80"))
+              main = '팀별 인당홈런 개수 비교',
+              family = 'NanumGothic',
+              col = ifelse(test = teamStat$팀명 %in% c('KIA', '두산'),
+                           yes = 'orange',
+                           no = 'gray80'))
 
 # 팀별 홈런 개수를 막대에 출력합니다. 
 text(x = bp, y = teamStat$인당홈런, labels = teamStat$인당홈런, cex = 1, pos = 1)
