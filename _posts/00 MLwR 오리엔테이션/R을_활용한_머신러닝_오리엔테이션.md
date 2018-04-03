@@ -11,46 +11,19 @@ R을 활용한 머신러닝
 목차
 ----
 
--   R 기초
-    -   R 자료형 소개 (벡터, 행렬, 리스트, 데이터프레임 등)
-    -   Indexing과 Slicing
--   R 웹크롤러 (GET, POST, User-agent, JavaScript, RSelenium, Open API)
-    -   GET 함수로 수집하기
-    -   POST 함수로 수집하기
-    -   User-Agent 설정하기
-    -   JavaScript 우회하기
-    -   RSelenium 활용하기
-    -   Open API 활용하기
--   탐색적 데이터 분석 (Explorative Data Analysis)
-
--   데이터 시각화
-    -   ggpot2 패키지
-    -   google map API
--   상관분석 (Correlation Analysis)
-    -   상관분석
-    -   t검정
-    -   분산분석
--   차원축소
-    -   주성분분석 (PCA)
-    -   요인분석 (FA)
-    -   다차원척도법 (MDS)
--   군집분석 (Clustering)
-    -   계층적 군집분석
-    -   K-평균 군집분석
--   K근접이웃(KNN)
-
--   나이브 베이즈(Naive Bayes)
-
--   의사결정나무 (Decision Tree)
-
--   단순선형회귀분석 (Linear Regression)
-
--   다중선형회귀분석 변수선택 (Linear Regression with variable selection)
-
--   벌점화 회귀모형 : Ridge, LASSO, Elastic Net
-
--   로지스틱 회귀분석 (Logistic Regression)
-
--   랜덤포레스트 (Random Forest)
-
--   서포트벡터머신 (Support Vector Machine)
+1.  R 기초 : R 자료형 소개, Indexing과 Slicing
+2.  R 웹크롤러 (GET, POST, User-agent, JavaScript, RSelenium, Open API)
+3.  탐색적 데이터 분석 (Explorative Data Analysis)
+4.  데이터 시각화 : ggpot2, google map API
+5.  상관분석, t검정, 분산분석
+6.  차원축소 : 주성분분석 (PCA), 요인분석 (FA), 다차원척도법 (MDS)
+7.  군집분석 (Clustering) : 계층적 군집분석, K-평균 군집분석
+8.  K근접이웃(KNN)
+9.  나이브 베이즈(Naive Bayes)
+10. 의사결정나무 (Decision Tree)
+11. 단순선형회귀분석 (Linear Regression)
+12. 다중선형회귀분석 변수선택 (Linear Regression with variable selection)
+13. 벌점화 회귀모형 : Ridge, LASSO, Elastic Net
+14. 로지스틱 회귀분석 (Logistic Regression)
+15. 랜덤포레스트 (Random Forest)
+16. 서포트벡터머신 (Support Vector Machine)
