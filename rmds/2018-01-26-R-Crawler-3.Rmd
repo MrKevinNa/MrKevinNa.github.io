@@ -73,7 +73,7 @@ aptList <- read_html(resp) %>%
   html_table(fill = TRUE)
 ```
 
-여기서 잠깐! **Windows** 사용자라면 이 부분에서 에러가 발생될 것입니다. 바로 **인코딩 문제 때문**인데요. 제가 이 부분을 해결하는 방법을 따로 정리했습니다. [인코딩 문제 해결하기](https://mrkevinna.github.io/%EC%9D%B8%EC%BD%94%EB%94%A9-%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0/)를 먼저 확인하시기 바랍니다.
+여기서 잠깐! **Windows** 사용자라면 이 부분에서 에러가 발생될 것입니다. 바로 **인코딩 문제 때문**인데요. 제가 이 부분을 해결하는 방법을 따로 정리했습니다. [한글 인코딩 문제 해결하기](https://mrkevinna.github.io/R-Crawler-3-%EB%B6%80%EB%A1%9D/)를 먼저 확인하시기 바랍니다.
 
 ```{r}
 # 데이터 테이블 구조를 확인합니다.
