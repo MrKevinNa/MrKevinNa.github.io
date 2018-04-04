@@ -1,5 +1,5 @@
 ---
-title: "R 기초2 인덱싱 및 슬라이싱"
+title: "R 객체의 인덱싱 및 슬라이싱"
 author: "Dr.Kevin"
 date: "1/2/2018"
 output: github_document

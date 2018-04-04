@@ -1,5 +1,5 @@
 ---
-title: "R Crawler1 GET 함수로 수집하기"
+title: "GET 함수로 수집하기"
 author: "Dr.Kevin"
 date: "1/18/2018"
 output: github_document
