@@ -2,9 +2,7 @@
 title: "Stringr 패키지 주요 함수 소개"
 author: "Dr.Kevin"
 date: "3/26/2018"
-output: 
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -52,7 +50,7 @@ x %>%
 
 ```
 
-제가 보기에는 파이프 연산자를 쓴 코드가 더 예쁘고 보기 좋은데 여러분은 어떤가요? ^^
+제가 보기에는 파이프 연산자를 쓴 코드가 더 예쁘고 보기 좋은데 여러분은 어떤가요?
 
 ### 관심 있는 패턴 포함 여부 확인하기
 
