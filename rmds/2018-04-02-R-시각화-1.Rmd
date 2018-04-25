@@ -1,7 +1,7 @@
 ---
 title: 'ggplot2 패키지를 활용한 시각화 1'
 author: "Dr.Kevin"
-date: "1/1/2018"
+date: "4/2/2018"
 output: github_document
 ---
 
