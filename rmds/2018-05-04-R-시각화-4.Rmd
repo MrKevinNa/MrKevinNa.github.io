@@ -38,7 +38,7 @@ library(ggplot2)
 # 세계 지도를 불러옵니다. 
 world <- map_data(map = 'world', region = '.')
 
-# 세계 지도에 포함된 국가명만 오름차순으로 정렬합니다.
+# 세계 지도에 포함된 국가명만 오름차순으로 정렬 후 출력합니다.
 world$region %>% unique() %>% sort()
 ```
 
