@@ -42,7 +42,7 @@ world <- map_data(map = 'world', region = '.')
 world$region %>% unique() %>% sort()
 ```
 
-모두 252개의 국가명이 출력되었습니다. 이 중엣 동북아시아 국가명만 골라서 주변 지도를 만들어 보겠습니다. 
+모두 252개의 국가명이 출력되었습니다. 이 중에서 동북아시아 국가명만 골라서 주변 지도를 만들어 보겠습니다. 
 
 ```{r}
 # 동북아시아 지도 데이터를 만듭니다.
@@ -238,7 +238,7 @@ register_google(key = '자신의 구글 지도 API 인증키를 입력하세요'
 register_google(key = 'AIzaSyAvP8a3r6aGTBpFwLn3e2lpIZrUGvhUBYU')
 ```
 
-```{r}
+```{r message=FALSE}
 # 독도의 위경도 좌표를 얻습니다.
 dd <- geocode(location = "dokdo")
 
