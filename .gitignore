@@ -9,8 +9,8 @@ package.json
 .Rproj.user
 .Rhistory
 *.Rproj
-.dbf
-.sbn
-.sbx
-.shp
-.shx
+*.dbf
+*.sbn
+*.sbx
+*.shp
+*.shx
