@@ -1,0 +1,303 @@
+---
+title: 'leaflet 패키지를 활용한 지도 시각화'
+author: 'Dr.Kevin'
+date: '5/4/2018'
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+```
+
+지난 포스팅에서는 Google Map Api를 활용하여 주소 정보로 위경도 좌표를 받고, 해당 좌표를 중심으로 지도를 불러온 후 지도 위에 몇 가지 이미지를 추가하는 방법에 대해 살펴보았습니다. 그 결과로 정적인 지도 이미지를 생성하였습니다만, **leaflet** 패키지를 활용하여 동적 지도 이미지(HTML)를 생성할 수 있습니다.
+
+이번 포스팅은 [**R 시각화 3**](https://mrkevinna.github.io/R-%EC%8B%9C%EA%B0%81%ED%99%94-3/)의 부록입니다. 서울 지하철 2호선의 승하차 데이터를 활용하여 지난 포스팅에서 배운 것을 복습하고, **leaflet** 패키지를 활용하여 동적 지도 이미지 만드는 방법을 순서대로 알아보도록 하겠습니다. 
+
+### 정적 지도 이미지 만들기 (서울 지하철 2호선 시각화)
+
+이번 포스팅에서 사용할 데이터를 먼저 준비해야 되겠죠? [**티머니 대중교통 통계자료**](https://www.t-money.co.kr/ncs/pct/ugd/ReadUgdMainGd.dev) 웹페이지에서는 매월 교통카드 통계자료를 제공하고 있습니다. 웹페이지에 접속하여 왼쪽 아래를 살펴보면 **대중교통 통계자료**라는 항목이 있습니다. 이 항목을 클릭하면 월별 교통카드 통계자료를 엑셀 파일로 내려받을 수 있습니다. 가장 최근 자료인 **2018년 04월 교통카드 통계자료.xlsx**를 선택한 후 적당한 위치에 옮겨놓습니다. 그리고 해당 데이터를 불러옵니다. 
+
+```{r message=FALSE}
+# 필요 패키지를 불러옵니다. 
+library(readxl)
+```
+
+```{r}
+# 2018년 04월 교통카드 통계자료를 불러옵니다.
+# "지하철 노선별 역별 이용현황"은 두 번째 sheet에 저장되어 있습니다. 
+subway <- read_excel(path = './data/2018년 04월 교통카드 통계자료.xls', sheet = 2)
+
+# 데이터의 구조를 확인합니다. 
+str(object = subway)
+
+# 데이터를 미리보기 합니다.
+head(x = subway, n = 10L)
+```
+
+`subway` 객체는 서울 지하철 590개 역에 대해 `사용월`, `호선명`, `역ID`, `지하철역`, `승차승객수`, `하차승객수`, `작업일시` 등 7개 컬럼으로 구성된 **tbl_df, tbl, data.frame**인 것을 확인할 수 있습니다. 승차승객수와 하차승객수는 숫자 벡터이어야 하는데 문자 벡터로 되어 있습니다. 왜 그럴까요? 그건 숫자 사이에 콤마(,)가 있기 때문입니다. 이 컬럼들로 사칙연산을 하려면 미리 숫자 벡터로 변환해두어야 합니다. 
+
+```{r}
+# 승하차 승객수 컬럼들을 숫자 벡터로로 변환합니다.
+# [주의!] 숫자 사이의 콤마(,)를 먼저 제거해야 숫자로 변환할 수 있습니다.
+subway[ , c('승차승객수', '하차승객수')] <- 
+  subway[ , c('승차승객수', '하차승객수')] %>% 
+  sapply(FUN = str_remove_all, pattern = ',') %>% 
+  as.numeric()
+```
+
+미리보기에서 `지하철역`을 보면 9번째 행에 '청량리(서울시립대입구)'로 되어 있는 걸 확인할 수 있습니다. 나중에 지도에 지하철역명을 출력해줘야 하는데 일부 역명이 아주 길게 되어 있는 것 같습니다. `지하철역` 글자 길이를 확인하고 적절한 조치를 취해야 할 것 같습니다. 
+
+```{r}
+# 지하철역의 글자 길이를 확인합니다.
+nchar(x = subway$지하철역) %>% table()
+```
+
+대부분이 2~3글자로 되어 있는데 최대 16글자로 되어 있는 지하철역도 있군요. `지하철역`의 길이가 6 이상인 항목들을 확인해보겠습니다. 
+
+```{r}
+# 지하철역의 글자 길이가 6 이상인 항목을 출력합니다. 
+subway$지하철역[nchar(x = subway$지하철역) >= 6]
+```
+
+원래 이름이 긴 지하철역도 있지만 대부분이 괄호로 추가 지명이 붙어 있음을 알 수 있습니다. 괄호 부분을 모두 삭제하면 길이를 크게 줄일 수 있을 것 같습니다. 아울러 `지하철역`이 '역'으로 끝나지 않은 경우 '역'을 붙이겠습니다. '역'을 붙이는 이유는 지명으로 위경도 좌표를 불러올 경우, 엉뚱한 곳의 좌표를 가져울 수 있기 때문입니다. 
+
+```{r}
+# 지하철역 컬럼 데이터를 정리합니다.
+# str_remove() 함수를 이용하여 괄호 부분을 없앱니다.
+# 맨 뒤에 '역'으로 끝나지 않으면 '역'을 붙입니다.
+subway$지하철역s <- 
+  subway$지하철역 %>% 
+  str_replace(pattern = '\\(.+\\)', replacement = '') %>% 
+  str_replace(pattern = '역$', replacement = '') %>% 
+  str_c('역')
+
+# 미리보기 합니다.
+head(x = subway, n = 10L)
+```
+
+새로 만든 `지하철역s` 컬럼이 잘 저장되어 있습니다. 이 컬럼의 데이터로 위경도 좌표를 수집하도록 하겠습니다. **ggmap** 패키지를 불러오고 **Google Map Api 인증키**를 등록하는 것부터 해야 되겠죠?
+
+```{r message=FALSE}
+# 필요 패키지를 불러옵니다. 
+library(ggmap)
+```
+
+```{r eval=FALSE}
+# 구글 지도 API 인증키를 등록합니다. 
+register_google(key = '자신의 구글 지도 API 인증키를 입력하세요')
+```
+
+```{r echo=FALSE}
+# 구글 지도 API 인증키를 등록합니다. 
+register_google(key = 'AIzaSyAvP8a3r6aGTBpFwLn3e2lpIZrUGvhUBYU')
+```
+
+인증키가 제대로 등록되었으면 Google Map API 일별 한도를 확인해보죠. 
+
+```{r}
+# Google Map API 일별 한도를 확인합니다.
+geocodeQueryCheck()
+```
+
+2,500번 남아 있습니다. 이제 위경도 좌표를 수집합니다. 여기서 잠깐! `geocode()` 및 `mutate_geocode()` 함수는 `location` 인자에 **UTF-8** 인코딩 방식의 텍스트를 지정해야 제대로 작동합니다. 따라서 Window 사용자는 개별 텍스트를 입력할 때에는 `enc2utf8()` 함수를 이용하든가 아니면 `iconv()` 함수를 이용하여 인코딩 방식을 **UTF-8**로 변경해주어야 합니다. 
+
+```{r}
+# 지하철역s 컬럼의 인코딩 방식을 확인합니다.
+Encoding(x = subway$지하철역s) %>% unique()
+```
+
+```{r}
+# 서울 지하철 2호선만 따로 추출합니다.
+subwayNo2 <- subway[subway$호선명 == '2호선', ]
+```
+
+서울 지하철 2호선에 해당하는 역만 추출하니 총 50건으로 줄어들었습니다. 이 데이터로 위경도 좌표를 얻도록 하겠습니다. 
+
+```{r message=FALSE}
+# 지하철역으로 위경도 좌표 얻기
+subwayNo2 <- mutate_geocode(data = subwayNo2,
+                            location = 지하철역s,
+                            source = 'google')
+```
+
+이제 지도 위에 출력할 준비가 완료되었습니다. **roadmap** 지도 위에 서울 지하철 2호선(순환) 지하철역을 표시하고 다각형을 지정한 후 테두리만 어두운 녹색으로 출력해보겠습니다. 
+
+```{r message=FALSE}
+# 서울 지하철 2호선 중 지선은 제외합니다. (용답~신설동, 도림천~까치산)
+df <- subwayNo2[1:43, ]
+
+# 중심 계산
+center <- c(median(x = df$lon), median(x = df$lat))
+
+# 지도 위에 지하철 2호선 역을 표시합니다.
+qmap(location = center,
+     zoom = 12,
+     maptype = 'roadmap',
+     source = 'google',
+     color = 'color') + 
+  geom_polygon(data = df,
+               mapping = aes(x = lon,
+                             y = lat,
+                             group = 호선명),
+               color = 'darkgreen',
+               fill = 'white',
+               size = 2,
+               alpha = 0) + 
+  geom_point(data = df,
+             mapping = aes(x = lon,
+                           y = lat),
+             pch = 21,
+             fill = 'darkgreen',
+             color = 'black',
+             size = 4,
+             stroke = 2) + 
+  geom_label(data = df,
+            mapping = aes(x = lon,
+                          y = lat,
+                          label = 지하철역s),
+            family = 'NanumGothic',
+            fontface = 'bold',
+            size = 3,
+            alpha = 0.5,
+            nudge_y = 0.004)
+```
+
+뭔가 좀 이상하죠? 신림역이 엉뚱한 곳에 출력되었습니다. 이런 경우, 번거롭더라도 해당 지명의 주소지를 검색하여 수정해주어야 합니다. 신림역의 주소는 '서울특별시 관악구 남부순환로 1614'입니다. 이 주소로 다시 위경도 좌표를 구하고, 기존 좌표와 교체하겠습니다. 
+
+```{r message=FALSE}
+# 신림역 위경도 좌표를 다시 얻습니다.
+newCoords <- geocode(location = enc2utf8('서울특별시 관악구 남부순환로 1614'),
+                     output = 'latlona',
+                     source = 'google')
+
+# 신림역 위경도 좌표를 변경합니다. 
+subwayNo2[subwayNo2$지하철역s == '신림역', c('lon', 'lat')] <- newCoords[, c('lon', 'lat')]
+```
+
+지도 위에 서울 지하철 2호선 시각화 작업을 다시 해보겠습니다. 
+
+
+```{r message=FALSE}
+# 서울 지하철 2호선 중 지선은 제외합니다. (용답~신설동, 도림천~까치산)
+df <- subwayNo2[1:43, ]
+
+# 중심을 중위값으로 지정합니다.
+center <- c(median(x = df$lon), median(x = df$lat))
+
+# 지도 위에 지하철 2호선 역을 표시합니다.
+qmap(location = center,
+     zoom = 12,
+     maptype = 'roadmap',
+     source = 'google',
+     color = 'color') + 
+  geom_polygon(data = df,
+               mapping = aes(x = lon,
+                             y = lat,
+                             group = 호선명),
+               color = 'darkgreen',
+               fill = 'white',
+               size = 2,
+               alpha = 0) + 
+  geom_point(data = df,
+             mapping = aes(x = lon,
+                           y = lat),
+             pch = 21,
+             fill = 'darkgreen',
+             color = 'black',
+             size = 4,
+             stroke = 2) + 
+  geom_label(data = df,
+            mapping = aes(x = lon,
+                          y = lat,
+                          label = 지하철역s),
+            family = 'NanumGothic',
+            fontface = 'bold',
+            size = 3,
+            alpha = 0.5,
+            nudge_y = 0.004)
+```
+
+이제 제대로 출력되었습니다. 여기까지는 지난 포스팅에서 했던 복습이라고 할 수 있습니다. 그럼 **leaflet** 패키지의 아주 일부 함수만 사용하여 동적인 지도 이미지를 만드는 방법을 알아보도록 하겠습니다. 아직 **leaflet** 패키지를 설치하지 않았다면 지금 바로 설치하기 바랍니다.
+
+### 동적인 지도 이미지 만들기 
+
+```{r message=FALSE}
+# 필요 패키지를 불러옵니다. 
+library(leaflet)
+```
+
+**leaflet** 패키지를 활용하는 간단한 방법은 `leaflet()` 함수를 활용하여 `leaflet` 객체를 만들고 다양한 타일을 추가함으로써 지도처럼 보이게 하는 것입니다. `leaflet` 객체를 만들 때 지도 위에 표시하고 싶은 항목들을 지정해주어야 하는데요. 정적인 이미지와 같이 아무런 동작 없이 정보를 출력할 수 있고, 아니면 마우스로 클릭하면 말풍선처럼 출력하고 사라지게 할 수 있습니다. 또는 해당 위치에 마우스 포인터를 놓았을 때 정보가 출력되도록 할 수도 있습니다. 
+
+첫 번째 예제로는 지도 위에 서울 지하철 2호선 역별로 승차승객수의 크기에 비례하여 원을 그리고, 해당 역의 승차승객수를 말풍선으로 출력한 후 마우스로 제거할 수 있도록 하는 방법입니다.
+
+이번 포스팅에서 소개해드릴 **leaflet** 패키지의 주요 함수는 아래와 같습니다.  
+
+  - `leaflet()` : 시각화할 데이터를 지정합니다.  
+  - `setView()` : 불러올 지도를 설정합니다.  
+  - `addCircles()` : 원 모양의 이미지를 추가합니다.  
+  - `addPopups()` : 팝업 이미지를 추가합니다.  
+
+```{r}
+# 지도의 중심을 중위값으로 지정합니다.
+center <- c(median(x = subwayNo2$lon), median(x = subwayNo2$lat))
+
+# leaflet() 함수를 이용하여 subwayNo2Leaflet1 객체를 생성합니다.
+subwayNo2Leaflet1 <- 
+  subwayNo2 %>% 
+  leaflet() %>% 
+  setView(lng = center[1],
+          lat = center[2],
+          zoom = 14) %>% 
+  addCircles(lng = ~ lon,
+             lat = ~ lat,
+             radius = ~ sqrt(승차승객수) / 2,
+             weight = 1,
+             color = NULL,
+             fillColor = ~ 'darkgreen',
+             opacity = 1) %>% 
+  addPopups(lng = ~ lon,
+            lat = ~ lat,
+            popup = ~ str_c(지하철역, '(', 승차승객수, ')'),
+            options = popupOptions(minWidth = 20,
+                                   closeOnClick = FALSE,
+                                   closeButton = TRUE))
+
+# 생성한 subwayNo2Leaflet1 객체에 타일을 추가하여 지도로 시각화합니다.
+subwayNo2Leaflet1 %>% addTiles()
+```
+
+지도 왼쪽 상단에 있는 **+ / -** 버튼을 클릭하면 지도를 확대하거나 축소할 수 있습니다. 마우스의 휠을 이용하여 확대하거나 축소하는 것도 가능합니다. 그런데 지도 때문에 서울 지하철 2호선 역마다 추가한 정보가 잘 보이지 않네요. 타일을 바꿔보겠습니다. 
+
+```{r}
+# 'CartoDB.Positron' 타일로 변경합니다.
+subwayNo2Leaflet1 %>% addProviderTiles(provider = 'CartoDB.Positron')
+```
+
+이제 아주 잘 보입니다. 추가할 수 있는 타일은 이 외에도 'Stamen.Toner', 'Stamen.TonerLines', 'Acetate.terrain' 등이 있으니 직접 해보기 바랍니다. 
+
+두 번째 예제로는 첫 번째 예제와 큰 차이가 없지만, 어떤 지하철역의 원을 클릭했을 때 승차승객수를 말풍선으로 출력하는 방법에서 차이가 있습니다. 마찬가지로 마우스로 클릭하여 없앨 수도 있습니다.
+
+```{r}
+# subwayNo2Leaflet2 객체를 생성합니다.
+subwayNo2Leaflet2 <- 
+  subwayNo2 %>% 
+  leaflet() %>% 
+  setView(lng = center[1],
+          lat = center[2],
+          zoom = 14) %>% 
+  addCircles(lng = ~ lon,
+             lat = ~ lat,
+             radius = ~ sqrt(승차승객수) / 2,
+             weight = 1,
+             color = NULL,
+             popup = ~ str_c(지하철역, '(', 승차승객수, ')'),
+             fillColor = ~ 'darkgreen',
+             opacity = 1)
+
+# 'CartoDB.Positron' 타일을 추가합니다.
+subwayNo2Leaflet2 %>% addProviderTiles(provider = 'CartoDB.Positron')
+```
+
+지금까지 작업한 결과를 HTML로 저장하려면 **Viewer** 패널의 **Export**를 클릭한 후 아래 메뉴에서 **Save as Web Page**를 선택하면 됩니다. 그러면 해당 HTML 파일을 더블 클릭하였을 때 웹 브라우저에서 이미지를 확인할 수 있습니다. 
+
+이상으로 **leaflet** 패키지에 대해서 간단하게 살펴보았습니다. 
