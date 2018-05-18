@@ -8,6 +8,7 @@ node_modules
 package.json
 .Rproj.user
 .Rhistory
+*.R
 *.Rproj
 *.dbf
 *.sbn
