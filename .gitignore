@@ -15,3 +15,6 @@ package.json
 *.sbx
 *.shp
 *.shx
+
+# for shinyapps.io
+*.dcf
