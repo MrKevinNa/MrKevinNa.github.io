@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 300)
 ```{r message=FALSE}
 # 필요 패키지를 불러옵니다. 
 library(leaflet)
+library(shiny)
 ```
 
 ```{r}
