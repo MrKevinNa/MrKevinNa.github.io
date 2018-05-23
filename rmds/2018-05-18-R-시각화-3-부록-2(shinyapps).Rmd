@@ -17,6 +17,8 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 300)
 ```{r message=FALSE}
 # 필요 패키지를 불러옵니다. 
 library(leaflet)
+library(stringr)
+library(dplyr)
 ```
 
 ```{r}
@@ -52,13 +54,13 @@ leafletObj <-
              weight = 1,
              color = NULL,
              fillColor = ~ 'darkgreen',
-             opacity = 1) 
-  # addPopups(lng = ~ lon,
-  #           lat = ~ lat,
-  #           popup = ~ str_c(지하철역, '(', 승차승객수, ')'),
-  #           options = popupOptions(minWidth = 20,
-  #                                  closeOnClick = FALSE,
-  #                                  closeButton = TRUE))
+             opacity = 1) %>%  
+  addPopups(lng = ~ lon,
+            lat = ~ lat,
+            popup = ~ str_c(지하철역, '(', 승차승객수, ')'),
+            options = popupOptions(minWidth = 20,
+                                   closeOnClick = FALSE,
+                                   closeButton = TRUE))
 
 # 생성한 leafletObj 객체에 타일을 추가하여 지도로 시각화합니다.
 renderLeaflet( leafletObj %>% addTiles() )
@@ -75,7 +77,7 @@ renderLeaflet( leafletObj %>% addProviderTiles(provider = 'CartoDB.Positron') )
 
 두 번째 예제로는 첫 번째 예제와 큰 차이가 없지만, 어떤 지하철역의 원을 클릭했을 때 승차승객수를 말풍선으로 출력하는 방법에서 차이가 있습니다. 마찬가지로 마우스로 클릭하여 없앨 수도 있습니다.
 
-```{r eval=FALSE}
+```{r}
 # 처음부터 말풍선을 출력하는 대신 원을 클릭할 때만 생기도록 합니다.
 renderLeaflet({
   subwayNo2 %>% 
