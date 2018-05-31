@@ -1,7 +1,7 @@
 ---
-title: '혼동행렬과 ROC 커브, AUROC'
+title: '분류모형의 성능 평가 기준'
 author: 'Dr.Kevin'
-date: '6/1/2018'
+date: '5/31/2018'
 output: github_document
 ---
 
