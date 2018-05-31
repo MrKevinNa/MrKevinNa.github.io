@@ -1,5 +1,5 @@
 ---
-title: '기계학습 알고리즘'
+title: '기계학습 알고리즘의 종류와 데이터셋 분할'
 author: 'Dr.Kevin'
 date: '5/31/2018'
 output: github_document
