@@ -82,7 +82,7 @@ p차원의 공간에 두 점 $ A(x_1, x_2, \cdots , x_p) $와 $ B(y_1, y_2, \cdo
 
   $$ \text {d(A, B)} = \biggl[ (X - Y)^T \Sigma^{-1} (X - Y) \biggl]^{\frac {1}{2}} $$
   
-  $$ S = \left[ \begin{array}{ccc} \sigma_{11} & \sigma_{12} & \cdots & \sigma_{1p} \\ \sigma_{21} & \sigma_{22} & \cdots & \sigma_{2p} \\ \vdots & \vdots & \ddots & \vdots \\ \sigma_{p1} & \sigma_{p2} & \cdots & \sigma_{pp} \\ \end{array} \right] $$
+  $$ \Sigma = \left[ \begin{array}{ccc} \sigma_{11} & \sigma_{12} & \cdots & \sigma_{1p} \\ \sigma_{21} & \sigma_{22} & \cdots & \sigma_{2p} \\ \vdots & \vdots & \ddots & \vdots \\ \sigma_{p1} & \sigma_{p2} & \cdots & \sigma_{pp} \\ \end{array} \right] $$
 
   - 코사인 유사도 : 두 벡터이 내적을 각 벡터의 크기로 나눈 값을 1에서 뺀 것입니다. 코사인은 0 ~ 1 사이의 값을 갖는데, 0도 일 때 1, 90도일 때 0의 값을 갖는다는 점을 착안한다면 두 벡터의 사이각이 0에 가까울수록 두 벡터의 거리가 가깝다고 판단할 수 있습니다.  
   
