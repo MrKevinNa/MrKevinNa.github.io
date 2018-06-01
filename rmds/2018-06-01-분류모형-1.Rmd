@@ -87,7 +87,7 @@ par(family = 'NanumGothic')
 
 # quality 컬럼으로 막대그래프를 그려 분포를 확인합니다. 
 bp <- barplot(height = table(wine$quality), 
-              ylim = c(0, 2300), 
+              ylim = c(0, 2400), 
               xlab = '와인 품질')
 # 빈도수를 추가합니다.
 text(x = bp, 
@@ -390,7 +390,7 @@ predObj <- prediction(predictions = as.numeric(testSet$predBal), labels = testSe
 perform <- performance(prediction.obj = predObj, measure = 'tpr', x.measure = 'fpr')
 
 # ROC 커브를 그립니다.
-plot(x = perform, main = 'ROC 커브 - 첫 번째 모형')
+plot(x = perform, main = 'ROC 커브 - 두 번째 모형')
 
 # 왼쪽 아래 모서리에서 오른쪽 위 모서리를 잇는 대각선을 추가합니다. 
 lines(x = c(0, 1), y = c(0, 1), col = 'red', lty = 2)
