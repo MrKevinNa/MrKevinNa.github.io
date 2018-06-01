@@ -28,7 +28,7 @@ K-근접이웃은 사실 분류모형 뿐만 아니라 회귀모형에도 사용
 
 ![KNN](https://www.researchgate.net/profile/Victor_Sheng/publication/260612049/figure/fig2/AS:214207917236228@1428082555895/The-principle-diagram-of-the-kNN-classification-algorithm.png)^[출처 : https://www.researchgate.net/figure/260612049_fig2_The-principle-diagram-of-the-kNN-classification-algorithm]
 
-그렇기 때문에 KNN 알고리즘에서 가장 중요한 것은 정수 K를 얼마로 설정하느냐에 따라 결과가 달라집니다.  
+그렇기 때문에 KNN 알고리즘에서 가장 중요한 것은 K를 얼마로 설정하느냐에 따라 결과가 달라집니다.  
 
   - K를 작은 숫자로 설정하면 참고하는 데이터의 범위가 작아지므로 인접한 소수의 값들에 크게 영향을 받습니다. (이상치에 민감)  
   - 반대로 K를 큰 숫자로 설정하면 참고하는 데이터의 범위가 커지므로 인접한 값들의 영향도가 감소합니다.  
@@ -54,7 +54,7 @@ str(object = wine)
 head(x = wine, n = 10L)
 ```
 
-불러온 데이터는 12개의 컬럼, 4989 건을 갖는 데이터 프레임입니다. 컬럼별 상세는 다음과 같습니다.  
+불러온 데이터는 12개의 컬럼, 4898 행을 갖는 데이터 프레임입니다. 컬럼별 상세는 다음과 같습니다.  
 
   - fixed.acidity : 고정 산도  
   - volatile.acidity : 변동 산도  
