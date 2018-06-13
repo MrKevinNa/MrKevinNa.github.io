@@ -1,5 +1,5 @@
 ---
-title: 'K-근접이웃'
+title: 'K-근접이웃 (K-nearest neighbors)'
 author: 'Dr.Kevin'
 date: '6/1/2018'
 output: github_document
