@@ -9,24 +9,34 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE, dpi = 300)
 ```
 
-아래는 양치기 소년 문제를 분류문제로 했을 때 성능이 어떨런지 Confusion Matrix와 F1 score 그리고 ROC 커브 & AUROC로 재미삼아 풀어본 것입니다. 
+아래는 양치기 소년 문제를 분류문제로 했을 때 성능이 어떨런지 **Confusion Matrix**와 **F1 score** 그리고 **ROC 커브 & AUROC**로 재미삼아 풀어본 것입니다. 
 
-양기치 소년이 늑대가 '안 나타났다'라고 한 번만 했더라면 좋았을텐데... 그러지는 않아서 혼동행렬이 좀 웃기긴 하지만 아무튼 **민감도 기준으로는 100%**지만, **정밀도가 33.3%**라서 **F1 score가 0.5**밖에 되지 않으며 **ROC는 대각선이 덜렁 하나** 그려지고 그 결과로 **AUROC는 0.5**가 되겠습니다. 후후
-
-```{r}
-# 양치기 소년 문제
+```{r message=FALSE}
+# 양치기 소년 문제 데이터를 입력합니다.
 real <- factor(x = c('none', 'none', 'wolf'), levels = c('wolf', 'none'))
 pred <- factor(c('wolf', 'wolf', 'wolf'), levels = c('wolf', 'none'))
+```
 
-# 혼동행렬
+위와 같이 데이터를 입력한 다음 **혼동행렬(Confusion Matrix)**를 확인해보겠습니다.
+
+```{r message=FALSE}
+# 혼동행렬 (confusion matrix)
 library(caret)
 confusionMatrix(data = pred, reference = real)
+```
 
-# F1 score
+**민감도가 100%, 특이도는 0%, 정밀도는 33%입니다. F1 score는 0.5**가 나오겠네요. 
+
+```{r message=FALSE}
+# F1 score 계산
 library(MLmetrics)
 F1_Score(y_pred = pred, y_true = real)
+```
 
-# ROC curve
+예상대로 0.5가 나왔습니다. 다음으로 **ROC 커브**를 그려보겠습니다. 
+
+```{r message=FALSE}
+# ROC curve 그리기
 library(ROCR)
 predObj <- prediction(predictions = as.numeric(pred), labels = real)
 
@@ -40,8 +50,16 @@ plot(x = perform, main = 'ROC Curve')
 
 # 왼쪽 아래 모서리에서 오른쪽 위 모서리를 잇는 대각선을 추가합니다. 
 lines(x = c(0, 1), y = c(0, 1), col = 'red', lty = 2)
+```
 
-# AUROC
+**ROC 커브**는 대각선 하나 덜렁 그려지네요. ㅎㅎ 마지막으로 **AUROC**를 확인해보겠습니다. 
+
+```{r message=FALSE}
+# AUROC 계산
 library(pROC)
 auc(real, as.numeric(pred))
 ```
+
+역시 예상대로 **AUROC가 0.5**죠? 
+
+**양기치 소년이 늑대가 '안 나타났다'라고 한 번만 했더라면 좋았을텐데**, 그러지는 않아서 결과가 좀 많이 웃기긴 한데, 재미있었습니다. 후후 
