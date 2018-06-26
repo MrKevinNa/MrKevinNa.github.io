@@ -117,7 +117,7 @@ $$ \text {Odds} = \frac {p}{1-p} = e^{\beta_0 + \beta_1 x_1} $$
 
 오즈비(Odds Ratio)는 2개의 오즈 간 비율이며, 다음과 같이 표현됩니다. 
 
-$$ \text {Odds Ratio} = \frac {e^{\beta_0 + \beta_1 x_1}}{e^{\beta_0 + \beta_1 (x_1 + 1)}} = e^{\beta_1} $$
+$$ \text {Odds Ratio} = \frac {e^{\beta_0 + \beta_1 (x_1 + 1)}}{e^{\beta_0 + \beta_1 x_1}} = e^{\beta_1} $$
 
 위 식을 통해, **입력변수가 1단위 증가할 때 회귀모형의 추정값이 오즈비만큼 증가한다**는 것을 알 수 있습니다. 
 
