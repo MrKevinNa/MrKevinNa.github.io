@@ -244,14 +244,11 @@ resp <- GET(url = URL)
 # response 상태코드를 확인합니다.
 status_code(x = resp)
 
-# response를 텍스트로 출력합니다.
-cat(content(x = resp, as = 'text'))
-
 # JSON 형태의 response를 데이터프레임으로 저장합니다.
 stat <- fromJSON(txt = resp %>% as.character())
 
-# 통계표를 출력합니다.
-print(stat)
+# 통계표를 미리보기 합니다.
+head(x = stat, n = 10L)
 ```
 
 이상으로 통계청 Open API를 이용하는 방법에 대해서 살펴봤습니다. 중간에 반복하여 기술하였지만 통계청 Open API는 사용하기가 매우 까다롭게 설계되어 있음을 알 수 있었습니다. 그래도 같은 항목에 대해 기간을 바꿔가며 수집할 때 수작업보다는 효율적일 수 있으니 인내심을 가지고 도전해보시기 바랍니다. 
