@@ -99,34 +99,26 @@ result <- readRDS(file = './data/2017_Presidential_Election_Result.RDS')
 ```{r message=FALSE}
 # 필요 패키지를 불러옵니다. 
 library(leaflet)
-library(shiny)
 ```
 
 ```{r}
-# leaflet() 함수를 사용하여 leafletObj 객체를 생성합니다.
-leafletObj <- 
+# shinyApp으로 동적 지도 시각화합니다.
+renderLeaflet({
   result %>% 
-  leaflet() %>% 
-  setView(lng = median(x = result$lon),
-          lat = median(x = result$lat),
-          zoom = 7) %>% 
-  addCircles(lng = ~ lon,
-             lat = ~ lat,
-             radius = ~ exp(x = 8),
-             weight = 1,
-             color = 'black',
-             popup = ~ str_c('<b>[', 지역명, ']</b>', '<br/>',
-                             '문재인 : ', 문재인R, '<br/>',
-                             '홍준표 : ', 홍준표R, '<br/>',
-                             '안철수 : ', 안철수R, '<br/>',
-                             '유승민 : ', 유승민R, '<br/>',
-                             '심상정 : ', 심상정R), 
-             fillColor = ~ 색상,
-             opacity = 0) %>% 
-  addProviderTiles(provider = 'CartoDB.Positron')
-
-# 브라우저에 렌더링합니다.
-renderLeaflet(leafletObj)
+    leaflet() %>% 
+    setView(lng = median(x = result$lon),
+            lat = median(x = result$lat),
+            zoom = 7) %>% 
+    addCircles(lng = ~ lon,
+               lat = ~ lat,
+               radius = ~ exp(x = 8),
+               weight = 1,
+               color = 'black',
+               popup = ~ str_c('[', 지역명, '] ', '문재인 : ', 문재인R, '/', '홍준표 : ', 홍준표R),
+               fillColor = ~ 색상,
+               opacity = 0) %>% 
+    addProviderTiles(provider = 'CartoDB.Positron')
+})
 ```
 
 이상으로 지방자치단체 중심지역에 5명의 후보자별 득표율을 동적 지도 이미지로 구현해봤습니다. 향후 행정경계구역 데이터를 활용하여 다각형으로 구현해보겠습니다. 
