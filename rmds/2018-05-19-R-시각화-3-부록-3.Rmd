@@ -114,7 +114,7 @@ renderLeaflet({
                radius = ~ exp(x = 8),
                weight = 1,
                color = 'black',
-               popup = ~ str_c('[', 지역명, '] ', '문재인 : ', 문재인R, '/', '홍준표 : ', 홍준표R),
+               popup = ~ str_c('[', 지역명, '] ', '문재인 : ', 문재인R, ', ', '홍준표 : ', 홍준표R),
                fillColor = ~ 색상,
                opacity = 0) %>% 
     addProviderTiles(provider = 'CartoDB.Positron')
