@@ -87,6 +87,9 @@ areaCoords <- geocode(location = enc2utf8(x = str_c(result$지역명, '청')))
 
 # result에 위경도 좌표를 붙입니다.
 result <- cbind(result, areaCoords)
+
+# RDS로 저장합니다.
+saveRDS(object = result, file = '2017_Presidential_Election_Result.RDS')
 ```
 
 ```{r echo=FALSE}
