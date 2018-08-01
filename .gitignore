@@ -12,7 +12,7 @@ package.json
 *.Rproj
 
 # for she files
-./shp
+/shp/*
 *.dbf
 *.prj
 *.sbn
