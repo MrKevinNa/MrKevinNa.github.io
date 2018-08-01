@@ -1,5 +1,5 @@
 ---
-title: '선거결과 데이터 정제하기'
+title: '선거 결과 데이터 정제하기'
 author: 'Dr.Kevin'
 date: '8/1/2018'
 output: github_document
