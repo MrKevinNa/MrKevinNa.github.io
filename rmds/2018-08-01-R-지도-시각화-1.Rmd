@@ -21,10 +21,22 @@ library(readxl)
 library(xlsx)
 ```
 
-```{r}
-# 선거 결과 데이터를 불러옵니다.
-result <- read_xlsx(path = './data/제19대 대통령선거 개표자료.xlsx')
+```{r eval=FALSE}
+# 데이터가 저장된 폴더로 작업경로를 변경합니다. 
+setwd(dir = '데이터가 저장된 폴더를 지정하세요')
+```
 
+```{r echo=FALSE}
+# 선거 결과 데이터를 불러옵니다.
+result <- read_xlsx(path = '../data/제19대 대통령선거 개표자료.xlsx')
+```
+
+```{r eval=FALSE}
+# 선거 결과 데이터를 불러옵니다.
+result <- read_xlsx(path = '제19대 대통령선거 개표자료.xlsx')
+```
+
+```{r}
 # 첫 5줄만 미리보기 합니다. 
 head(x = result, n = 5L)
 ```
@@ -131,9 +143,16 @@ areaCoords <- geocode(location = enc2utf8(x = str_c(result$지역명, '청')))
 ```{r}
 # result에 위경도 좌표를 붙입니다.
 result <- cbind(result, areaCoords)
+```
 
+```{r echo=FALSE}
 # RDS로 저장합니다.
-saveRDS(object = result, file = './data/2017_Presidential_Election_Result.RDS')
+saveRDS(object = result, file = '../data/2017_Presidential_Election_Result.RDS')
+```
+
+```{r eval=FALSE}
+# RDS로 저장합니다.
+saveRDS(object = result, file = '2017_Presidential_Election_Result.RDS')
 ```
 
 이상으로 선거 결과 데이터를 정제하는 방법에 대해 소개해드렸습니다. 
