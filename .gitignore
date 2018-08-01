@@ -10,7 +10,12 @@ package.json
 .Rhistory
 *.R
 *.Rproj
+
+# for she files
+/data
+/shp
 *.dbf
+*.prj
 *.sbn
 *.sbx
 *.shp
