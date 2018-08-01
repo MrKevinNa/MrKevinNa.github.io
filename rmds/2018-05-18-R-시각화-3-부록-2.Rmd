@@ -50,8 +50,9 @@ leafletObj <-
              radius = ~ sqrt(승차승객수) / 2,
              weight = 1,
              color = NULL,
+             opacity = 1.0, 
              fillColor = ~ 'darkgreen',
-             opacity = 1) %>% 
+             fillOpacity = 0.5) %>% 
   addPopups(lng = ~ lon,
             lat = ~ lat,
             popup = ~ str_c(지하철역, '(', 승차승객수, ')'),
@@ -95,9 +96,10 @@ subwayNo2 %>%
              radius = ~ sqrt(승차승객수) / 2,
              weight = 1,
              color = NULL,
+             opacity = 1.0, 
              popup = ~ str_c(지하철역, '(', 승차승객수, ')'),
              fillColor = ~ 'darkgreen',
-             opacity = 1) %>% 
+             fillOpacity = 0.5) %>% 
   addProviderTiles(provider = 'CartoDB.Positron')
 ```
 
