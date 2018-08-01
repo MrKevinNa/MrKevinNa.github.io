@@ -17,9 +17,17 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 300)
 
 먼저 지난 포스팅에서 RDS로 저장한 데이터를 불러오겠습니다. 
 
-```{r}
+```{r echo=FALSE}
 # RDS 파일을 읽습니다.
-result <- readRDS(file = './data/2017_Presidential_Election_Result.RDS')
+result <- readRDS(file = '../data/2017_Presidential_Election_Result.RDS')
+```
+
+```{r eval=FALSE}
+# 데이터가 저장된 폴더로 작업경로를 변경합니다. 
+setwd(dir = 'RDS가 저장된 폴더를 지정하세요')
+
+# RDS 파일을 읽습니다.
+result <- readRDS(file = '2017_Presidential_Election_Result.RDS')
 ```
 
 행정경계구역 데이터에서 가장 중요한 파일은 **shp** 확장자로 된 것입니다. 파일명에서 **bnd**는 boundary를 의미하는 것 같고 **sido**는 광역시도, **sigungu**는 시/군/구, 그리고 **dong**는 법정동을 의미합니다. 그 뒤에 나오는 **00**은 무슨 의미인지 모르겠습니다. 마지막 **2016**은 연도입니다. 
@@ -32,20 +40,27 @@ library(ggplot2)
 library(rgdal)
 ```
 
-```{r}
-# 단계구분도를 그릴 때 사용할 시/군/구 행정경계구역 데이터를 불러옵니다.
-unit <- 'sigungu'
-layer <- str_c('bnd_', unit, '_00_2016')
+shp 파일을 불러오려면 **rgdal** 패키지의 `readOGR()` 함수를 사용해야 합니다. `dsn` 인자에는 shp 파일이 저장되어 있는 폴더를 지정하고, `layer` 인자에는 확장자를 제외한 layer 이름을 할당합니다. 통계청에서 제공하는 데이터는 폴더명과 파일명이 같습니다. 
 
+```{r eval=FALSE}
+# 단계구분도를 그릴 때 사용할 시/군/구 행정경계구역 데이터를 불러옵니다.
 jido <- 
   readOGR(
-    dsn = str_c('~/Documents/GitHub/MrKevinNa.github.io/rmds/data/', layer),
-    layer = layer,
+    dsn = 'bnd_sigungu_00_2016',
+    layer = 'bnd_sigungu_00_2016',
     encoding = 'CP949')
-
 ```
 
-**rgdal** 패키지의 `readOGR()` 함수를 이용하여 행경경계구역 데이터를 불러왔으면, **ggplot2** 패키지의 `fortify()` 함수를 이용하여 데이터 프레임으로 변환하여 `jidoDf` 객체를 생성합니다. 그리고 `id` 컬럼을 생성해야 하는데 그 이유는 `jidoDf`에는 지방자치단체명이 없기 때문입니다. 그리고 지방자치단체명은 `jido` 객체 중 `data`라는 요소에 포함되어 있습니다. 따라서 `id`를 기준으로 병합(merge)할 수 있습니다.
+```{r echo=FALSE}
+# 단계구분도를 그릴 때 사용할 시/군/구 행정경계구역 데이터를 불러옵니다.
+jido <- 
+  readOGR(
+    dsn = '../shp/bnd_sigungu_00_2016',
+    layer = 'bnd_sigungu_00_2016',
+    encoding = 'CP949')
+```
+
+행경경계구역 데이터를 불러왔으면, **ggplot2** 패키지의 `fortify()` 함수를 이용하여 데이터 프레임으로 변환하여 `jidoDf` 객체를 생성합니다. 그리고 `id` 컬럼을 생성해야 하는데 그 이유는 `jidoDf`에는 지방자치단체명이 없기 때문입니다. 그리고 지방자치단체명은 `jido` 객체 중 `data`라는 요소에 포함되어 있습니다. 따라서 `id`를 기준으로 병합(merge)할 수 있습니다.
 
 ```{r}
 # jido 객체를 데이터프레임으로 변환합니다. 
@@ -78,17 +93,25 @@ colnames(x = jidoDf)[8:10] <- c('year', 'jidoCd', 'jidoNm')
 
 미리보기를 통해 알게 되었겠지만 지방자치단체명에는 광역시도명이 없습니다. 그렇기 때문에 **광역시도** shp 파일도 따로 불러와야 합니다. 
 
-```{r}
+```{r eval=FALSE}
 # 광역시도명 코드와 이름을 얻기 위해 시도 행정경계구역 데이터를 불러옵니다.
-unit <- 'sido'
-layer <- str_c('bnd_', unit, '_00_2016')
-
 sido <- 
   readOGR(
-    dsn = str_c('~/Documents/GitHub/MrKevinNa.github.io/rmds/data/', layer),
-    layer = layer,
+    dsn = 'bnd_sido_00_2016',
+    layer = 'bnd_sido_00_2016',
     encoding = 'CP949')
+```
 
+```{r echo=FALSE}
+# 광역시도명 코드와 이름을 얻기 위해 시도 행정경계구역 데이터를 불러옵니다.
+sido <- 
+  readOGR(
+    dsn = '../shp/bnd_sido_00_2016',
+    layer = 'bnd_sido_00_2016',
+    encoding = 'CP949')
+```
+
+```{r}
 # 광역시도명만 추출합니다.
 sidoGb <- sido@data[, c('SIDO_CD', 'SIDO_NM')]
 colnames(x = sidoGb) <- c('sidoCd', 'sidoNm')
