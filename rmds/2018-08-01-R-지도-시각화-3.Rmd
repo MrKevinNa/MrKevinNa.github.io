@@ -221,12 +221,12 @@ spJido@data <- spJido@data %>% arrange(FID)
 
 ```{r echo=FALSE}
 # RDS로 저장합니다.
-saveRDS(object = result, file = '../data/spJido for leaflet.RDS')
+saveRDS(object = spJido, file = '../data/spJido for leaflet.RDS')
 ```
 
 ```{r eval=FALSE}
 # RDS로 저장합니다.
-saveRDS(object = result, file = 'spJido for leaflet.RDS')
+saveRDS(object = spJido, file = 'spJido for leaflet.RDS')
 ```
 
 ## leaflet 패키지를 활용한 지도 시각화
@@ -235,7 +235,7 @@ saveRDS(object = result, file = 'spJido for leaflet.RDS')
 
 ```{r echo=FALSE}
 # RDS 파일을 읽습니다.
-result <- readRDS(file = '../data/spJido for leaflet.RDS')
+spJido <- readRDS(file = '../data/spJido for leaflet.RDS')
 ```
 
 ```{r eval=FALSE}
@@ -243,7 +243,7 @@ result <- readRDS(file = '../data/spJido for leaflet.RDS')
 setwd(dir = 'RDS가 저장된 폴더를 지정하세요')
 
 # RDS 파일을 읽습니다.
-result <- readRDS(file = 'spJido for leaflet.RDS')
+spJido <- readRDS(file = 'spJido for leaflet.RDS')
 ```
 
 **leaflet** 패키지를 이용하면 움직이는 지도 시각화를 할 수 있습니다. 함수는 아주 간단합니다. 자세한 내용이 필요하신 분은 별도로 찾아보시기 바랍니다. 지도 시각화는 두 가지를 선보이도록 하겠습니다.  
