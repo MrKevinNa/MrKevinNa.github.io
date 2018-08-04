@@ -119,7 +119,7 @@ status_code(x = resp)
 
 ```{r eval=FALSE}
 # 응답 결과를 출력하여 육안으로 확인합니다. 
-content(x = resp, as = 'text)
+content(x = resp, as = 'text')
 ```
 
 전부 출력하려고 했으나 매우 길기 때문에 코드만 알려드리고 결과는 따로 보여드리지 않겠습니다. 궁금하신 분은 직접 해보시기 바랍니다. 
