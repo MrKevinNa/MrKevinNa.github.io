@@ -25,7 +25,7 @@ RSelenium을 실행시키려면 몇 가지 프로그램을 미리 설치해야 �
 
 위 링크를 따라 들어가면 아래 그림과 같이 웹페이지가 보입니다. JDK는 여러 버전이 있지만 이번에는 "8u161" 버전을 설치해보도록 하겠습니다. 아래 그림에서 **Accept License Agreement**를 체크한 후 각자 자신의 버전에 맞는 파일을 선택합니다. 
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-01-29-R-Crawler-5_files/Webpage%20for%20JDK.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-01-29-R-Crawler-5/Webpage%20for%20JDK.png)
 
 Windows 사용자는 자신의 컴퓨터에서 [Windows 비트수를 먼저 확인](https://support.microsoft.com/ko-kr/help/13443/windows-which-operating-system)한 후에 해당 파일을 설치하시기 바랍니다. 64비트 사용자라면 64비트만 설치하셔도 되지만 32비트도 함께 설치하는 편이 좋다고 하니 참고하시기 바랍니다. 
 

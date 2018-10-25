@@ -66,7 +66,7 @@ leafletObj %>% addTiles()
 
 ```{r echo=FALSE}
 library(htmltools)
-includeHTML(path = '../images/2018-05-18-R-시각화-3-부록-2_files/leaflet1.html')
+includeHTML(path = '../images/2018-05-18-R-시각화-3-부록-2/leaflet1.html')
 ```
 
 지도 왼쪽 상단에 있는 **+ / -** 버튼을 클릭하면 지도를 확대하거나 축소할 수 있습니다. 마우스의 휠을 이용하여 확대하거나 축소하는 것도 가능합니다. 그런데 지도 때문에 서울 지하철 2호선 역마다 추가한 정보가 잘 보이지 않네요. 타일을 바꿔보겠습니다. 
@@ -77,7 +77,7 @@ leafletObj %>% addProviderTiles(provider = 'CartoDB.Positron')
 ```
 
 ```{r echo=FALSE}
-includeHTML(path = '../images/2018-05-18-R-시각화-3-부록-2_files/leaflet2.html')
+includeHTML(path = '../images/2018-05-18-R-시각화-3-부록-2/leaflet2.html')
 ```
 
 이제 아주 잘 보입니다. 추가할 수 있는 타일은 이 외에도 'Stamen.Toner', 'Stamen.TonerLines', 'Acetate.terrain' 등이 있으니 직접 해보기 바랍니다. 
@@ -104,7 +104,7 @@ subwayNo2 %>%
 ```
 
 ```{r echo=FALSE}
-includeHTML(path = '../images/2018-05-18-R-시각화-3-부록-2_files/leaflet3.html')
+includeHTML(path = '../images/2018-05-18-R-시각화-3-부록-2/leaflet3.html')
 ```
 
 지금까지 작업한 결과를 HTML로 저장하려면 **Viewer** 패널의 **Export**를 클릭한 후 아래 메뉴에서 **Save as Web Page**를 선택하면 됩니다. 그러면 해당 HTML 파일을 더블 클릭하였을 때 웹 브라우저에서 이미지를 확인할 수 있습니다. 
