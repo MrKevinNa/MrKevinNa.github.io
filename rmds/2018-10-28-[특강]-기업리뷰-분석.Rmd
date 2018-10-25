@@ -1,10 +1,12 @@
 ---
-title: "Company Review Analysis"
+title: '기업리뷰 수집 및 분석'
+author: 'Dr.Kevin'
+date: '8/2/2018'
 output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
 ```
 
 ## Data collection
