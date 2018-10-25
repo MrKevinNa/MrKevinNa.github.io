@@ -70,7 +70,7 @@ resp <- POST(url = URI,
 # 로그인 정보를 이용하여 HTTP 요청을 합니다. 
 resp <- POST(url = URI,
              body = list('user[email]' = 'kevin.na74@gmail.com',
-                         'user[password]' = 'Sktjdgh052&'))
+                         'user[password]' = ''))
 ```
 
 ```{r}
