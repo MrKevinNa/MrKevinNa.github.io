@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>stringr 패키지 주요 함수 소개</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>stringr 패키지 주요 함수 소개</h1>
+
+<p>Dr.Kevin
+3/26/2018</p>
+
+<p>데이터 전처리 과정에서 문자형 벡터 또는 문자열에서 원하는 텍스트를 찾고, 바꾸고, 합치고, 나누는 과정이 필요한 경우가 많습니다. 이번 포스팅에서는 텍스트를 원하는 방식으로 처리하는 함수들을 소개하고자 합니다. R 기본함수들로도 충분히 가능한 작업이지만 이번 포스팅에서는 <strong>stringr</strong>의 주요 함수들을 소개하려고 하는데요. 그 이유는 R 기본함수들로는 <code>파이프 연산자(%&gt;%)</code>를 사용하지 못하는 경우가 많기 때문입니다. 파이프 연산자를 사용하면 코드를 깔끔하게 정리할 수 있고 가독성도 좋아집니다. 따라서 아래에 관련 함수에 대한 예제에서는 의도적으로 파이프 연산자를 사용하도록 하겠습니다.</p>
+
+<p>참고로 파이프 연산자는 앞에서 실행된 결과를 다음 함수의 첫 번째 인자로 자동할당해주는 기능을 합니다. 코드로 예를 들면 쉽게 이해할 수 있습니다. 아래 두 줄의 코드는 같은 결과를 출력합니다.</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다. 
+library(dplyr)
+library(stringr)
+
+# 파이프 연산자를 사용하지 않는 경우
+str_detect(string = letters[1:5], pattern = &#39;e&#39;)
+</code></pre>
+
+<pre><code>## [1] FALSE FALSE FALSE FALSE  TRUE
+</code></pre>
+
+<pre><code class="r"># 파이프 연산자를 사용하는 경우
+letters[1:5] %&gt;% str_detect(pattern = &#39;e&#39;)
+</code></pre>
+
+<pre><code>## [1] FALSE FALSE FALSE FALSE  TRUE
+</code></pre>
+
+<p>파이프 연산자를 사용하지 않으면 파이프 연산자를 사용하는 경우보다 대체르 코드의 길이가 더 깁니다. 때에 따라서는 (불필요하지만) 중간 과정의 객체를 만들어야 하기도 하고, 무엇보다 함수 인자에 할당되는 값을 해석하기 위해 (마치 영어를 한글로 번역하듯이) 안에서부터 바깥으로 나오면서 이해해야 하는 경우도 많습니다.</p>
+
+<p>그러나 파이프 연산자를 사용하면 왼쪽에서 오른쪽으로, 위에서 아래로 이동하면서 순차적으로 실행되기 때문에 이해하기 편하고, 코드를 깔끔하게 정리할 수 있는 것입니다. 위에서 두 번째 코드를 보면 파이프 연산자 뒤에 오는 <code>str_detect()</code> 함수의 첫 번째 인자인 <code>string</code>을 따로 명시하지 않아도 파이프 연산자 왼쪽에 있는 <code>letters[1:5]</code>가 자동으로 할당됩니다.</p>
+
+<p>파이프 연산자에 대한 재미있는 예시를 하나 들고 본론으로 넘어가겠습니다.</p>
+
+<pre><code class="r"># 평균이 0이고 표준편차가 1인 임의의 수를 100개 만들어 x에 할당합니다. 
+set.seed(seed = 123)
+x &lt;- rnorm(n = 100, mean = 0, sd = 1)
+
+# x의 평균을 구하고 제곱을 한 뒤, 
+# 소수점 4째자리까지 보이도록 반올림하는 코드를 작성해보겠습니다. 
+
+# 파이프 연산자를 사용하지 않는 경우
+round(x = mean(x)^2, digits = 4L)
+</code></pre>
+
+<pre><code>## [1] 0.0082
+</code></pre>
+
+<pre><code class="r"># 파이프 연산자를 사용하는 경우
+x %&gt;% 
+  mean() %&gt;% 
+  .^2 %&gt;% 
+  round(digits = 4L)
+</code></pre>
+
+<pre><code>## [1] 0.0082
+</code></pre>
+
+<p>제가 보기에는 파이프 연산자를 쓴 코드가 더 예쁘고 보기 좋은데 여러분은 어떤가요?</p>
+
+<h3>관심 있는 패턴 포함 여부 확인하기</h3>
+
+<p><code>str_detect()</code> 함수 <code>string</code> 인자에 문자형 벡터를 할당하고 <code>pattern</code> 인자에 관심 있는 텍스트를 할당한 후 실행하면, 문자형 벡터의 각 원소 중 관심 있는 텍스트를 포함하면 <code>TRUE</code>, 그렇지 않으면 <code>FALSE</code>를 출력합니다. 만약 <code>string</code> 인자에 문자열을 할당하면, 해당 문자열에 관심 있는 텍스트가 포함되어 있는지를 <code>TRUE</code> 또는 <code>FALSE</code>로 출력합니다. 실습을 위해 샘플 문자형 벡터를 하나 생성한 뒤, <code>str_detect()</code> 함수를 실행합니다.</p>
+
+<pre><code class="r"># 샘플 문자형 벡터를 생성합니다. 
+subject &lt;- c(&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;, &#39;과학&#39;, &#39;국사&#39;, &#39;도덕&#39;, &#39;음악&#39;, &#39;미술&#39;, &#39;체육&#39;)
+
+# 벡터에서 &#39;어&#39;를 포함하는 원소(과목명) 포함 여부를 확인합니다. 
+subject %&gt;% str_detect(pattern = &#39;어&#39;)
+</code></pre>
+
+<pre><code>## [1]  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+</code></pre>
+
+<p>전체 원소 중 &#39;어&#39;를 포함하고 있으면 <code>TRUE</code>, 없으면 <code>FALSE</code>로 출력된 것을 확인할 수있습니다. 이 코드 뒤에 <code>파이프 연산자(%&gt;%)</code>와 <code>which()</code>를 추가하면 <code>TRUE</code>에 해당하는 원소의 위치를 숫자로 출력합니다. 이것은 R 기본 함수인 <code>grep()</code> 함수와 같은 결과를 갖습니다.</p>
+
+<pre><code class="r"># 벡터에서 &#39;어&#39;를 포함하는 원소(과목명)의 위치를 숫자로 출력합니다.
+subject %&gt;% str_detect(pattern = &#39;어&#39;) %&gt;% which()
+</code></pre>
+
+<pre><code>## [1] 1 2
+</code></pre>
+
+<pre><code class="r">grep(pattern = &#39;어&#39;, x = subject)
+</code></pre>
+
+<pre><code>## [1] 1 2
+</code></pre>
+
+<h3>관심 있는 패턴 출력</h3>
+
+<p><code>str_subset()</code> 함수 <code>string</code> 인자에 문자형 벡터를 할당하고 <code>pattern</code> 인자에 관심 있는 텍스트를 할당한 후 실행하면, 문자형 벡터에서 관심 있는 텍스트를 포함하는 원소만 출력합니다. <code>grep()</code> 함수에 <code>value = TRUE</code>를 추가하면 위치가 아닌 해당 원소값을 출력합니다.</p>
+
+<pre><code class="r"># 벡터에서 &#39;어&#39;를 포함하는 원소(과목명)을 출력합니다.
+subject %&gt;% str_subset(pattern = &#39;어&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;국어&quot; &quot;영어&quot;
+</code></pre>
+
+<pre><code class="r">grep(pattern = &#39;어&#39;, x = subject, value = TRUE)
+</code></pre>
+
+<pre><code>## [1] &quot;국어&quot; &quot;영어&quot;
+</code></pre>
+
+<p>이번에는 관심 있는 텍스트를 찾는 다른 방법을 소개합니다. <code>str_extract()</code> 함수는 <code>string</code> 인자에 할당된 문자형 벡터의 각 원소에 대해서 관심 있는 텍스트가 있으면 정확히 그 패턴을, 없으면 <code>NA</code>를 출력합니다. 결과 객체는 벡터입니다.</p>
+
+<pre><code class="r"># 샘플 문자형 벡터를 생성합니다. 
+object &lt;- c(&#39;요거트&#39;, &#39;요요&#39;, &#39;요리&#39;, &#39;오리&#39;)
+
+# 벡터의 각 원소에서 &#39;요&#39;를 포함하면 &#39;요&#39;를 출력합니다. 없으면 NA를 출력합니다. 
+object %&gt;% str_extract(pattern = &#39;요&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;요&quot; &quot;요&quot; &quot;요&quot; NA
+</code></pre>
+
+<p>그런데 주어진 문자형 벡터에서 두 번째 원소인 <code>요요</code>는 관심 있는 텍스트를 두 개 이상 가지고 있습니다. 이와 같이 관심 있는 텍스트가 2개 이상인 문자열에 대해서 모든 텍스트를 출력하고자 할 때 <code>str_extract_all()</code> 함수를 이용하면 됩니다. 다만 이 함수는 결과 객체를 리스트로 반환한다는 점에 주의해야 합니다.</p>
+
+<pre><code class="r"># 벡터의 각 원소에서 &#39;요&#39;를 모두 찾아 출력합니다. 없으면 NA를 출력합니다. 
+object %&gt;% str_extract_all(pattern = &#39;요&#39;)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] &quot;요&quot;
+## 
+## [[2]]
+## [1] &quot;요&quot; &quot;요&quot;
+## 
+## [[3]]
+## [1] &quot;요&quot;
+## 
+## [[4]]
+## character(0)
+</code></pre>
+
+<p>실행 결과 리스트의 두 번째 원소가 <code>요</code>를 두 개 갖는 벡터인 것을 확인할 수 있습니다.</p>
+
+<h3>관심 있는 패턴을 다른 패턴으로 바꾸기</h3>
+
+<p><code>str_replace()</code> 함수 <code>string</code> 인자에 문자형 벡터, <code>pattern</code> 인자에 찾고자 하는 텍스트, <code>replacement</code> 인자에 바꿀 텍스트를 각각 할당한 후 실행하면, 문자형 벡터 각 원소에 대하여 찾고자 하는 텍스트를 바꿀 텍스트로 변경하여 벡터로 출력합니다.</p>
+
+<pre><code class="r"># 벡터의 각 원소에 있는 &#39;요&#39;를 &#39;유&#39;로 바꿉니다. 
+# &#39;요&#39;가 두 번 이상 있어도 맨 처음 &#39;요&#39;만 &#39;유&#39;로 바꿉니다. 
+object %&gt;% str_replace(pattern = &#39;요&#39;, replacement = &#39;유&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;유거트&quot; &quot;유요&quot;   &quot;유리&quot;   &quot;오리&quot;
+</code></pre>
+
+<p>다만 이렇게 하면 찾고자 하는 텍스트가 여러번 반복될 때 맨 처음 텍스트만 바꿔줍니다. 만약 모든 텍스트를 다 바꿔주고 싶다면 <code>str_replace_all()</code> 함수를 사용하면 됩니다. 이것은 R 기본함수인 <code>gsub()</code>와 같은 결과를 갖습니다.</p>
+
+<pre><code class="r"># 벡터의 각 원소에 있는 모든 &#39;요&#39;를 &#39;유&#39;로 바꿉니다. 
+object %&gt;% str_replace_all(pattern = &#39;요&#39;, replacement = &#39;유&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;유거트&quot; &quot;유유&quot;   &quot;유리&quot;   &quot;오리&quot;
+</code></pre>
+
+<pre><code class="r">gsub(pattern = &#39;요&#39;, replacement = &#39;유&#39;, x = object)
+</code></pre>
+
+<pre><code>## [1] &quot;유거트&quot; &quot;유유&quot;   &quot;유리&quot;   &quot;오리&quot;
+</code></pre>
+
+<h3>여러 문자열을 (구분자를 추가하여) 하나의 문자열로 합치기</h3>
+
+<p><code>str_c()</code> 함수에 여러 문자열을 콤마(,)로 구분하여 할당한 후 실행하면, 여러 문자열이 하나의 커다란 문자열로 합쳐집니다. 이 함수의 <code>c</code>는 <code>combine</code> 또는 <code>concatenate</code>의 머릿글자로 이해하시면 됩니다.</p>
+
+<pre><code class="r"># 여러 문자열을 하나의 문자열로 합칩니다.
+str_c(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가나다라마바사&quot;
+</code></pre>
+
+<p>만약 문자열 사이에 특정 구분자(seperator)를 추가하려면, <code>str_c()</code> 함수에 <code>sep = &#39;구분자&#39;</code>를 추가하면 됩니다. 이것은 R 기본함수 <code>paste()</code>에 <code>sep = &#39;구분자&#39;</code>를 추가한 것과 같은 결과를 갖습니다.</p>
+
+<pre><code class="r"># 여러 문자열에 구분자를 추가하여 하나의 문자열로 합칩니다.
+str_c(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;, sep = &#39;+&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가+나+다+라+마+바+사&quot;
+</code></pre>
+
+<pre><code class="r">paste(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;, sep = &#39;+&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가+나+다+라+마+바+사&quot;
+</code></pre>
+
+<p>만약 <code>paste()</code>에 <code>sep</code> 인자를 추가하지 않고 실행하면 어떻게 될까요?</p>
+
+<pre><code class="r"># paste 함수에 sep 인자를 추가하지 않고 실행하면 공백이 구분자로 추가됩니다. 
+paste(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가 나 다 라 마 바 사&quot;
+</code></pre>
+
+<p>모든 문자열 사이에 공백이 하나씩 추가된 것을 알 수 있습니다. 즉, <code>paste()</code> 함수는 <code>sep = &quot; &quot;</code>이 기본값으로 설정되어 있습니다. 따라서 <code>str_c()</code>에 <code>sep</code>를 추가하지 않은 것과 동일한 결과를 얻으려면, <code>paste()</code> 함수에 <code>sep = &quot;&quot;</code>를 추가해주거나 아니면 <code>paste0()</code>를 사용하면 됩니다.</p>
+
+<pre><code class="r"># paste 함수 sep 인자에 &#39;&#39;를 할당하고 실행하면
+# 공백 없이 하나의 문자열로 합쳐집니다.
+paste(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;, sep = &#39;&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가나다라마바사&quot;
+</code></pre>
+
+<pre><code class="r">paste0(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가나다라마바사&quot;
+</code></pre>
+
+<p>이번에는 <code>str_c()</code> 함수에 여러 문자열 대신 문자형 벡터를 할당하고 <code>sep = &#39;  구분자&#39;</code>를 추가한 후 실행해보겠습니다.</p>
+
+<pre><code class="r"># str_c 함수에 문자형 벡터를 할당하고 실행하면 원하는 결과를 얻을 수 없습니다. 
+krletters &lt;- c(&#39;가&#39;, &#39;나&#39;, &#39;다&#39;, &#39;라&#39;, &#39;마&#39;, &#39;바&#39;, &#39;사&#39;)
+krletters %&gt;% str_c(sep = &#39;+&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot; &quot;마&quot; &quot;바&quot; &quot;사&quot;
+</code></pre>
+
+<p>원래 문자형 벡터와 동일한 결과를 출력할 뿐, 하나의 문자열로 합쳐지지 않았습니다. 문자형 벡터의 각 원소를 하나의 커다란 문자열로 합치려면 <code>sep</code> 대신 <code>collapse</code> 인자를 사용하여야 합니다. 이것은 <code>paste()</code> 함수에도 동일하게 적용됩니다.</p>
+
+<pre><code class="r"># 문자형 벡터의 각 원소를 하나의 커다란 문자열로 합칠 때에는
+# collapse 인자를 사용합니다. 
+krletters %&gt;% str_c(collapse = &#39;+&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가+나+다+라+마+바+사&quot;
+</code></pre>
+
+<pre><code class="r">paste(krletters, collapse = &#39;+&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;가+나+다+라+마+바+사&quot;
+</code></pre>
+
+<h3>하나의 문자열을 구분자로 분리하기</h3>
+
+<p><code>str_split()</code> 함수 <code>string</code> 인자에 문자열을 할당하고 <code>pattern</code> 인자에 구분자를 할당한 후 실행하며, 문자열을 구분자 기준으로 나눈 후 리스트 객체를 반환합니다. 이것은 R 기본함수인 <code>strsplit()</code>와 동일한 결과를 갖습니다.</p>
+
+<pre><code class="r"># 하나의 커다란 문자열을 생성합니다. 
+krletters2 &lt;- krletters %&gt;% str_c(collapse = &#39;+&#39;)
+
+# 문자열을 구분자(+) 기준으로 분리합니다. 
+krletters2 %&gt;% str_split(pattern = &#39;\\+&#39;)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot; &quot;마&quot; &quot;바&quot; &quot;사&quot;
+</code></pre>
+
+<p><code>str_split</code> 함수 <code>pattern</code> 인자에 구분자를 할당할 때 <code>\\</code>를 추가한 것이 이상하죠? <code>pattern</code> 인자에는 <strong>정규표현식(Regex)</strong>이 할당되는데, 정규표현식에서 <code>+</code>는 &#39;특정 문자를 하나 이상 무한대까지 찾기&#39;라는 의미를 갖는 기호로 사용됩니다. 따라서 문자 그대로 <code>+</code>를 인식시키려면 <strong>이스케이프 문자(&#39;\&#39;)</strong>를 <code>+</code> 앞에 추가해주어야 하는데요. R은 이스케이프 문자를 두 번 반복해주어야 합니다.</p>
+
+<p>아무튼 구분자를 기준으로 여러 문자열이 잘 분리되었음을 확인할 수 있습니다. 이것은 R 기본함수인 <code>strsplit()</code>와 같은 결과를 갖습니다. 두 함수 모두 결과를 리스트로 반환하므로 만약 벡터로 결과를 변환하고 싶으면 코드 뒤에 파이프 연산자와 <code>unlist()</code> 함수를 추가하면 됩니다.</p>
+
+<pre><code class="r"># strsplit() 함수로도 같은 결과를 얻을 수 있습니다. 
+krletters2 %&gt;% strsplit(split = &#39;\\+&#39;)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot; &quot;마&quot; &quot;바&quot; &quot;사&quot;
+</code></pre>
+
+<pre><code class="r"># unlist()를 사용하여 결과 객체를 벡터로 변환합니다. 
+krletters2 %&gt;% str_split(pattern = &#39;\\+&#39;) %&gt;% unlist()
+</code></pre>
+
+<pre><code>## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot; &quot;마&quot; &quot;바&quot; &quot;사&quot;
+</code></pre>
+
+<h3>문자열에서 시작 위치과 끝 위치를 지정하여 잘라내기</h3>
+
+<p><code>str_sub()</code> 함수 <code>string</code> 인자에 문자열을 할당하고 <code>start</code> 인자에 시작 위치, <code>end</code> 인자에 끝 위치를 숫자로 할당한 후 실행하면 해당 부분의 문자열을 벡터로 출력합니다. 이것은 R 기본함수인 <code>substr()</code>과 같은 결과를 갖습니다.</p>
+
+<pre><code class="r"># 샘플 문자열을 생성합니다. 
+krAnthem &lt;- &#39;  동해물과 백두산이 마르고 닳도록   하느님이 보우하사 우리나라 만세  &#39;
+
+# 문자열에서 3번째부터 6번째 문자를 잘라냅니다. 
+krAnthem %&gt;% str_sub(start = 3, end = 6)
+</code></pre>
+
+<pre><code>## [1] &quot;동해물과&quot;
+</code></pre>
+
+<pre><code class="r">substr(x = krAnthem, start = 3, stop = 6)
+</code></pre>
+
+<pre><code>## [1] &quot;동해물과&quot;
+</code></pre>
+
+<h3>문자열에서 앞뒤 공백 제거하기</h3>
+
+<p><code>str_trim()</code> 함수 <code>string</code> 인자에 문자열을 할당하고 실행하면 문자열 앞뒤에 있는 공백을 제거하고 벡터로 출력합니다. 한편, <code>str_squich()</code> 함수를 실행하면 문자열 앞뒤 공백은 물론 문자열 안에서 반복되는 공백도 함께 제거합니다.</p>
+
+<pre><code class="r"># 문자열 앞뒤에 있는 공백을 제거합니다. 
+krAnthem %&gt;% str_trim()
+</code></pre>
+
+<pre><code>## [1] &quot;동해물과 백두산이 마르고 닳도록   하느님이 보우하사 우리나라 만세&quot;
+</code></pre>
+
+<pre><code class="r"># 문자열 앞뒤에 있는 공백과 문자열 안에서 중복되는 공백도 함께 제거합니다. 
+krAnthem %&gt;% str_squish()
+</code></pre>
+
+<pre><code>## [1] &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+</code></pre>
+
+<p>이상으로 <strong>stringr</strong> 패키지의 주요 함수를 이용하여 텍스트 처리하는 방법에 대해 살펴봤습니다.</p>
+
+</body>
+
+</html>

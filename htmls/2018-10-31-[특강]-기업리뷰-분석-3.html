@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>텍스트 마이닝을 활용한 기업리뷰 분석</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>텍스트 마이닝을 활용한 기업리뷰 분석</h1>
+
+<p>Dr.Kevin
+10/31/2018</p>
+
+<p>기업리뷰 분석 마지막 포스팅입니다. 이번 포스팅에서는 기업리뷰 중 <code>장점</code>, <code>단점</code> 및 <code>경영진에 바라는 점</code> 등 텍스트 데이터를 이용하여 기업리뷰에 담긴 공통된 생각을 추출하는 작업을 해보겠습니다. 텍스트 마이닝에 대해서 익숙하지 않은 분들이 많을 것 같습니다. 간단하게 전체 과정을 소개하면 다음과 같습니다.</p>
+
+<h2>텍스트 마이닝 과정</h2>
+
+<ol>
+<li><p>가장 처음 해야 할 일은 자연어를 분석할 수 있는 데이터 형태로 변환하는 것입니다. 따라서 형태소 분석을 실시합니다. 형태소 분석을 할 때 사전이 필요한 데, 텍스트 데이터는 도메인에 영향을 많이 받으므로 형태소 분석을 할 때마다 사전을 만들어야 하는 경우가 일반적입니다. 사전을 만들 때는 N-gram을 사용하는 방법이 있지만 최근에는 딥러닝 기법을 활용한다고도 합니다. (저는 딥알못이라 지금은 모르지만 곧 공부하고 싶습니다.)</p></li>
+<li><p>형태소 분석이 끝나면 말뭉치를 전처리하여 문서단어행렬(Document-Term Matrix, 이하 DTM) 또는 이를 전치한 단어문서행렬(Term-Document Matrix, 이하 TDM)를 생성합니다. DTM의 원소는 단어 빈도수(Term Frequency, 이하 TF) 또는 단어 빈도수와 역문서 빈도수(Term Frequency - Inverse Document Frequency, 이하 TF-IDF)가 사용됩니다. TF는 단어의 빈도수가 많을수록 중요하다고 간주하지만, TF-IDF는 여러 문서에서 두루 출현하는 단어에 벌점을 부여함으로써 특정 문서에 집중해서 많이 출현하는 단어를 중요하다고 간주합니다.</p></li>
+<li><p>DTM이 생성되면 컬럼의 합계(단어별 빈도수) 데이터로 다양한 시각화를 실행할 수 있습니다. 단어별 빈도수를 내림차순으로 정렬한 다음 상위 단어들로 막대그래프를 그리거나 아니면 워드클라우드 또는 트리맵 등을 그릴 수 있습니다.</p></li>
+<li><p>특정 단어에 대해 함께 출현하는 연관성이 높은 단어들을 추출해보는 작업을 수행하면 문서에 대한 이해를 높일 수 있습니다. 주로 3가지 방법을 사용하는데 하나는 DTM의 상관행렬을 구하는 것이고, 다른 하나는 R의 tm 패키지에서 제공되는 함수를 사용하는 것이며, 마지막으로 word2vec 알고리즘을 사용하는 것입니다. 이번 포스팅에서는 처음 2가지를 소개합니다.</p></li>
+<li><p>마지막으로 상관관계가 높은 단어들을 연결한 네트워크 맵을 그려봄으로써 전체 문서에서 공통적으로 언급된 단어들의 흐름을 파악할 수 있습니다. 중개중심성이 높은 단어들을 중심으로 흐름을 파악하면 됩니다. 생각보다 쉽지 않습니다.</p></li>
+</ol>
+
+<p>이 외에도 토픽 클러스터링과 감성분석 등이 있지만 이번 포스팅에서는 다루지 않겠습니다. 사실 둘 다 해봤는데요. 데이터가 좀 이상해서 그런지 결과가 별로더라구요. 다음에 기회가 닿으면 소개하도록 하겠습니다.</p>
+
+<h3>형태소 분석</h3>
+
+<p>기업리뷰 데이터 컬럼 중 텍스트 데이터만 추출하고, 자연어를 분석할 수 있는 데이터로 변환하기 위해 형태소 분석을 실시합니다. 먼저 RDS 데이터를 불러와서 간단한 전처리를 실행합니다.</p>
+
+<pre><code class="r"># 필요한 패키지를 불러옵니다.
+library(tidyverse)
+library(stringr)
+library(stringi)
+library(magrittr)
+</code></pre>
+
+<pre><code class="r"># 분석 대상 회사이름을 지정합니다. 
+compNm &lt;- &#39;삼성화재&#39;
+
+# RDS 파일을 읽어옵니다. 
+dt &lt;- readRDS(file = &#39;../data/Company_Review_Data_삼성화재해상보험.RDS&#39;)
+
+# 별점을 1~5점으로 환산합니다.
+dt[, 8:13] &lt;- sapply(X = dt[, 8:13], FUN = function(x) x / 20)
+
+# 추천여부 컬럼을 &#39;추천&#39;과 &#39;비추&#39;로 변환합니다.
+dt$추천여부 &lt;- str_extract(string = dt$추천여부, pattern = &#39;추천(?= )&#39;)
+dt$추천여부[is.na(x = dt$추천여부) == TRUE] &lt;- &#39;비추&#39;
+
+# 필요한 컬럼만 선택합니다. 
+cols &lt;- c(&#39;기업장점&#39;, &#39;기업단점&#39;, &#39;바라는점&#39;, &#39;재직상태&#39;, &#39;별점평가&#39;, &#39;추천여부&#39;)
+texts &lt;- dt[, cols]
+
+# NA가 포함된 행을 제거합니다.
+texts &lt;- texts[complete.cases(texts), ]
+nrow(x = texts)
+</code></pre>
+
+<pre><code>## [1] 279
+</code></pre>
+
+<pre><code class="r"># 중복 행을 제거합니다. 
+texts &lt;- unique(x = texts)
+nrow(x = texts)
+</code></pre>
+
+<pre><code>## [1] 279
+</code></pre>
+
+<p>데이터 원본과 나중에 생성할 DTM을 서로 결합할 때 기준변수로 사용할 <code>id</code> 컬럼을 생성합니다.</p>
+
+<pre><code class="r"># 객체에 id를 추가하는 함수를 생성합니다.
+generateIDs &lt;- function(obj, index = &#39;id&#39;) {
+
+  # 객체의 종류에 따라 길이를 계산합니다. 
+  if (obj %&gt;% class() == &#39;data.frame&#39;) {
+    n &lt;- nrow(x = obj)
+  } else {
+    n &lt;- length(x = obj)
+  }
+
+  # id를 생성합니다. 
+  id &lt;- str_c(
+    index, 
+    str_pad(
+      string = 1:n, 
+      width = ceiling(x = log10(x = n)), 
+      side = &#39;left&#39;, 
+      pad = &#39;0&#39;) )
+
+  # 결과를 반환합니다. 
+  return(id)
+}
+
+# texts 객체에 id 컬럼을 추가합니다. 
+texts$id &lt;- generateIDs(obj = texts, index = &#39;doc&#39;)
+</code></pre>
+
+<p>텍스트 데이터 컬럼인 <code>장점</code>, <code>단점</code> 및 <code>바라는점</code>을 붙여서 하나의 컬럼으로 만듭니다. 그리고 공백을 모두 없앱니다. 그 이유는 다음과 같습니다. 기업리뷰 데이터는 한 명이 작성한 것이 아니므로 회원마다 말버릇이 다릅니다. 같은 단어의 경우 띄어쓰기도 제각각일 수 있습니다. 실제로 이 데이터에서는 &#39;자기계발&#39;과 &#39;자기계발기회&#39;가 혼재되어 있었습니다. 나중에 사전을 만들어서 형태소 분석할 때 사용한다고 하더라도 100% 같은 방식으로 처리되지 못하므로 아예 처음부터 공백을 없애는 것입니다. 다행인 점은 우리가 앞으로 사용할 형태소 분석기가 띄어쓰기를 처리할 수 있다는 것입니다.</p>
+
+<pre><code class="r"># &#39;장점&#39;, &#39;단점&#39; 및 &#39;바라는점&#39; 등 텍스트 데이터를 붙여서 
+# 텍스트 마이닝을 위한 content 컬럼을 만듭니다.  
+texts$content &lt;- apply(
+  X = texts[, c(&#39;기업장점&#39;, &#39;기업단점&#39;, &#39;바라는점&#39;)], 
+  MARGIN = 1, 
+  FUN = str_c, collapse = &#39; &#39;)
+
+# 텍스트의 공백을 모두 제거합니다. 형태소 분석기가 띄어쓰기를 구분합니다. 
+texts$content &lt;- texts$content %&gt;% str_remove_all(pattern = &#39;\\s+&#39;)
+
+# 필요한 컬럼만 남깁니다. 
+texts &lt;- texts[ , c(&#39;id&#39;, &#39;content&#39;, &#39;재직상태&#39;, &#39;추천여부&#39;)]
+
+# 중복을 제거합니다. 
+texts &lt;- unique(x = texts)
+
+# 건수를 확인합니다. 
+nrow(x = texts)
+</code></pre>
+
+<pre><code>## [1] 279
+</code></pre>
+
+<p>회원마다 리뷰를 길게 남기는 사람이 있는가하면 아주 간단하게 쓰는 사람도 있습니다. 텍스트 마이닝에서는 단어 하나 하나가 모두 정보가 되므로 글이 길수록 정보가 많다고 할 수 있습니다. 따라서 글자의 길이가 작은 문서는 과감하게 제외하는 것이 좋습니다. 이번 예제에서는 글자수가 <code>40</code> 미만인 9개의 문서를 제외하였습니다.</p>
+
+<pre><code class="r"># content 컬럼의 글자수를 확인합니다. 
+textRange &lt;- texts$content %&gt;% nchar() %&gt;% range()
+print(x = textRange)
+</code></pre>
+
+<pre><code>## [1]   9 554
+</code></pre>
+
+<pre><code class="r"># 글자수 구간을 15개로 나눌 때 간격(by)을 계산합니다. 
+by &lt;- ((textRange[2] - textRange[1]) / 15) %&gt;% round(digits = -1L)
+print(x = by)
+</code></pre>
+
+<pre><code>## [1] 40
+</code></pre>
+
+<pre><code class="r"># 도수분포표를 생성합니다. 이때, 최소값과 최대값을 포함하도록 합니다.
+# Hmisc::cut2() 함수의 minmax 인자로 최소값 또는 최대값을 포함할지 여부를 지정합니다.
+cuts &lt;- Hmisc::cut2(
+  x = texts$content %&gt;% nchar(),
+  cuts = seq(from = 0, to = textRange[2], by = by),
+  minmax = TRUE)
+
+# 빈도수를 구합니다.
+freq &lt;- table(cuts)
+print(freq)
+</code></pre>
+
+<pre><code>## cuts
+## [  0, 40) [ 40, 80) [ 80,120) [120,160) [160,200) [200,240) [240,280) 
+##         9        43       101        57        39        16         3 
+## [280,320) [320,360) [360,400) [400,440)       440       480 [520,554] 
+##         6         2         1         1         0         0         1
+</code></pre>
+
+<pre><code class="r"># 첫 번째 구간에 포함된 40 글자 미만인 글을 확인합니다. 
+texts$content[nchar(x = texts$content) &lt; by]
+</code></pre>
+
+<pre><code>## [1] &quot;높은보수낮은기본급직원기본급보장&quot;                                              
+## [2] &quot;높은인지도와체계적인시스템성과급의부재질좋은프로모션많이해주셨으면&quot;            
+## [3] &quot;업무의자율성낮은보수임금인상&quot;                                                  
+## [4] &quot;교육이좋음업무강도강함&quot;                                                        
+## [5] &quot;자율성영업복리후생&quot;                                                            
+## [6] &quot;업무의자율성이용이함성과에따른보수차보너스많이줬으면...&quot;                       
+## [7] &quot;좋은시설퇴직금안주려초단시간근로를시킨다초단시간알바에게도복지혜택은주기바란다&quot;
+## [8] &quot;신뢰와효율,가치를실현하는것과중된업무로인한피로좀더가족적인이미지가필요하다&quot;   
+## [9] &quot;복지혜택좋다급여대비업무과다인력관리에힘좀쓰세요&quot;
+</code></pre>
+
+<pre><code class="r"># 첫 번째 구간에 해당하는 건을 삭제합니다.
+texts &lt;- texts[nchar(x = texts$content) &gt;= by, ]
+
+# 건수를 확인합니다.
+nrow(x = texts)
+</code></pre>
+
+<pre><code>## [1] 270
+</code></pre>
+
+<p>지금까지 형태소 분석을 하기 위한 전처리 과정을 거쳤고 이제부터 형태소 분석에 들어갑니다. 저는 형태소 분석기로 <strong>NLP4kec</strong> 패키지의 함수를 사용합니다. CRAN에 등록되어 있지 않으므로 Github 링크로 설치하면 됩니다. 문제는 이 패키지가 <strong>rJava</strong> 패키지에 의존한다는 것입니다. 그러므로 Java를 설치해야 하고 Java Home을 설정한 다음 rJava 패키지를 불러올 수 있어야 합니다.</p>
+
+<pre><code class="r"># 패키지를 설치합니다.
+# install.packages(&#39;~/Documents/TextMining/NLP4kec_1.2.0.tgz&#39;, repos = NULL)
+
+# 필요한 패키지를 불러옵니다.
+library(NLP4kec)
+</code></pre>
+
+<p>지금 다루고 있는 데이터에 사용할 수 있는 사전이 없으므로 일단 사전 없이 형태소 분석을 수행합니다. 아래 과정을 거치면서 사전을 만들 예정이고, 사전이 완성되면 이번 과정을 한 번 더 반복합니다. 물론 그 때는 사전을 가지고 형태소 분석을 한다는 점에서 차이가 있습니다.</p>
+
+<pre><code class="r"># 형태소를 분석하여 parsed 객체에 할당합니다. 이 때 띄어쓰기가 구분됩니다. 
+parsed &lt;- r_parser_r(contentVector = texts$content, language = &#39;ko&#39;)
+
+# 길이를 확인합니다. 
+length(x = parsed)
+</code></pre>
+
+<pre><code>## [1] 270
+</code></pre>
+
+<pre><code class="r"># 형태소 분석 결과 중 일부를 육안으로 확인합니다. 
+parsed[1:10]
+</code></pre>
+
+<pre><code>##  [1] &quot;그룹 인센티브 포함 많다 급여 네임 밸류 단기 목표 지향 문화 선진 외국 기업 겉 따르다 하다 문화 임원 계약 기간 때문 장기 목표 가져가다 수 없다 현실 이해 이 보완 수 있다 체계 마련 발전 &quot;                                                                     
+##  [2] &quot;연봉 주다 연봉 순위 자기 생활 주 오오 않다 사람 최고 회사 영업 쪽 자기 인생 1도 없다 야근 없다 날 드물다 실적 스트레스 상당 한편 지점 실적 줄이다 업무 강도 낮추다 주다 하다 &quot;                                                                              
+##  [3] &quot;무엇 연봉 복지 등 장점 이외 것 모르다 승진 나 힘들다 잦다 야근 조직 문화 딱딱하다 조직 문화 유연하다 만들다 좋다 생각 &quot;                                                                                                                                     
+##  [4] &quot;본사 위치 좋다 교통 편하다 직원 충성 높다 일 사람 일 맛 나다 구내식당 줄 길다 밥 먹다 때기 다리다 먹다 하다 단점 있다 업무 분담 확실하다 일 더디다 진행 부분 있다 직원 대화 나누다 시간 직원 가족 만남 가지다 기업 개개인 전체 직원 되다 마음 되다 수 있다 &quot;
+##  [5] &quot;보험 기업 선두 주자 복지 급여 만족 보수 분위기 비율 하락 시장 경쟁력 확보 필요 시급하다 1위 기업 유지 위하다 많다 노력 시장 조사 필요 &quot;                                                                                                                     
+##  [6] &quot;시간 자유 서원 만큼 일 하다 수 있다 양복 입다 근무 것 장점 수 있다 실적 제다 보다 월급 일정 않다 영업 인하다 실적 압박 시달리다 수당 수수료 챙기다 주다 설계사 힘들다 &quot;                                                                                     
+##  [7] &quot;기업 자부심 느끼다 수 있다 졸다 취업 결정 학교 생활 마치다 뒤 취업 나가다 좋다 높다 연봉 높다 업무 강도 퇴사 사람 많다 업무 강도 낮추다 주다 좋다 일한 받다 것 생각 &quot;                                                                                       
+##  [8] &quot;연봉 연봉 연봉 보람 없다 보수 못하다 일 하다 않다 만년 병장 느낌 수석 많다 좋다 것 좋다 것 가족 분위기 맡다 능력 근거 평가 필요 &quot;                                                                                                                           
+##  [9] &quot;급여 같다 연차 회사 직원 비하다 높다 복지 있다 업무 스트레스 직무 순환 되다 않다 어디 갈다 존재 어르신 현장 목소리 듣다 수 있다 기회 만들다 주다 &quot;                                                                                                          
+## [10] &quot;높다 연봉 성과급 근무 환경 따르다 연차 쓰다 수 있다 인력 부족 경우 가능 수 있다 삼성 자부심 퇴근 시간 일정 않다 하다 눈치 봄 군대식 문화 나 레비 실적 줄 세우다 직군 은근하다 차별 존재 출퇴근 시간 지키다 직원 스트레스 관리 앞장서다 &quot;
+</code></pre>
+
+<pre><code class="r"># NA가 포함되어 있는지 확인합니다. 
+parsed[is.na(x = parsed) == TRUE]
+</code></pre>
+
+<pre><code>## character(0)
+</code></pre>
+
+<pre><code class="r"># 글자수를 확인합니다. 
+parsed %&gt;% nchar() %&gt;% table()
+</code></pre>
+
+<pre><code>## .
+##  46  49  51  52  53  55  56  57  61  62  66  68  69  70  72  73  74  75 
+##   1   1   1   2   1   1   1   1   1   1   1   1   2   3   1   3   7   1 
+##  76  77  78  79  80  81  82  83  84  85  86  87  88  89  91  93  94  95 
+##   4   3   2   3   3   4   2   1   3   1   5   3   2   1   2   3   4   3 
+##  96  97  98  99 100 101 102 104 105 107 108 109 110 111 112 113 114 115 
+##   3   2   5   7   3   2   2   3   3   4   3   3   2   2   1   1   4   2 
+## 116 118 119 121 122 124 125 127 128 129 130 131 132 133 134 136 137 138 
+##   3   4   3   2   3   1   5   1   3   3   1   2   3   2   1   1   3   1 
+## 139 140 141 142 143 144 145 146 147 148 150 151 152 153 155 156 157 158 
+##   2   3   2   1   5   1   1   1   1   1   3   1   1   1   4   2   1   1 
+## 160 162 163 164 165 166 167 168 169 171 172 173 174 175 178 180 181 184 
+##   1   1   1   1   1   1   1   1   1   1   2   1   1   1   1   3   2   1 
+## 185 189 190 191 192 193 194 196 197 199 202 205 209 210 214 216 217 219 
+##   1   2   1   1   1   1   1   3   1   1   1   1   2   1   1   2   1   2 
+## 223 226 229 245 250 254 263 264 271 272 304 315 327 341 343 345 366 554 
+##   1   1   1   2   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+</code></pre>
+
+<pre><code class="r"># 중복 건수를 확인합니다. 
+duplicated(x = parsed) %&gt;% sum()
+</code></pre>
+
+<pre><code>## [1] 0
+</code></pre>
+
+<p>형태소 분석을 마치면 말뭉치(corpus)를 생성합니다. 말뭉치를 생성하기 전에 텍스트를 벡터 소스로 변경합니다. 벡터 소스는 벡터의 개별 원소를 각각의 문서로 인식합니다. <strong>tm</strong> 패키지를 불러온 다음 아래 라인을 실행하시면 됩니다.</p>
+
+<pre><code class="r"># 필요한 패키지를 불러옵니다.
+library(tm)
+</code></pre>
+
+<pre><code class="r"># 말뭉치를 생성합니다. 
+corpus &lt;- parsed %&gt;% VectorSource() %&gt;% VCorpus()
+print(corpus)
+</code></pre>
+
+<pre><code>## &lt;&lt;VCorpus&gt;&gt;
+## Metadata:  corpus specific: 0, document level (indexed): 0
+## Content:  documents: 270
+</code></pre>
+
+<p>결과 객체인 <code>corpus</code>는 <code>content</code>와 <code>meta</code>를 원소로 갖는 리스트입니다. <code>content</code>에는 한글 텍스트가, <code>meta</code>에는 데이터 속성이 할당되어 있습니다.</p>
+
+<pre><code class="r"># 첫 번째 결과를 출력하여 확인합니다. 
+str(object = corpus[[1]])
+</code></pre>
+
+<pre><code>## List of 2
+##  $ content: chr &quot;그룹 인센티브 포함 많다 급여 네임 밸류 단기 목표 지향 문화 선진 외국 기업 겉 따르다 하다 문화 임원 계약 기간 때&quot;| __truncated__
+##  $ meta   :List of 7
+##   ..$ author       : chr(0) 
+##   ..$ datetimestamp: POSIXlt[1:1], format: &quot;2018-10-31 02:18:46&quot;
+##   ..$ description  : chr(0) 
+##   ..$ heading      : chr(0) 
+##   ..$ id           : chr &quot;1&quot;
+##   ..$ language     : chr &quot;en&quot;
+##   ..$ origin       : chr(0) 
+##   ..- attr(*, &quot;class&quot;)= chr &quot;TextDocumentMeta&quot;
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;PlainTextDocument&quot; &quot;TextDocument&quot;
+</code></pre>
+
+<p>이제 사전을 만들기 위해 N-gram을 사용합니다. 사전을 만드는 과정은 다음과 같습니다. 말뭉치에서 인접한 2 단어씩 묶은 bigram을 생성하고 빈도수 기준으로 내림차순 정렬합니다. 명사 위주로 띄어쓰기를 없앨 필요가 있는지 확인합니다. 만약 &#39;업무 량&#39; 같이 하나의 단어로 처리해야 한다고 판단되면 이와 같은 bigram만 따로 모아 spacing.txt에 저장합니다. 나중에 공백을 없앤 단어들만 dictionary.txt에 추가하면 됩니다.</p>
+
+<pre><code class="r"># 필요한 패키지를 불러옵니다. 
+library(RWeka)
+</code></pre>
+
+<pre><code class="r"># 인접한 2개의 단어를 결합한 bigram을 생성합니다. 
+# min과 max에 할당할 숫자를 바꾸면 원하는 N-gram을 만들 수 있습니다. 
+bigram &lt;- function(x) {
+  NGramTokenizer(x = x, control = Weka_control(min = 2, max = 2))
+}
+
+# 단어문서행렬(Term-Document matrix)을 생성합니다. 
+bigramList &lt;- corpus %&gt;% 
+  TermDocumentMatrix(control = list(tokenize = bigram)) %&gt;% 
+  apply(MARGIN = 1, FUN = sum) %&gt;% 
+  sort(decreasing = TRUE)
+
+# bigram의 길이를 확인합니다. 
+length(bigramList)
+</code></pre>
+
+<pre><code>## [1] 8396
+</code></pre>
+
+<pre><code class="r"># 문서 개수의 1% 이상 발생하는 bigram만 남깁니다. 
+# 빈도수가 작은 것은 굳이 관심을 가지지 않아도 됩니다. 
+bigramList &lt;- bigramList[bigramList &gt;= (nrow(x = texts) * 0.01)]
+length(x = bigramList)
+</code></pre>
+
+<pre><code>## [1] 451
+</code></pre>
+
+<pre><code class="r"># bigram의 컬럼명(글자)만 따로 추출하여 bigramNames에 할당합니다. 
+bigramNames &lt;- names(bigramList)
+
+# bigramNames을 육안으로 확인하기 위해 최대 100개까지 출력합니다. 
+top &lt;- if (length(x = bigramNames) &gt;= 100) bigramNames[1:100] else bigramNames
+print(top)
+</code></pre>
+
+<pre><code>##   [1] &quot;수 있다&quot;       &quot;업무 강도&quot;     &quot;높다 연봉&quot;     &quot;것 같다&quot;      
+##   [5] &quot;기업 문화&quot;     &quot;수 없다&quot;       &quot;업계 1위&quot;      &quot;업무 량&quot;      
+##   [9] &quot;연봉 높다&quot;     &quot;주다 좋다&quot;     &quot;하다 하다&quot;     &quot;되다 있다&quot;    
+##  [13] &quot;복리 후생&quot;     &quot;있다 업무&quot;     &quot;주다 하다&quot;     &quot;받다 수&quot;      
+##  [17] &quot;하다 주다&quot;     &quot;강도 높다&quot;     &quot;조직 문화&quot;     &quot;하다 수&quot;      
+##  [21] &quot;높다 급여&quot;     &quot;일 하다&quot;       &quot;좋다 회사&quot;     &quot;근무 환경&quot;    
+##  [25] &quot;급여 수준&quot;     &quot;높다 편&quot;       &quot;복지 좋다&quot;     &quot;있다 것&quot;      
+##  [29] &quot;하다 것&quot;       &quot;교육 기회&quot;     &quot;실적 압박&quot;     &quot;일 많다&quot;      
+##  [33] &quot;있다 하다&quot;     &quot;지다 있다&quot;     &quot;되다 않다&quot;     &quot;문화 개선&quot;    
+##  [37] &quot;보수 기업&quot;     &quot;삶 균형&quot;       &quot;경우 많다&quot;     &quot;높다 업무&quot;    
+##  [41] &quot;돈 주다&quot;       &quot;량 많다&quot;       &quot;보험 회사&quot;     &quot;있다 연봉&quot;    
+##  [45] &quot;근무 시간&quot;     &quot;동종 업계&quot;     &quot;되다 수&quot;       &quot;보험 사&quot;      
+##  [49] &quot;복지 혜택&quot;     &quot;쓰다 수&quot;       &quot;일 삶&quot;         &quot;있다 좋다&quot;    
+##  [53] &quot;자기 계발&quot;     &quot;최고 수준&quot;     &quot;1위 기업&quot;      &quot;1위 자부심&quot;   
+##  [57] &quot;국내 최고&quot;     &quot;급여 높다&quot;     &quot;느끼다 수&quot;     &quot;도움 되다&quot;    
+##  [61] &quot;쉽다 않다&quot;     &quot;야근 많다&quot;     &quot;야근 잦다&quot;     &quot;연봉 복지&quot;    
+##  [65] &quot;인간 관계&quot;     &quot;잦다 야근&quot;     &quot;좋다 지다&quot;     &quot;퇴근 시간&quot;    
+##  [69] &quot;필요 있다&quot;     &quot;것 생각&quot;       &quot;근로 문화&quot;     &quot;눈치 보다&quot;    
+##  [73] &quot;라이프 밸런스&quot; &quot;보험업 특성&quot;   &quot;삼성 계열사&quot;   &quot;삼성 화재&quot;    
+##  [77] &quot;성과 주의&quot;     &quot;손해 보험&quot;     &quot;시스템 되다&quot;   &quot;신경 쓰다&quot;    
+##  [81] &quot;업계 최고&quot;     &quot;업무 시간&quot;     &quot;없다 업무&quot;     &quot;워크 라이프&quot;  
+##  [85] &quot;의사 결정&quot;     &quot;있다 않다&quot;     &quot;있다 회사&quot;     &quot;자부심 있다&quot;  
+##  [89] &quot;출근 시간&quot;     &quot;하다 않다&quot;     &quot;것 없다&quot;       &quot;것 좋다&quot;      
+##  [93] &quot;국내 시장&quot;     &quot;네임 밸류&quot;     &quot;높다 수준&quot;     &quot;눈치 보이다&quot;  
+##  [97] &quot;늦다 퇴근&quot;     &quot;되다 것&quot;       &quot;많다 업무&quot;     &quot;복지 되다&quot;
+</code></pre>
+
+<p><code>top</code> 객체를 spacing.txt를 생성합니다. 이 파일을 열고 띄어쓰기를 수정해야 하는 것들만 남기고 저장합니다.</p>
+
+<pre><code class="r"># spacing.txt를 생성합니다. 
+write.table(
+  x = top, 
+  quote = FALSE, 
+  file = &#39;../data/spacing.txt&#39;, 
+  row.names = FALSE, 
+  col.names = FALSE)
+</code></pre>
+
+<p>spacing.txt 파일을 읽은 다음 <code>spacing</code> 객체에 할당합니다. 이 객체에는 문자 벡터가 하나 저장되어 있을텐데요. 이 컬럼명을 <code>before</code>로 지정합니다. 그리고 <code>before</code>에서 띄어쓰기를 없앤 문자 벡터를 <code>after</code> 컬럼으로 추가한 다음 이 컬럼으로 dictionary.txt 파일을 생성합니다.</p>
+
+<pre><code class="r"># 
+spacing &lt;- read.table(file = &#39;../data/spacing.txt&#39;, sep = &#39;\t&#39;)
+colnames(x = spacing) &lt;- &#39;before&#39;
+
+# 중복을 제거합니다. 
+spacing &lt;- unique(x = spacing)
+
+# 띄어쓰기 없앤 문자벡터를 after 컬럼으로 추가합니다. 
+spacing$after &lt;- spacing$before %&gt;% str_remove_all(pattern = &#39; &#39;)
+</code></pre>
+
+<pre><code class="r"># 이제 dictionary.txt로 저장합니다. 
+write.table(
+  x = spacing$after,
+  quote = FALSE,
+  file = &#39;../data/dictionary.txt&#39;,
+  row.names = FALSE,
+  col.names = FALSE)
+</code></pre>
+
+<p>사전 만들기를 완성했다면 형태소 분석을 재실행합니다. 이번에는 사전을 추가합니다.</p>
+
+<pre><code class="r"># 사전을 추가한 다음 형태소 분석을 다시 실행합니다.
+parsed &lt;- r_parser_r(
+  contentVector = texts$content, 
+  language = &#39;ko&#39;,
+  korDicPath = &#39;../data/dictionary.txt&#39;)
+
+# 길이를 확인합니다. 
+length(x = parsed)
+</code></pre>
+
+<pre><code>## [1] 270
+</code></pre>
+
+<pre><code class="r"># 형태소 분석 결과 중 일부를 육안으로 확인합니다. 
+parsed[1:10]
+</code></pre>
+
+<pre><code>##  [1] &quot;그룹 인센티브 포함 많다 급여 네임밸류 단기 목표 지향 문화 선진 외국 기업 겉 따르다 하다 문화 임원 계약 기간 때문 장기 목표 가져가다 수 없다 현실 이해 이 보완 수 있다 체계 마련 발전 &quot;                                                                      
+##  [2] &quot;연봉 주다 연봉 순위 자기 생활 주 오오 않다 사람 최고 회사 영업 쪽 자기 인생 1도 없다 야근 없다 날 드물다 실적 스트레스 상당 한편 지점 실적 줄이다 업무강도 낮추다 주다 하다 &quot;                                                                               
+##  [3] &quot;무엇 연봉 복지 등 장점 이외 것 모르다 승진 나 힘들다 잦다 야근 조직문화 딱딱하다 조직문화 유연하다 만들다 좋다 생각 &quot;                                                                                                                                       
+##  [4] &quot;본사 위치 좋다 교통 편하다 직원 충성 높다 일 사람 일 맛 나다 구내식당 줄 길다 밥 먹다 때기 다리다 먹다 하다 단점 있다 업무 분담 확실하다 일 더디다 진행 부분 있다 직원 대화 나누다 시간 직원 가족 만남 가지다 기업 개개인 전체 직원 되다 마음 되다 수 있다 &quot;
+##  [5] &quot;보험 기업 선두 주자 복지 급여 만족 보수 분위기 비율 하락 시장 경쟁력 확보 필요 시급하다 1위 기업 유지 위하다 많다 노력 시장 조사 필요 &quot;                                                                                                                     
+##  [6] &quot;시간 자유 서원 만큼 일 하다 수 있다 양복 입다 근무 것 장점 수 있다 실적 제다 보다 월급 일정 않다 영업 인하다 실적압박 시달리다 수당 수수료 챙기다 주다 설계사 힘들다 &quot;                                                                                      
+##  [7] &quot;기업 자부심 느끼다 수 있다 졸다 취업 결정 학교 생활 마치다 뒤 취업 나가다 좋다 높다 연봉 높다 업무강도 퇴사 사람 많다 업무강도 낮추다 주다 좋다 일한 받다 것 생각 &quot;                                                                                         
+##  [8] &quot;연봉 연봉 연봉 보람 없다 보수 못하다 일 하다 않다 만년 병장 느낌 수석 많다 좋다 것 좋다 것 가족 분위기 맡다 능력 근거 평가 필요 &quot;                                                                                                                           
+##  [9] &quot;급여 같다 연차 회사 직원 비하다 높다 복지 있다 업무 스트레스 직무순환 되다 않다 어디 갈다 존재 어르신 현장 목소리 듣다 수 있다 기회 만들다 주다 &quot;                                                                                                           
+## [10] &quot;높다 연봉 성과급 근무환경 따르다 연차 쓰다 수 있다 인력 부족 경우 가능 수 있다 삼성 자부심 퇴근시간 일정 않다 하다 눈치 봄 군대식문화 나 레비 실적 줄 세우다 직군 은근하다 차별 존재 출퇴근시간 지키다 직원 스트레스 관리 앞장서다 &quot;
+</code></pre>
+
+<pre><code class="r"># 말뭉치를 생성하기 전에 텍스트를 벡터 소스로 변경합니다. 
+# 벡터 소스는 벡터의 개별 원소를 각각의 문서로 인식합니다. 
+corpus &lt;- parsed %&gt;% VectorSource() %&gt;% VCorpus()
+</code></pre>
+
+<p>사전을 추가하여 형태소 분석을 실시해도 여전히 띄어쓰기가 남아있는 경우가 있습니다. 이런 문제는 하나씩 확인해봐야 합니다. 데이터 분석 중 텍스트 마이닝이 특히 어려운 점이 확인해야 할 텍스트 데이터가 무진장 많다는 것입니다. 이번 예제의 경우 아주 작은 데이터를 다루고 있으니 운이 좋다고 할 수 있습니다. (물론 그래서 분석 결과가 그렇게 좋지는 않습니다.)</p>
+
+<pre><code class="r"># 사전으로도 처리되지 않는 단어 띄어쓰기 강제로 변환하는 함수를 생성합니다.
+changeTerms &lt;- function(corpus, before, after) {
+
+  # corpus의 길이를 확인합니다.
+  n &lt;- length(x = corpus)
+
+  # 반복문을 실행합니다.
+  for (i in 1:n) {
+    corpus[[i]]$content &lt;- corpus[[i]]$content %&gt;%
+      str_replace_all(pattern = before, replacement = after)
+  }
+
+  # 결과를 반환합니다. 
+  return(corpus)
+}
+
+# 띄어쓰기가 적용되지 않은 단어들을 강제로 적용합니다. 
+for (i in 1:nrow(x = spacing)) {
+  corpus &lt;- changeTerms(
+    corpus = corpus,
+    before = spacing$before[i],
+    after = spacing$after[i])
+}
+
+# 의심되는 단어가 여전히 바뀌지 않은 채로 포함되어 있는지 확인합니다. 
+checkTerms &lt;- function(corpus, term) {
+  corpus %&gt;% 
+    sapply(FUN = `[[`, &#39;content&#39;) %&gt;% 
+    str_detect(pattern = term) %&gt;% 
+    sum() %&gt;% 
+    print()
+}
+
+# 의심되는 단어별로 corpus에 포함된 개수를 확인합니다. 
+checkTerms(corpus = corpus, term = &#39;워라벨&#39;)
+</code></pre>
+
+<pre><code>## [1] 4
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;일삶균형&#39;)
+</code></pre>
+
+<pre><code>## [1] 8
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;워크라이프밸런스&#39;)
+</code></pre>
+
+<pre><code>## [1] 5
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;자기계발기회&#39;)
+</code></pre>
+
+<pre><code>## [1] 3
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;자기개발&#39;)
+</code></pre>
+
+<pre><code>## [1] 4
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;네임벨류&#39;)
+</code></pre>
+
+<pre><code>## [1] 5
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;군대 문화&#39;)
+</code></pre>
+
+<pre><code>## [1] 0
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;군대식문화&#39;)
+</code></pre>
+
+<pre><code>## [1] 5
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;수직문화&#39;)
+</code></pre>
+
+<pre><code>## [1] 4
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;가정 날&#39;)
+</code></pre>
+
+<pre><code>## [1] 5
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;손보&#39;)
+</code></pre>
+
+<pre><code>## [1] 10
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;조직문화&#39;)
+</code></pre>
+
+<pre><code>## [1] 13
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;회사문화&#39;)
+</code></pre>
+
+<pre><code>## [1] 2
+</code></pre>
+
+<pre><code class="r">checkTerms(corpus = corpus, term = &#39;근로문화&#39;)
+</code></pre>
+
+<pre><code>## [1] 5
+</code></pre>
+
+<p>철자가 틀린 단어나 비슷한 뜻을 하나로 통일시키는 작업을 여기에서 실시하면 됩니다.</p>
+
+<pre><code class="r"># 추가로 변경합니다. 
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;워라벨&#39;, after = &#39;워라밸&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;일삶균형&#39;, after = &#39;워라밸&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;워크라이프밸런스&#39;, after = &#39;워라밸&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;자기계발기회&#39;, after = &#39;자기계발 기회&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;자기개발&#39;, after = &#39;자기계발&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;네임벨류&#39;, after = &#39;네임밸류&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;군대 문화&#39;, after = &#39;군대문화&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;군대식문화&#39;, after = &#39;군대문화&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;수직문화&#39;, after = &#39;군대문화&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;가정 날&#39;, after = &#39;가정의날&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;손보&#39;, after = &#39;손해보험&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;조직문화&#39;, after = &#39;기업문화&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;회사문화&#39;, after = &#39;기업문화&#39;)
+corpus &lt;- changeTerms(corpus = corpus, before = &#39;근로문화&#39;, after = &#39;기업문화&#39;)
+</code></pre>
+
+<p>간혹 <code>corpus</code> 객체를 전처리 하다가 실수로 문자 벡터로 변환해버릴 수 있습니다. 그럴 경우 <strong>tm</strong> 패키지의 함수들을 사용할 수 없으니 반드시 <code>corpus</code> 객체의 속성을 확인하여야 합니다. <code>PlainTextDocument</code>면 통과입니다.</p>
+
+<pre><code class="r"># corpus 객체의 속성을 확인합니다.
+class(x = corpus[[1]])
+</code></pre>
+
+<pre><code>## [1] &quot;PlainTextDocument&quot; &quot;TextDocument&quot;
+</code></pre>
+
+<p>아래 함수들은 <code>corpus</code> 객체를 전처리할 때 유용하게 사용할 수 있는 함수들입니다. 만약 영문을 사용하거나 기호나 숫자를 없애야 한다면 아래 함수들을 사용하시기 바랍니다. 아래 3줄은 실행하지 않도록 설정했으니 참고하시기 바랍니다.</p>
+
+<pre><code class="r"># 소문자로 변경합니다. (영어가 포함되었을 경우. 대문자는 toupper)
+# [주의] content_transformer() 함수를 사용하지 않으면 character로 강제 변환됩니다.
+corpus &lt;- tm_map(x = corpus, FUN = content_transformer(FUN = tolower))
+
+# 특수문자를 제거합니다.
+corpus &lt;- tm_map(x = corpus, FUN = removePunctuation)
+
+# 숫자를 삭제합니다.
+corpus &lt;- tm_map(x = corpus, FUN = removeNumbers)
+</code></pre>
+
+<p><code>corpus</code> 객체 전처리의 마지막은 불용어(stopwords)를 삭제하는 것입니다. 한글 불용어는 인터넷에서 공개된 자료가 많으니 별도로 정리하여 사용하든가 아니면 아래 링크를 사용하시면 됩니다. 아래 링크는 인터넷에서 수집하여 정리한 다음 제 github에 올린 것입니다.</p>
+
+<pre><code class="r"># 불용어 객체를 생성합니다. 
+myStopwords &lt;- read.table(
+  file = &#39;https://raw.githubusercontent.com/MrKevinNa/TextMining/master/stopwords.txt&#39;) %&gt;% 
+  .$V1
+
+# 불용어(stopwords)를 삭제합니다.
+corpus &lt;- tm_map(x = corpus, FUN = removeWords, myStopwords)
+
+# whitespace를 제거합니다.
+corpus &lt;- tm_map(x = corpus, FUN = stripWhitespace)
+
+# 문서번호를 새로운 컬럼에 만든 후 데이터 프레임으로 저장합니다.
+parsedDf &lt;- data.frame(
+  id = generateIDs(obj = parsed, index = &#39;doc&#39;),
+  parsedContent = parsed, 
+  corpusContent = sapply(X = corpus, FUN = `[[`, &#39;content&#39;))
+</code></pre>
+
+<h3>문서단어행렬(DTM) 생성</h3>
+
+<p>말뭉치 전처리까지 완료했다면 이제 문서단어행렬(Document-Term Matrix)을 생성할 차례입니다. 말뭉치에서 글자의 길이가 2 이상인 단어들만 남긴 다음 DTM의 원소가 TF인 행렬을 만듭니다. 생성된 <code>dtm</code> 객체를 출력하면 여러 가지 정보를 확인할 수 있습니다. <code>sparsity</code>는 전체 행렬에서 0이 차지하는 비중을 의미합니다. <code>weighting</code>은 행렬을 구성하는 각각의 값(value)을 계산한 방식을 나타냅니다.</p>
+
+<pre><code class="r"># DTM을 생성합니다. 
+dtm &lt;- DocumentTermMatrix(x = corpus, control = list(wordLengths = c(2, Inf)))
+
+# 단어(=컬럼명) 양옆의 공백을 제거합니다.
+colnames(x = dtm) &lt;- trimws(x = colnames(x = dtm), which = &#39;both&#39;)
+
+# 차원을 확인합니다.
+dim(x = dtm)
+</code></pre>
+
+<pre><code>## [1]  270 1901
+</code></pre>
+
+<p>현재 작업 중인 <code>dtm</code> 객체는 270개 행(문서)에서 1901개 열(단어)로 구성된 것입니다. 단어의 수가 상당히 많습니다. 작업의 편의를 위해 대부분이 0인 sparse Terms 일부를 삭제하여 차원을 축소하는 편이 좋습니다. <code>sparse</code> 인자에 할당하는 값의 크기가 작을수록 <code>term</code>의 개수가 크게 감소합니다. 그러니까 <code>sparse</code>가 크다는 것은 그만큼 희소성이 있는 컬럼을 남겨두겠다는 의미가 됩니다. 아래 라인은 각각의 열(단어) 기준으로 sparsity가 0.99를 넘는 열을 삭제합니다. 그 결과 문서의 개수는 변함 없이 단어의 개수만 크게 감소합니다.</p>
+
+<pre><code class="r"># dtm의 차원을 줄입니다. 
+dtm &lt;- removeSparseTerms(x = dtm, sparse = as.numeric(x = 0.99))
+
+# 차원을 확인합니다.
+dim(x = dtm)
+</code></pre>
+
+<pre><code>## [1] 270 605
+</code></pre>
+
+<pre><code class="r"># 행의 합이 0인 건수를 확인합니다. 
+rowSums(x = dtm %&gt;% as.matrix()) %&gt;% table()
+</code></pre>
+
+<pre><code>## .
+##  7  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 
+##  2  1  2  6  6 11  8 12 17 15 12 15 12 10 14 16 10  8  8 12  9  5  3  6  1 
+## 33 34 35 36 37 38 39 40 41 42 44 45 46 49 50 51 56 58 62 63 65 93 
+##  6  3  4  6  1  3  3  2  2  1  5  2  1  2  1  1  1  1  1  1  1  1
+</code></pre>
+
+<pre><code class="r"># 문서 이름(row name)을 지정합니다. 나중에 생성할 parsedDf와 병합하기 위함입니다.
+dtm$dimnames$Docs &lt;- generateIDs(obj = dtm$dimnames$Docs, index = &#39;doc&#39;)
+
+# dtm 객체를 육안으로 확인합니다. 
+dtm$dimnames$Docs[1:40]
+</code></pre>
+
+<pre><code>##  [1] &quot;doc001&quot; &quot;doc002&quot; &quot;doc003&quot; &quot;doc004&quot; &quot;doc005&quot; &quot;doc006&quot; &quot;doc007&quot;
+##  [8] &quot;doc008&quot; &quot;doc009&quot; &quot;doc010&quot; &quot;doc011&quot; &quot;doc012&quot; &quot;doc013&quot; &quot;doc014&quot;
+## [15] &quot;doc015&quot; &quot;doc016&quot; &quot;doc017&quot; &quot;doc018&quot; &quot;doc019&quot; &quot;doc020&quot; &quot;doc021&quot;
+## [22] &quot;doc022&quot; &quot;doc023&quot; &quot;doc024&quot; &quot;doc025&quot; &quot;doc026&quot; &quot;doc027&quot; &quot;doc028&quot;
+## [29] &quot;doc029&quot; &quot;doc030&quot; &quot;doc031&quot; &quot;doc032&quot; &quot;doc033&quot; &quot;doc034&quot; &quot;doc035&quot;
+## [36] &quot;doc036&quot; &quot;doc037&quot; &quot;doc038&quot; &quot;doc039&quot; &quot;doc040&quot;
+</code></pre>
+
+<pre><code class="r">dtm$dimnames$Terms[1:40]
+</code></pre>
+
+<pre><code>##  [1] &quot;10년&quot;     &quot;10일&quot;     &quot;1년&quot;      &quot;1등&quot;      &quot;1위&quot;      &quot;30분&quot;    
+##  [7] &quot;6시&quot;      &quot;8시&quot;      &quot;가능&quot;     &quot;가정&quot;     &quot;가정의날&quot; &quot;가족&quot;    
+## [13] &quot;가지다&quot;   &quot;가치&quot;     &quot;각오&quot;     &quot;갈다&quot;     &quot;감사&quot;     &quot;감수&quot;    
+## [19] &quot;감축&quot;     &quot;강도&quot;     &quot;강요&quot;     &quot;강점&quot;     &quot;강제&quot;     &quot;강하다&quot;  
+## [25] &quot;갖다&quot;     &quot;갖추다&quot;   &quot;같다&quot;     &quot;개개인&quot;   &quot;개발&quot;     &quot;개선&quot;    
+## [31] &quot;개인&quot;     &quot;개인주의&quot; &quot;건강&quot;     &quot;건전&quot;     &quot;결과&quot;     &quot;결재&quot;    
+## [37] &quot;결정&quot;     &quot;경력&quot;     &quot;경영&quot;     &quot;경영진&quot;
+</code></pre>
+
+<p>이번에는 TF-IDF를 원소로 갖는 DTM을 생성해보겠습니다. 같은 함수를 사용하지만 <code>control</code> 인자에 할당하는 파라미터가 많이 다릅니다. 역시 글자의 길이가 2 이상인 단어들만 남기고 원소를 계산하는 방식으로 <code>weightTfIdf()</code> 함수를 사용한다는 특징이 있습니다.</p>
+
+<pre><code class="r"># 문서단어행렬의 원소가 TF-IDF인 dtmTfIdf 객체를 생성합니다.
+dtmTfIdf &lt;- DocumentTermMatrix(
+  x = corpus,
+  control = list(
+    removeNumbers = TRUE,
+    wordLengths = c(2, Inf),
+    weighting = function(x) weightTfIdf(x, normalize = TRUE) ))
+
+# 단어(=컬럼명) 양옆의 공백을 제거합니다.
+colnames(x = dtmTfIdf) &lt;- trimws(x = colnames(x = dtmTfIdf))
+
+# 차원을 확인합니다.
+dim(x = dtmTfIdf)
+</code></pre>
+
+<pre><code>## [1]  270 1871
+</code></pre>
+
+<p><code>dtmTfIdf</code> 객체의 경우, 행이 270이고 열이 1871인 행렬이 생성되었습니다. 혹시 <code>dtm</code>과 차원이 다른 이유를 짐작하실 수 있나요? 그건 바로 <code>control</code> 인자에 할당된 <code>removeNumbers</code> 때문입니다. 숫자로 된 단어를 모두 제외하였기 때문에 열의 개수가 소폭 감소하였습니다.</p>
+
+<p><code>dtmTfIdf</code> 객체도 차원을 줄여보겠습니다.</p>
+
+<pre><code class="r"># 네트워크의 크기를 줄이기 위해 sparse가 큰 컬럼을 제거합니다.
+# 역시 이 과정을 통해 DTM의 단어 개수가 크게 줄었습니다.
+dtmTfIdf &lt;- removeSparseTerms(x =  dtmTfIdf, sparse = as.numeric(x = 0.99))
+
+# 차원을 확인합니다.
+dim(x = dtmTfIdf)
+</code></pre>
+
+<pre><code>## [1] 270 598
+</code></pre>
+
+<pre><code class="r"># 행의 합이 0인 건수를 확인합니다.
+rowSums(x = dtmTfIdf %&gt;% as.matrix() %&gt;% round(digits = 1L)) %&gt;% table()
+</code></pre>
+
+<pre><code>## .
+## 1.5 1.8 1.9   2 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9   3 3.1 3.2 3.3 3.4 
+##   1   1   2   2   3   1   6   2   8  10  10  10  15  17  25  28  17  21 
+## 3.5 3.6 3.7 3.8 3.9   4 4.1 4.2 4.3 4.4 
+##  20  24  11   8  12   6   4   3   2   1
+</code></pre>
+
+<pre><code class="r"># 문서 이름(row name)을 지정합니다. 나중에 생성할 parsedDf와 병합하기 위함입니다.
+dtmTfIdf$dimnames$Docs &lt;- generateIDs(obj = dtmTfIdf$dimnames$Docs, index = &#39;doc&#39;)
+</code></pre>
+
+<h3>고빈도 단어 시각화</h3>
+
+<p><code>dtm</code>과 <code>dtmTfIdf</code> 객체를 생성하였으므로 고빈도 단어 시각화를 3가지 소개해드리겠습니다. 먼저 상위 20개 단어로 막대그래프를 그린 것입니다. <code>dtm</code>에서 열 합계를 계산한 다음 빈도수 기준으로 내림차순 정렬을 하고 상위 20개만 추출하면 막대그래프를 그릴 준비를 마친 것입니다.</p>
+
+<pre><code class="r"># dtm에 언급된 단어(term)별 빈도수를 생성합니다.
+wordsFreq &lt;- dtm %&gt;% as.matrix() %&gt;% colSums()
+
+# 사용된 단어의 총 개수를 확인합니다.
+length(x = wordsFreq)
+</code></pre>
+
+<pre><code>## [1] 605
+</code></pre>
+
+<pre><code class="r"># 내림차순으로 정렬하고, 상위 20개만 확인합니다.
+wordsFreq &lt;- wordsFreq[order(wordsFreq, decreasing = TRUE)]
+head(x = wordsFreq, n = 20L)
+</code></pre>
+
+<pre><code>##     좋다     높다     많다     연봉     회사     업무     직원     야근 
+##      175      158      140      135      133      119       90       73 
+##     기업     복지   대하다     삼성 업무강도     필요 기업문화     영업 
+##       71       69       62       60       60       57       56       53 
+##      1위     보수     급여   분위기 
+##       51       51       47       47
+</code></pre>
+
+<pre><code class="r"># 단어 빈도를 막대그래프로 그리기 위해 데이터 프레임으로 변환한 다음 
+# 내림차순으로 정렬합니다.
+wordDf &lt;- data.frame(
+  word = names(x = wordsFreq),
+  freq = wordsFreq,
+  row.names = NULL) %&gt;% 
+  arrange(desc(x = freq))
+
+# 건수를 확인합니다.
+nrow(x = wordDf)
+</code></pre>
+
+<pre><code>## [1] 605
+</code></pre>
+
+<p><code>ggplot()</code> 함수를 이용하여 막대그래프를 그립니다. 그 전에 깔끔한 그래프를 그릴 수 있도록 나만의 테마를 만듭니다.</p>
+
+<pre><code class="r"># ggplot() 함수에 적용할 나만의 테마(mytheme)를 설정합니다.
+mytheme &lt;- theme(
+  plot.title = element_text(size = 14, face = &#39;bold&#39;, hjust = 0.5),
+  axis.title.x = element_text(color = &#39;blue&#39;, size = 12, face = &#39;bold&#39;),
+  axis.title.y = element_text(color = &#39;#993333&#39;, size = 12, face = &#39;bold&#39;),
+  axis.text.x = element_text(family = &#39;NanumGothic&#39;, size = 10, face = &#39;bold&#39;),
+  axis.text.y = element_blank(), 
+  axis.ticks.length = unit(0, &#39;cm&#39;),
+  panel.background = element_blank(),
+  panel.grid = element_blank() )
+
+# 총 빈도수 상위 15개 단어로 막대그래프를 그립니다. (내림차순 정렬)
+ggplot(
+  data = head(x = wordDf, n = 20L), 
+  mapping = aes(
+    x = reorder(word, -freq), 
+    y = freq)) + 
+  geom_bar(
+    stat = &#39;identity&#39;, 
+    fill = c(rep(x = &#39;gray30&#39;, times = 5), rep(x = &#39;gray80&#39;, times = 15))) +
+  geom_text(
+    mapping = aes(label = freq), 
+    size = 4, 
+    vjust = -0.5) + 
+  labs(
+    x = &#39;고빈도 단어&#39;, 
+    y = &#39;빈도수&#39;, 
+    title = &#39;고빈도 단어 현황_전체&#39;) + 
+  mytheme 
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-27-1.png" alt=""></p>
+
+<p>이번에는 아주 유명한 텍스트 시각화 기법 중 하나인 단어 구름(Word Cloud)를 생성해보겠습니다. 단어의 색을 예쁘게 하기 위해 파스텔 색상으로 나만의 팔레트를 만들고 빈도수가 높은 단어에 색을 적용하도록 하겠습니다.</p>
+
+<pre><code class="r"># 필요한 패키지를 불러옵니다. 
+library(RColorBrewer)
+library(wordcloud2)
+library(htmlwidgets)
+</code></pre>
+
+<pre><code class="r"># 나만의 팔레트를 설정합니다. (n:사용할 색깔 수, name:색깔 조합 이름)
+display.brewer.pal(n = 8, name = &#39;Set2&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-29-1.png" alt=""></p>
+
+<pre><code class="r">pal &lt;- brewer.pal(n = 8, name = &#39;Set2&#39;)
+# http://colorbrewer2.org/ 참고
+
+# 워드클라우드에 적용할 데이터의 길이를 최대 300건으로 제한합니다. 
+# 이 숫자가 넘어가면 워드클라우드가 예쁘게 그려지지 않습니다. 
+if (nrow(x = wordDf) &gt;= 300) wordCloud &lt;- wordDf[1:300, ] else wordCloud &lt;- wordDf
+
+# Wordcloud를 그립니다. 
+wordcloud2(
+  data = wordCloud,
+  size = 0.8,
+  fontFamily = &#39;NanumGothic&#39;,
+  color = pal,
+  backgroundColor = &#39;white&#39;,
+  minRotation = -pi / 4,
+  maxRotation = pi / 4,
+  shuffle = TRUE,
+  rotateRatio = 0.25,
+  shape = &#39;circle&#39;,
+  ellipticity = 0.6)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-29-2.png" alt=""></p>
+
+<p>세 번째 그래프는 트리맵입니다. 사실 별 거 아니지만 단어 빈도수가 높은 순서대로 네모 칸의 크기를 다르게 하여 고빈도 단어들을 한 눈에 파악할 수 있도록 한 것입니다.</p>
+
+<pre><code class="r"># 필요한 패키지를 불러옵니다.
+library(treemap)
+</code></pre>
+
+<pre><code class="r"># 고빈도 단어 트리맵을 그립니다. 
+treemap(
+  dtf = wordDf,
+  title = &#39;고빈도 단어 트리맵&#39;,
+  index = c(&#39;word&#39;),
+  vSize = &#39;freq&#39;,
+  fontfamily.labels = &#39;NanumGothic&#39;,
+  fontsize.labels = 14,
+  palette = pal,
+  border.col = &#39;white&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-31-1.png" alt=""></p>
+
+<h3>단어 연관성 분석</h3>
+
+<p>이번에는 특정 단어와 함께 출현하는 빈도가 높은, 연관성 높은 단어를 추출하는 방법에 대해서 알아보겠습니다. 모두에 말씀드린 바와 같이 저는 3가지 방법을 사용하는데요. 이번 포스팅에서는 2가지만 소개하겠습니다. 둘 다 간단합니다.</p>
+
+<p>첫 번째 방법은 <code>dtmTfIdf</code> 객체를 행렬로 변환한 다음 상관(계수) 행렬을 구하는 걸로 거의 모든 것이 끝납니다. 그리고 나서 특정 단어가 속한 컬럼을 뽑아 행렬 원소를 내림차순으로 정렬하면 끝납니다. 아래는 고빈도 단어 중 명사 위주로 관심 있는 몇 가지에 대해 상위 10개씩 확인해본 것입니다.</p>
+
+<pre><code class="r"># 상관계수 행렬을 직접 생성합니다.
+corTerms &lt;- dtmTfIdf %&gt;% as.matrix() %&gt;% cor()
+
+# 차원을 확인합니다. 
+dim(x = corTerms)
+</code></pre>
+
+<pre><code>## [1] 598 598
+</code></pre>
+
+<pre><code class="r"># 상관계수 행렬로 연관성 높은 단어를 확인합니다.
+checkCorTerms &lt;- function(n = 10, keyword) {
+
+  # 키워드 유무를 확인합니다.
+  corTerms %&gt;% 
+    colnames() %&gt;% 
+    str_subset(pattern = keyword) %&gt;% 
+    print()
+
+  # 연관 키워드가 있는 컬럼의 전체 단어를 한꺼번에 출력합니다.
+  corRef &lt;- data.frame()
+
+  # 상관계수 높은 순서로 정렬합니다.
+  corRef &lt;- corTerms[ , keyword] %&gt;%
+    sort(decreasing = TRUE) %&gt;%
+    data.frame() %&gt;%
+    set_colnames(c(&#39;corr&#39;))
+
+  # 미리보기 합니다. 
+  head(x = corRef, n = n + 1)
+}
+
+# 빈도수 높은 단어 중 관심 있는 명사 위주로 확인합니다. 
+checkCorTerms(n = 10, keyword = &#39;연봉&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;연봉&quot;
+
+##             corr
+## 연봉   1.0000000
+## 상승   0.3024012
+## 높다   0.3007580
+## 해결   0.2232224
+## 상당   0.2172382
+## 인식   0.1951647
+## 각오   0.1802804
+## 커리어 0.1726297
+## 맡다   0.1715646
+## 브랜드 0.1652702
+## 자기   0.1599896
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;야근&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;야근&quot;     &quot;야근수당&quot;
+
+##               corr
+## 야근     1.0000000
+## 잦다     0.4773754
+## 일상     0.2983263
+## 가정     0.2503515
+## 기본     0.2398341
+## 필수     0.2285899
+## 쎄다     0.2266016
+## 기업문화 0.2265103
+## 이익     0.2259482
+## 과도하다 0.2215771
+## 기본급   0.2192393
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;삼성&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;삼성&quot;     &quot;삼성그룹&quot; &quot;삼성화재&quot;
+
+##               corr
+## 삼성     1.0000000
+## 자부심   0.3204171
+## 타이틀   0.2773458
+## 근무시간 0.2634302
+## 자랑     0.2251222
+## 상당     0.2109360
+## 마감     0.2067216
+## 나아지다 0.1919994
+## 조절     0.1815198
+## 압박     0.1761186
+## 금융업   0.1759662
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;업무강도&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;업무강도&quot;
+
+##               corr
+## 업무강도 1.0000000
+## 세다     0.3707511
+## 높다     0.3550106
+## 조절     0.3210592
+## 높이다   0.2888525
+## 강하다   0.2673936
+## 낮추다   0.2421293
+## 저녁     0.2073970
+## 느끼다   0.2046691
+## 바라다   0.1947416
+## 교육기회 0.1897041
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;기업문화&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;기업문화&quot;
+
+##               corr
+## 기업문화 1.0000000
+## 유연하다 0.3502078
+## 잦다     0.3384624
+## 단순     0.3172063
+## 보수     0.3013308
+## 경직     0.2981385
+## 양립     0.2934218
+## 바꾸다   0.2889535
+## 개선     0.2755130
+## 딱딱하다 0.2719651
+## 이외     0.2719651
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;분위기&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;분위기&quot;
+
+##               corr
+## 분위기   1.0000000
+## 차별     0.3143072
+## 대우     0.2700052
+## 자유     0.2649019
+## 체계     0.2559453
+## 나가다   0.2460992
+## 키우다   0.2065264
+## 전문가   0.2043906
+## 재무구조 0.2009425
+## 수직     0.1970148
+## 사용     0.1969903
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;스트레스&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;스트레스&quot;
+
+##               corr
+## 스트레스 1.0000000
+## 낮다     0.3046307
+## 빼다     0.2740408
+## 실질     0.2669483
+## 여유     0.2399733
+## 교육기회 0.2307128
+## 시급     0.2293218
+## 관리직   0.2274678
+## 금전     0.2268050
+## 급여     0.2243942
+## 직무순환 0.2203238
+</code></pre>
+
+<pre><code class="r">checkCorTerms(n = 10, keyword = &#39;자부심&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;자부심&quot;
+
+##               corr
+## 자부심   1.0000000
+## 삼성     0.3204171
+## 포화상태 0.3185390
+## 타이틀   0.2904761
+## 자랑     0.2679928
+## 보험업   0.2641174
+## 해외진출 0.2542467
+## 업계     0.2470959
+## 단순     0.2133139
+## 경직     0.2098528
+## 줏다     0.2070730
+</code></pre>
+
+<p>단어 연관성 분석의 두 번째 방법은 <strong>tm</strong> 패키지의 <code>findAssocs()</code> 함수를 하용하는 것입니다. 이 함수에 상관계수 행렬과 관심 있는 단어, 그리고 상관계수 기준점만 지정하면 알아서 결과를 제시합니다. 저는 연관성 단어를 추출하고 이것을 재직상태별로 나누어 막대그래프로 표현해보고자 아래와 같이 사용자 정의 함수를 만들었습니다. 전직원과 현직원 간 인식의 차이를 보이는 단어가 보이나요?</p>
+
+<pre><code class="r"># tm 패키지의 findAssocs() 함수 이용하여 상관계수 높은 단어를 확인할 수 있습니다.
+# 상관계수가 기준 이상인 단어들만 추출합니다.
+checkAssocs &lt;- function(dtm, keyword, corr = 0.01) {
+
+  # 재직상태별 상관계수를 생성하고 데이터 프레임에 저장합니다. 
+  createDtmObj &lt;- function(dtm, workGb, n = 10) {
+
+    # 전직원/현직원별로 dtm을 나눕니다.
+    dtmSmp &lt;- dtm[rownames(x = dtm) %in% texts$id[texts$재직상태 == workGb], ]
+
+    # 상관계수가 높은 단어만 저장합니다.
+    assocs &lt;- findAssocs(x = dtmSmp, terms = keyword, corlimit = corr)
+
+    # 재직상태별 상관계수로 데이터 프레임을 생성합니다. 
+    dtmObj &lt;- eval(expr = parse(text = str_c(&#39;assocs&#39;, keyword, sep = &#39;$&#39;))) %&gt;% 
+      `[`(1:n) %&gt;% 
+      as.data.frame() %&gt;% 
+      set_colnames(&#39;corr&#39;) 
+
+    # 행이름으로 word 컬럼을 생성합니다. 
+    dtmObj$word &lt;- rownames(x = dtmObj) 
+
+    # 행이름을 삭제합니다. 
+    rownames(x = dtmObj) &lt;- NULL 
+
+    # workGb 컬럼을 생성합니다. 
+    dtmObj$workGb &lt;- workGb
+
+    # 결과를 반환합니다. 
+    return(dtmObj)
+  }
+
+  # 행 기준으로 붙여서 dtmObj를 생성합니다. 
+  dtmObj &lt;- rbind(createDtmObj(dtm = dtm, workGb = &#39;전직원&#39;), 
+                  createDtmObj(dtm = dtm, workGb = &#39;현직원&#39;))
+
+  # 막대그래프 리스트를 생성합니다. 
+  plots &lt;- lapply(X = split(x = dtmObj, f = dtmObj$workGb), FUN = function(x) {
+
+    # 단어의 순서를 상관계수 역순으로 재조정합니다. 
+    x$word &lt;- factor(x = x$word, levels = x$word[order(x$corr, decreasing = TRUE)])
+
+    # 막대그래프를 설정합니다. 
+    ggplot(data = x, 
+           mapping = aes(
+             x = word, 
+             y = corr, 
+             width = 0.8)) +
+      geom_col(fill = &#39;gray50&#39;) +
+      geom_text(mapping = aes(label = corr), 
+                size = 4, 
+                vjust = -0.5) + 
+      scale_y_continuous(limits = c(0, max(x$corr)*1.1 )) + 
+      labs(x = &#39;&#39;, 
+           y = &#39;상관계수&#39;,
+           title = str_c(&#39;[&#39;, unique(x$workGb), &#39;]&#39;, 
+                         keyword, 
+                         &#39;관련 연관성 높은 단어&#39;, 
+                         sep = &#39; &#39;)) + 
+      theme(legend.position = &#39;none&#39;) + mytheme 
+  })
+
+  # 2행으로 그래프를 그립니다. 
+  do.call(what = gridExtra::grid.arrange, args = c(plots, nrow = 2))
+}
+
+# 재직상태별 상관계수 높은 단어들을 확인합니다. 
+checkAssocs(dtm = dtmTfIdf, keyword = &#39;연봉&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-1.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;야근&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-2.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;삼성&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-3.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;업무강도&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-4.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;기업문화&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-5.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;분위기&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-6.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;스트레스&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-7.png" alt=""></p>
+
+<pre><code class="r">checkAssocs(dtm = dtmTfIdf, keyword = &#39;자부심&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-33-8.png" alt=""></p>
+
+<h3>네트워크 맵 그리기</h3>
+
+<p>이번 포스팅의 마지막 꼭지는 네트워크 맵 그리기입니다. <code>dtm</code>이나 <code>dtmTfIdf</code>로 상관계수 행렬을 만들고 네트워크 객체를 생성한 다음 각 단어별로 매개 중심성(Betweenness Centrality)을 계산합니다. 매개 중심성은 네트워크에서 노드 간 최단 연결고리에 속하는지 여부로 결정됩니다. 숫자가 클수록 각각의 노드를 연결하는 중심에 있다는 것이죠. 이 외에 연결 중심성(Degree Centrality)도 중요합니다. 각 노드마다 연결된 엣지의 수가 다를텐데요. 이 엣지의 수가 많을수록 연결되어 있는 노드가 많다는 의미입니다. 이건 쉽죠?</p>
+
+<p>아래는 매개 중심성 상위 10%에 해당하는 노드를 금색으로 색칠하고 각 노드를 연결하는 엣지는 상관계수의 1.2배로 설정했습니다. 상관계수가 높을수록 연결된 선이 굵게 표시됩니다.</p>
+
+<pre><code class="r"># 필요한 패키지를 불러옵니다. 
+library(network)
+library(GGally)
+</code></pre>
+
+<pre><code class="r"># 네트워크 맵을 그리는 사용자 정의 함수를 생성합니다. 
+drawNetworkmap &lt;- function(dtmObj, title, sparse, corr, prob, link, cex) {
+
+  # 상관계수 행렬의 크기를 조정합니다.
+  corTerms &lt;- dtmObj %&gt;% as.matrix() %&gt;% cor()
+  corTerms[corTerms &lt;= corr] &lt;- 0
+
+  # 네트워크 객체를 생성합니다.
+  netTerms &lt;- network(x = corTerms, directed = FALSE)
+
+  # 매개 중심성을 계산합니다.
+  btnTerms &lt;- sna::betweenness(dat = netTerms)
+  netTerms %v% &#39;mode&#39; &lt;-
+    ifelse(
+      test = btnTerms &gt;= quantile(x = btnTerms, probs = prob, na.rm = TRUE), 
+      yes = &#39;Top&#39;, 
+      no = &#39;Rest&#39;)
+
+  # 노드 컬러를 지정합니다. 
+  # 상위 10%는 금색, 나머지 90%는 흰색으로 설정합니다. 
+  nodeColors &lt;- c(&#39;Top&#39; = &#39;gold&#39;, &#39;Rest&#39; = &#39;white&#39;)
+
+  # 엣지 크기를 지정합니다. 이번 예제에서는 상관계수의 1.2배로 합니다.
+  set.edge.value(x = netTerms, attrname = &#39;edgeSize&#39;, value = corTerms * 1.2)
+
+  # 네트워크 지도를 그립니다. 
+  ggnet2(
+    net = netTerms,
+    mode = &#39;fruchtermanreingold&#39;,
+    layout.par = list(cell.jitter = 0.001),
+    size.min = link,
+    label = TRUE,
+    label.size = cex,
+    node.color = &#39;mode&#39;,
+    palette = nodeColors,
+    node.size = sna::degree(dat = netTerms),
+    edge.size = &#39;edgeSize&#39;,
+    legend.position = &#39;None&#39;,
+    family = &#39;NanumGothic&#39;) + 
+    labs(title = title) + 
+    theme(plot.title = element_text(hjust = 0.5, face = &#39;bold&#39;))
+}
+</code></pre>
+
+<p>위와 같이 네트워크 맵을 그리는 사용자 정의 함수를 만들었다면, 이제 네트워크 맵을 그려보겠습니다. 먼저 재직상태별로 네트워크 맵을 그리는 것입니다. 네트워크 맵을 그리면 전체 문서에서 자주 출현하는 단어 간 연결고리를 확인할 수 있습니다. 마치 글을 읽듯이 자연스러운 부분을 발견할 수 있는데요. 예를 들면 <strong>실적 - 압박 - 상당</strong>을 들 수 있습니다. **보험 - 설계사 - 급여 - 낮다 **도 바로 붙어 있네요. 이런 식으로 네트워크 맵에 있는 연결고리를 찾는 재미가 있습니다. 동시에 이런 걸 찾으려면 힘이 들기도 하겠군요.</p>
+
+<pre><code class="r"># 재직상태별 네트워크 맵을 그리는 함수를 생성합니다. 
+dt4Networkmap1 &lt;- function(workGb, sparse, corr, prob = 0.95, link = 4, cex = 4) {
+
+    # 입력조건에 따라 dtm을 선택합니다.
+    checks &lt;- texts$재직상태 == workGb
+    dtmSub &lt;- dtmTfIdf[rownames(x = dtmTfIdf) %in% texts$id[checks], ]
+
+    # 모든 값이 0인 열을 삭제합니다. 
+    dtmSub &lt;- dtmSub[, as.matrix(x = dtmSub) %&gt;% colSums() &gt;= 1]
+
+    # 그래프 제목을 설정합니다. 
+    title &lt;- str_c(&#39;[&#39;, workGb, &#39;] 네트워크맵&#39;, sep = &#39; &#39;)
+
+    # 네트워크 맵을 그립니다. 
+    drawNetworkmap(dtmObj = dtmSub, title, sparse, corr, prob, link, cex)
+}
+
+# 재직상태별 네트워크 맵을 그립니다. 
+dt4Networkmap1(workGb = &#39;전직원&#39;, sparse = 0.95, corr = 0.30, link = 2, cex = 3)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-36-1.png" alt=""></p>
+
+<pre><code class="r">dt4Networkmap1(workGb = &#39;현직원&#39;, sparse = 0.95, corr = 0.30, link = 2, cex = 3)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-36-2.png" alt=""></p>
+
+<p>기업리뷰를 남긴 회원의 추천 여부에 따른 네트워크 맵을 비교할 수도 있습니다. <strong>비추 네트워크 맵</strong>을 보면 <strong>처음 - 좋다 - 말다</strong>라는 문구가 보이네요. <strong>야근 - 잦다 - 기업문화 - 개선</strong>이라는 것도 보이구요. 데이터가 좋으면 이런 부분을 쉽게 찾을 수 있는 것 같습니다.</p>
+
+<pre><code class="r"># 추천 여부별 네트워크 맵을 그리는 함수를 생성합니다. 
+dt4Networkmap2 &lt;- function(recomm, sparse, corr, prob = 0.95, link = 4, cex = 4) {
+
+    # 입력조건에 따라 dtm을 선택합니다.
+    checks &lt;- texts$추천여부 == recomm 
+    dtmSub &lt;- dtmTfIdf[rownames(x = dtmTfIdf) %in% texts$id[checks], ]
+
+    # 모든 값이 0인 열을 삭제합니다. 
+    dtmSub &lt;- dtmSub[, as.matrix(x = dtmSub) %&gt;% colSums() &gt;= 1]
+
+    # 그래프 제목을 설정합니다. 
+    title &lt;- str_c(&#39;[&#39;, recomm, &#39;] 네트워크맵&#39;, sep = &#39; &#39;)
+
+    # 네트워크 맵을 그립니다. 
+    drawNetworkmap(dtmObj = dtmSub, title, sparse, corr, prob, link, cex)
+  }
+
+# 재직상태별 네트워크 맵을 그립니다. 
+dt4Networkmap2(recomm = &#39;추천&#39;, sparse = 0.90, corr = 0.30, link = 2, cex = 3)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-37-1.png" alt=""></p>
+
+<pre><code class="r">dt4Networkmap2(recomm = &#39;비추&#39;, sparse = 0.90, corr = 0.30, link = 2, cex = 3)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-10-31-%5B%ED%8A%B9%EA%B0%95%5D-%EA%B8%B0%EC%97%85%EB%A6%AC%EB%B7%B0-%EB%B6%84%EC%84%9D-3/unnamed-chunk-37-2.png" alt=""></p>
+
+<p>이상으로 부족한 부분이 많지만 텍스트 마이닝 부분까지 모두 소개해드렸습니다. 질문이나 지적사항 모두 환영합니다. 많은 관심 부탁드립니다.</p>
+
+</body>
+
+</html>

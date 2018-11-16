@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>양치기 소년 문제를 분류문제로 풀어본 것</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>양치기 소년 문제를 분류문제로 풀어본 것</h1>
+
+<p>Dr.Kevin
+6/19/2018</p>
+
+<p>아래는 양치기 소년 문제를 분류문제로 했을 때 성능이 어떨런지 <strong>Confusion Matrix</strong>와 <strong>F1 score</strong> 그리고 <strong>ROC 커브 &amp; AUROC</strong>로 재미삼아 풀어본 것입니다.</p>
+
+<pre><code class="r"># 양치기 소년 문제 데이터를 입력합니다.
+real &lt;- factor(x = c(&#39;none&#39;, &#39;none&#39;, &#39;wolf&#39;), levels = c(&#39;wolf&#39;, &#39;none&#39;))
+pred &lt;- factor(x = c(&#39;wolf&#39;, &#39;wolf&#39;, &#39;wolf&#39;), levels = c(&#39;wolf&#39;, &#39;none&#39;))
+</code></pre>
+
+<p>위와 같이 데이터를 입력한 다음 <strong>혼동행렬(Confusion Matrix)</strong>를 확인해보겠습니다.</p>
+
+<pre><code class="r"># 혼동행렬 (confusion matrix)
+library(caret)
+confusionMatrix(data = pred, reference = real)
+</code></pre>
+
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction wolf none
+##       wolf    1    2
+##       none    0    0
+##                                           
+##                Accuracy : 0.3333          
+##                  95% CI : (0.0084, 0.9057)
+##     No Information Rate : 0.6667          
+##     P-Value [Acc &gt; NIR] : 0.9630          
+##                                           
+##                   Kappa : 0               
+##  Mcnemar&#39;s Test P-Value : 0.4795          
+##                                           
+##             Sensitivity : 1.0000          
+##             Specificity : 0.0000          
+##          Pos Pred Value : 0.3333          
+##          Neg Pred Value :    NaN          
+##              Prevalence : 0.3333          
+##          Detection Rate : 0.3333          
+##    Detection Prevalence : 1.0000          
+##       Balanced Accuracy : 0.5000          
+##                                           
+##        &#39;Positive&#39; Class : wolf            
+## 
+</code></pre>
+
+<p><strong>민감도가 100%, 특이도는 0%, 정밀도는 33%입니다. F1 score는 0.5</strong>가 나오겠네요.</p>
+
+<pre><code class="r"># F1 score 계산
+library(MLmetrics)
+F1_Score(y_pred = pred, y_true = real)
+</code></pre>
+
+<pre><code>## [1] 0.5
+</code></pre>
+
+<p>예상대로 0.5가 나왔습니다. 다음으로 <strong>ROC 커브</strong>를 그려보겠습니다.</p>
+
+<pre><code class="r"># ROC curve 그리기
+library(ROCR)
+predObj &lt;- prediction(predictions = as.numeric(pred), labels = real)
+
+# prediction 객체를 활용하여 performance 객체를 생성합니다. 
+perform &lt;- performance(prediction.obj = predObj, 
+                       measure = &#39;tpr&#39;, 
+                       x.measure = &#39;fpr&#39;)
+
+# ROC 커브를 그립니다.
+plot(x = perform, main = &#39;ROC Curve&#39;)
+
+# 왼쪽 아래 모서리에서 오른쪽 위 모서리를 잇는 대각선을 추가합니다. 
+lines(x = c(0, 1), y = c(0, 1), col = &#39;red&#39;, lty = 2)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-06-19-%EC%89%AC%EC%96%B4%EA%B0%80%EA%B8%B0-%EC%BD%94%EB%84%88/unnamed-chunk-4-1.png" alt=""></p>
+
+<p><strong>ROC 커브</strong>는 대각선 하나 덜렁 그려지네요. ㅎㅎ 마지막으로 <strong>AUROC</strong>를 확인해보겠습니다.</p>
+
+<pre><code class="r"># AUROC 계산
+library(pROC)
+auc(real, as.numeric(pred))
+</code></pre>
+
+<pre><code>## Area under the curve: 0.5
+</code></pre>
+
+<p>역시 예상대로 <strong>AUROC가 0.5</strong>죠?</p>
+
+<p><strong>양기치 소년이 늑대가 &#39;안 나타났다&#39;라고 한 번만 했더라면 좋았을텐데</strong>, 그러지는 않아서 결과가 좀 많이 웃기긴 한데, 재미있었습니다. 후후</p>
+
+</body>
+
+</html>

@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>ggplot2 패키지를 활용한 지도 시각화</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>ggplot2 패키지를 활용한 지도 시각화</h1>
+
+<p>Dr.Kevin
+5/25/2018</p>
+
+<p>이전 포스팅에서는 <strong>ggmap</strong> 패키지를 활용한 지도 시각화에 대해서 알아보았는데요. 제 생각이지만 실제 지도 이미지 위에 시각화를 하는 것만으로는 생각보다 할 일이 많지 않는 것 같습니다. 업무에 활용해야 한다면 더더욱 그럴 것 같네요. 그래서 이번 포스팅에서는 <strong>ggplot2</strong> 패키지를 활용하여 지도 경계 데이터를 수집하고, 지역별로 다각형을 만들어 채우기 색상을 지정하는 등의 지도 시각화에 대해서 알아보도록 하겠습니다.</p>
+
+<h2><strong>ggplot2</strong> 패키지를 활용한 지도 시각화</h2>
+
+<p>본격적인 지도 시각화에 앞서 가볍게 몸풀기를 하도록 하겠습니다. <strong>ggplot2</strong> 패키지의 <code>map_data()</code> 함수를 이용하면 간단하게나마 원하는 지역의 지도 경계 데이터를 가져올 수 있습니다. 그렇다면 <code>map_data()</code> 함수의 주요 인자를 알아봐야 하겠죠?</p>
+
+<ul>
+<li>  map : <strong>maps</strong> 패키지에서 제공되는 지도 이름을 지정합니다. &#39;county&#39;, &#39;france&#39;, &#39;italy&#39;, &#39;nz&#39;, &#39;state&#39;, &#39;usa&#39;, &#39;world&#39;, &#39;world2&#39; 중에서 하나를 지정하면 됩니다. 우리는 &#39;world&#39; 지도를 이용할 예정입니다.</li>
+<li>  region : 국가명을 지정합니다. 예를 들어 &#39;South Korea&#39;, &#39;North Korea&#39; 등으로 지정하면 됩니다. 기본값은 <code>.</code>이고 전체 국가명을 의미합니다.</li>
+</ul>
+
+<p><code>map_data()</code> 함수를 실행하면 6개의 컬럼을 갖는 데이터프레임이 생성됩니다. 각 컬럼은 다음과 같습니다.</p>
+
+<ul>
+<li>  long : 경도(longitude)를 의미합니다. 경도는 x축 좌표입니다.</li>
+<li>  lat : 위도(latitude)를 의미합니다. 위도는 y축 좌표입니다.</li>
+<li>  group : 한 권역은 같은 값을 갖습니다. 이 값을 기준으로 polygon(다각형)을 만들 수 있습니다.</li>
+<li>  order : 좌표의 순번 개념으로 생각하면 됩니다. 순번으로 정렬되어 있어야 제대로 된 다각형을 만들 수 있습니다! (중요)</li>
+<li>  region : <code>map_data()</code> 함수의 <code>region</code> 인자에 지정한 값입니다.</li>
+<li>  subregion : &#39;region&#39;의 하위 세부 지역을 의미하는 데 <code>NA</code>인 값도 상당히 많습니다.</li>
+</ul>
+
+<p>이 정도로 <code>map_data()</code> 함수에 대한 설명을 마무리 짓고 실습으로 넘어가도록 하겠습니다.</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다.
+library(ggplot2)
+</code></pre>
+
+<pre><code class="r"># 세계 지도를 불러옵니다. 
+world &lt;- map_data(map = &#39;world&#39;, region = &#39;.&#39;)
+
+# 세계 지도에 포함된 국가명만 오름차순으로 정렬 후 출력합니다.
+world$region %&gt;% unique() %&gt;% sort()
+</code></pre>
+
+<p>위 코드를 직접 실행하면 모두 252개의 국가명이 출력될 것입니다. 이 중에서 동북아시아 국가명만 골라서 주변 지도를 만들어 보겠습니다. </p>
+
+<pre><code class="r"># 동북아시아 지도 데이터를 만듭니다.
+neAsia &lt;- map_data(map = &#39;world&#39;,
+                   region = c(&#39;South Korea&#39;, &#39;North Korea&#39;, &#39;China&#39;,
+                              &#39;Japan&#39;, &#39;Mongolia&#39;, &#39;Taiwan&#39;))
+
+# 지도 데이터 미리보기 합니다. 
+head(x = neAsia, n = 10L)
+</code></pre>
+
+<pre><code>##        long      lat group order region subregion
+## 1  110.8888 19.99194     1     1  China         1
+## 2  110.9383 19.94756     1     2  China         1
+## 3  110.9707 19.88330     1     3  China         1
+## 4  110.9977 19.76470     1     4  China         1
+## 5  111.0137 19.65547     1     5  China         1
+## 6  110.9127 19.58608     1     6  China         1
+## 7  110.8223 19.55791     1     7  China         1
+## 8  110.6409 19.29121     1     8  China         1
+## 9  110.6031 19.20703     1     9  China         1
+## 10 110.5722 19.17188     1    10  China         1
+</code></pre>
+
+<p><code>ggplot()</code> 함수를 이용하여 지도를 그려보겠습니다.</p>
+
+<pre><code class="r"># x축에 경도, y축에 위도를 지정하여 지도를 그릴 수 있습니다.
+# geom_polygon() 함수를 이용하여 국가별로 다각형을 만들 수 있고,
+# 다각형별로 채우기 및 테두리 색을 변경할 수 있습니다. 
+neAsiaMap &lt;- 
+  ggplot(data = neAsia,
+         mapping = aes(x = long,
+                       y = lat,
+                       group = group)) +
+  geom_polygon(fill = &#39;white&#39;,
+               color = &#39;black&#39;)
+
+# 지도를 그립니다.
+neAsiaMap
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-4-1.png" alt=""></p>
+
+<p>지도를 그렸는데 왠지 비율이 맞지 않는 것 같고 어색합니다. 이런 문제를 해결하려면 아래와 같이 좌표계를 적용해주어야 합니다.</p>
+
+<pre><code class="r"># 좌표계를 적용하면 좀 더 지도처럼 출력할 수 있습니다. 
+# 아래 옵션 중에서 하나를 선택할 수 있습니다. 
+# &#39;mercator&#39;(기본값), &#39;polyconic&#39;, &#39;cylindrical&#39;, &#39;azequalarea&#39;
+neAsiaMap + coord_map()
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-5-1.png" alt=""></p>
+
+<p>이제 한결 나아졌습니다. 국가별로 채우기 색을 적용해보도록 하죠. 대한민국은 파란색, 북한은 빨간색으로 채우는 것입니다.</p>
+
+<pre><code class="r"># 한반도에만 채우기와 테두리 색을 지정합니다. 
+# 대한민국은 파란색, 북한은 빨간색으로 채우기 합니다.
+southKorea &lt;- map_data(map = &#39;world&#39;, region = &#39;South Korea&#39;)
+northKorea &lt;- map_data(map = &#39;world&#39;, region = &#39;North Korea&#39;)
+
+# 기존 지도 이미지에 한반도 국가들을 추가로 덧붙입니다. 
+neAsiaMap + 
+  coord_map() + 
+  geom_polygon(data = southKorea,
+               mapping = aes(x = long,
+                             y = lat,
+                             group = group),
+               fill = &#39;blue&#39;,
+               color = &#39;blue&#39;) +
+  geom_polygon(data = northKorea,
+               mapping = aes(x = long,
+                             y = lat,
+                             group = group),
+               fill = &#39;red&#39;,
+               color = &#39;red&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-6-1.png" alt=""></p>
+
+<p>그런데 최근 남북정상회담이 있었고, 평화의 무드가 조성되고 있는 이 즈음에 맞게 통일한국을 표현해보는 것도 의미가 있을 것 같습니다. 한반도를 &#39;하늘색&#39;으로 채워보도록 하겠습니다.</p>
+
+<pre><code class="r"># 한반도를 하늘색으로 채웁니다. 
+neAsiaMap + 
+  coord_map() + 
+  geom_polygon(data = southKorea,
+               mapping = aes(x = long,
+                             y = lat,
+                             group = group),
+               fill = &#39;skyblue&#39;,
+               color = &#39;skyblue&#39;) +
+  geom_polygon(data = northKorea,
+               mapping = aes(x = long,
+                             y = lat,
+                             group = group),
+               fill = &#39;skyblue&#39;,
+               color = &#39;skyblue&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-7-1.png" alt=""></p>
+
+<p>통일한국의 모습이 보기에 아주 좋습니다. 흐뭇하네요. 기왕에 하는 김에 한반도만 추려서 큰 이미지로 그려보도록 하죠. (임의로 정한 것이지만) <strong>통일 전 한반도 / 통일 후 한반도</strong>라는 타이틀을 넣은 두 개의 지도 이미지를 병렬로 나란히 그리는 것입니다.</p>
+
+<pre><code class="r"># 대한민국과 북한 지도 경계 데이터만 수집합니다. 
+twoKoreas &lt;- map_data(map = &#39;world&#39;, 
+                      region = c(&#39;South Korea&#39;, &#39;North Korea&#39;))
+
+# 지도를 깔끔하게 정리하기 위해 나만의 테마를 만듭니다. 
+my_theme &lt;- theme(panel.background = element_blank(),
+                  axis.title = element_blank(),
+                  axis.text = element_blank(),
+                  axis.ticks = element_blank(),
+                  plot.title = element_text(hjust = 0.5,
+                                            face = &#39;bold&#39;))
+</code></pre>
+
+<p>먼저 <strong>통일 전 한반도 / 통일 후 한반도</strong> 이미지를 각각 그려보겠습니다.</p>
+
+<pre><code class="r"># 통일 전 한반도 지도 이미지를 생성합니다. 
+before &lt;- 
+  ggplot(data = twoKoreas,
+         mapping = aes(x = long,
+                       y = lat,
+                       group = group)) + 
+  coord_map() + 
+  geom_polygon(data = southKorea,
+               aes(x = long,
+                   y = lat,
+                   group = group),
+               fill = &#39;blue&#39;,
+               color = &#39;blue&#39;) +
+  geom_polygon(data = northKorea,
+               aes(x = long,
+                   y = lat,
+                   group = group),
+               fill = &#39;red&#39;,
+               color = &#39;red&#39;) +
+  ggtitle(label = &#39;통일 전 한반도&#39;) + 
+  my_theme
+
+# 통일 전 한반도 지도 이미지를 그립니다.
+before 
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-9-1.png" alt=""></p>
+
+<pre><code class="r"># 통일 후 한반도 지도 이미지를 생성합니다. 
+after &lt;- 
+  ggplot(data = twoKoreas,
+         mapping = aes(x = long,
+                       y = lat,
+                       group = group)) + 
+  coord_map() + 
+  geom_polygon(data = southKorea,
+               aes(x = long,
+                   y = lat,
+                   group = group),
+               fill = &#39;skyblue&#39;,
+               color = &#39;skyblue&#39;) +
+  geom_polygon(data = northKorea,
+               aes(x = long,
+                   y = lat,
+                   group = group),
+               fill = &#39;skyblue&#39;,
+               color = &#39;skyblue&#39;) +
+  ggtitle(label = &#39;통일 후 한반도&#39;) +
+  my_theme
+
+# 통일 후 한반도 지도 이미지를 그립니다.
+after
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-10-1.png" alt=""></p>
+
+<p>두 개의 지도 이미지를 옆으로 나란히 그려보겠습니다. <strong>gridExtra</strong> 패키지의 <code>grid.arrange()</code> 함수를 이용하면 간단하게 해결될 수 있습니다.</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다.
+library(gridExtra)
+
+# 두 개의 이미지를 옆으로 나란히 그립니다.
+grid.arrange(before, after, ncol = 2)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-11-1.png" alt=""></p>
+
+<p>한 가지 아쉬운 점은 독도가 지도에 포함되어 있지 않다는 것입니다. 혹시나 해서 일본 지도 경계 데이터로 지도를 그려봤지만 독도는 일본 지도에도 포함되어 있지 않았습니다.</p>
+
+<pre><code class="r"># 일본 지도 경계 데이터를 수집합니다. 
+japan &lt;- map_data(map = &#39;world&#39;, region = &#39;Japan&#39;)
+
+# 통일 후 한반도 이미지에 일본 지도를 추가합니다. 
+after + 
+  geom_polygon(data = japan,
+               mapping = aes(x = long,
+                             y = lat,
+                             group = group),
+               fill = &#39;gray50&#39;,
+               color = &#39;black&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-12-1.png" alt=""></p>
+
+<p>그래서 제가 독도를 만들어 추가했습니다. 내용이 조금 복잡하긴 합니다만 천천히 따라하면 누구나 할 수 있습니다. 먼저 <strong>ggmap</strong> 패키지의 <code>geocode()</code> 함수로 독도의 위경도 좌표를 얻은 후 다이아몬드 형태로 변형을 해주어 <code>map_data()</code> 함수를 실행한 결과 데이터프레임처럼 만들어주면 됩니다. 별로 어렵지 않죠?</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다.
+library(ggmap)
+</code></pre>
+
+<pre><code class="r"># 구글 지도 API 인증키를 등록합니다. 매번 하려니 귀찮네요.
+register_google(key = &#39;자신의 구글 지도 API 인증키를 입력하세요&#39;)
+</code></pre>
+
+<pre><code class="r"># 독도의 위경도 좌표를 얻습니다.
+dd &lt;- geocode(location = &quot;dokdo&quot;)
+</code></pre>
+
+<pre><code class="r"># 독도의 위경도 좌표를 중심으로 다이아몬드 형태로 만들기 위해
+# 위경도 좌표 4개를 임의로 만듭니다. 
+# 그리고 map_data() 함수를 실행한 결과 데이터프레임처럼 만듭니다.
+dokdo &lt;- 
+  data.frame(
+    long = c(dd[[1]]-0.01, dd[[1]], dd[[1]]+0.01, dd[[1]]),
+    lat = c(dd[[2]], dd[[2]]+0.01, dd[[2]], dd[[2]]-0.01),
+    group = 1,
+    order = 1:4,
+    region = &#39;South Korea&#39;,
+    subregion = &#39;Dok Do&#39;
+  )
+
+# 통일 후 한반도 지도 이미지에 독도를 추가합니다. 
+after +
+  geom_polygon(data = dokdo,
+               aes(x = long,
+                   y = lat,
+                   group = group),
+               fill = &#39;skyblue&#39;,
+               color = &#39;skyblue&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-16-1.png" alt=""></p>
+
+<p>아주 작아서 잘 보이지 않지만 울릉도에서 4시 방향으로 조그마한 점이 하나 생겼습니다. 이쯤 해놓고 보니 더욱 보기 좋네요. 더 크게 만들면 보기에는 편할 것 같지만 과장된 이미지일 것 같아 이 정도 크기로 만족할까 합니다.</p>
+
+<h2><strong>단계구분도(choropleth)</strong> 그리기</h2>
+
+<p><strong>단계구분도</strong>는 지역별로 산출한 요약 정보량을 이용하여 시각화하는 것을 말합니다. 예를 들어, 선거가 끝나면 신문이나 방송에서 지도 하나 그려놓고 그 위에 특정 기준에 따라 권역별 색깔을 달리해놓은 것을 많이 보셨죠? 그렇게 그린 것이 단계구분도입니다. 이 포스팅을 끝까지 따라하다 보면 여러분도 단계구분도를 그릴 줄 아는 사람이 되는 것입니다. <sup>^</sup></p>
+
+<p>그런데 이제까지 배운 것만으로도 국가별 단계구분도를 그릴 수 있을 것 같다는 막연한 생각이 들지 않나요? 우리는 지도 경계 데이터를 수집해서 국가별로 다각형을 만들었고, 그 국가별 다각형에 채우기 색을 지정하는 것도 배웠습니다. 그러니 만약 국가별 요약 통계량, 예컨데 국가별 GDP 또는 인당GDP 컬럼을 만들어서 &#39;aes(fill=GDP)&#39;처럼 지정하면 국가별 단계구분도도 가능할 것입니다.</p>
+
+<pre><code class="r"># 동북아시아 국가 및 지역별 GDP와 인당GDP 컬럼을 만듭니다. 
+
+# Nomial GDP와 Per Capita nomial GDP는 2017년 IMF 자료를 참고하였습니다. 
+# 북한 데이터만 2016년 UN 데이터를 사용했습니다. 
+# GDP : https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)
+# Per Capita GDP : https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)_per_capita
+
+# 위 데이터를 하나의 데이터프레임으로 만듭니다. 
+neAsiaStat &lt;- 
+  data.frame(
+    region = c(&#39;China&#39;, &#39;Japan&#39;, &#39;South Korea&#39;, &#39;North Korea&#39;, &#39;Taiwan&#39;, &#39;Mongolia&#39;),
+    gdp = c(12014610, 4872135, 1538030, 17396, 579302, 10869),
+    perGdp = c(8643, 38440, 29891, 665, 24577, 3640))
+</code></pre>
+
+<p>이제 <code>merge()</code> 함수를 사용하여 두 개의 데이터프레임을 하나로 병합하겠습니다.</p>
+
+<pre><code class="r"># 두 개의 데이터프레임을 하나로 병합합니다. 
+neAsia &lt;- merge(x = neAsia,
+                y = neAsiaStat,
+                by = &#39;region&#39;,
+                all.x = TRUE)
+
+# region 및 order 기준으로 오름차순 정렬합니다.
+# 이 작업을 하지 않으면 다각형이 이상하게 그려질 수 있습니다! 
+neAsia &lt;- neAsia[order(neAsia$region, neAsia$order), ]
+
+# 데이터 미리보기 합니다. 
+head(x = neAsia, n = 10L)
+</code></pre>
+
+<pre><code>##    region     long      lat group order subregion      gdp perGdp
+## 1   China 110.8888 19.99194     1     1         1 12014610   8643
+## 2   China 110.9383 19.94756     1     2         1 12014610   8643
+## 3   China 110.9707 19.88330     1     3         1 12014610   8643
+## 4   China 110.9977 19.76470     1     4         1 12014610   8643
+## 5   China 111.0137 19.65547     1     5         1 12014610   8643
+## 6   China 110.9127 19.58608     1     6         1 12014610   8643
+## 7   China 110.8223 19.55791     1     7         1 12014610   8643
+## 8   China 110.6409 19.29121     1     8         1 12014610   8643
+## 9   China 110.6031 19.20703     1     9         1 12014610   8643
+## 10  China 110.5722 19.17188     1    10         1 12014610   8643
+</code></pre>
+
+<p>10줄 미리보기한 결과를 보니 잘 들어가 있는 것으로 보입니다. 이제 단계구분도를 그려볼까요?</p>
+
+<pre><code class="r"># 동북아시아 지도 데이터로 단계구분도를 그립니다. (명목 GDP 기준)
+ggplot(data = neAsia,
+       mapping = aes(x = long,
+                     y = lat,
+                     group = group)) + 
+  coord_map() + 
+  geom_polygon(mapping = aes(fill = gdp),
+               color = &#39;black&#39;) + 
+  my_theme + 
+  ggtitle(label = &#39;동북아시아 국가별 명목 GDP&#39;) + 
+  theme(legend.position = c(0.9, 0.1),
+        legend.text = element_text(size = 8, face = &#39;bold&#39;),
+        legend.title = element_text(size = 10, face = &#39;bold&#39;))
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-19-1.png" alt=""></p>
+
+<p><strong>명목 GDP</strong>를 기준으로 단계구분도를 그려보니 세계 11위인 대한민국도 중국의 규모 앞에서는 어두컴컴한 지역이 되어 버렸습니다. 이번에는 <strong>인당 명목 GDP</strong> 기준으로도 단계구분도를 그려보겠습니다.</p>
+
+<pre><code class="r"># 동북아시아 지도 데이터로 단계구분도를 그립니다. (인당 명목 GDP 기준)
+ggplot(data = neAsia,
+       mapping = aes(x = long,
+                     y = lat,
+                     group = group)) + 
+  coord_map() + 
+  geom_polygon(mapping = aes(fill = perGdp),
+               color = &#39;black&#39;) + 
+  my_theme + 
+  ggtitle(label = &#39;동북아시아 국가별 인당 명목 GDP&#39;) + 
+  theme(legend.position = c(0.9, 0.1),
+        legend.text = element_text(size = 8, face = &#39;bold&#39;),
+        legend.title = element_text(size = 10, face = &#39;bold&#39;))
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-20-1.png" alt=""></p>
+
+<p><strong>인당 명목 GDP</strong> 기준으로 단계구분도를 그려보니 상황이 역전되었습니다. 이제 우리나라 지역별로 단계구분도를 그려보도록 하겠습니다.</p>
+
+<h2>우리나라 행정경계 데이터로 단계구분도 그리기</h2>
+
+<p>통계청의 <a href="https://sgis.kostat.go.kr">통계지리정보서비스 웹사이트</a>에서 <strong>대한민국 센서스 행정경계구역 데이터</strong>를 내려받을 수 있습니다. 2018년 5월 현재, 2016년도 데이터가 제공되고 있습니다. 행경경계구역 데이터를 찾아서 신청하고 내려받는 방법을 설명하도록 하겠습니다.</p>
+
+<h3>통계청 행정경계구역 데이터 내려받기</h3>
+
+<p>통계지리정보서비스 웹사이트를 방문하면 아래와 같은 이미지가 열립니다. 우측 하단에 있는 <strong>자료제공목록</strong> 메뉴를 클릭합니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/%ED%86%B5%EA%B3%84%EC%A7%80%EB%A6%AC%EC%A0%95%EB%B3%B4%EC%84%9C%EB%B9%84%EC%8A%A4.png" alt=""></p>
+
+<p>자료제공목록 화면을 아래로 내리면 <strong>통계지역경계</strong>에 <strong>센서스용 행정구역경계(전체)</strong> 데이터가 보입니다. 기준년도가 여러 개 있지만 가장 최근인 <strong>2016</strong>년을 사용하면 됩니다. 이 상태에서 가장 오른쪽에 있는 <strong>무료</strong>를 클릭하면 자료신청화면으로 넘어갑니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/%EC%A0%9C%EA%B3%B5%EC%9E%90%EB%A3%8C%EC%A1%B0%ED%9A%8C.png" alt=""></p>
+
+<p>자료신청을 하려면 통계청 ONE-ID로 로그인을 해야 합니다. 아직 회원가입하지 않았다면 이번 기회에 통합회원가입하기 바랍니다.</p>
+
+<p>로그인을 하면 아래와 같은 신청 화면이 열립니다. 제가 쓴 내용은 참고만 하고 본인의 의사에 맞도록 작성한 후 신청을 클릭하면 신청이 완료됩니다. 주의할 점은 중간에 자료선택 항목을 기입한 후 오른쪽 끝에 있는 <strong>추가</strong>를 클릭해야 한다는 것입니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/%EC%9E%90%EB%A3%8C%EC%8B%A0%EC%B2%AD.png" alt=""></p>
+
+<p>자료신청이 완료되면 과거 자료신청 이력 화면으로 넘어갑니다. 공교롭게도 저는 딱 1년 만에 다시 자료 신청을 하는 군요. 내년 5월 4일에 다시 만나요.</p>
+
+<p>자료 승인은 시간이 조금 소요됩니다. 사람이 직접 확인을 하는 것 같습니다. 그래도 신청 당일에 완료되니 조금 기다렸다가 다시 확인해보기 바랍니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/%EC%8B%A0%EC%B2%AD%EB%82%B4%EC%97%AD%EC%A1%B0%ED%9A%8C.png" alt=""></p>
+
+<p>한 시간쯤 후에 다시 확인해보니 승인되었습니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/%EC%8A%B9%EC%9D%B8%EA%B2%B0%EA%B3%BC.png" alt=""></p>
+
+<p>상단 메뉴에서 오른쪽 끝에 <strong>자료 다운로드</strong>를 클릭하면 해당화면으로 이동합니다. 화면을 아래로 쭈욱 내리면 아래 표에 사용신청했던 <strong>통계지역경계</strong> 데이터가 보입니다. 표의 맨 오른쪽에 있는 <strong>다운로드</strong> 컬럼값 **bnd_all_))_2016 ...**을 클릭하면 압축파일을 다운로드할 수 있습니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/%EC%9E%90%EB%A3%8C%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png" alt=""></p>
+
+<p>참고로, 제가 내려받은 파일은 &#39;파일명.zip.html&#39;형태로 되어 있었습니다. 따라서 파일명에서 맨 마지막에 있는 &#39;.html&#39;를 지우니 zip 파일로 변환되었었고, 이 상태에서 압축을 해제할 수 있었습니다.</p>
+
+<p>압축파일을 풀면 그 안에 3개의 압축파일이 들어있습니다. <strong>bnd_sido_00_2016.zip</strong>은 17개 광역시도 단위 행정경계구역 데이터이고, <strong>bnd_sigungu_00_2016.zip</strong>은 시군구 단위 단위 행정경계구역 데이터입니다. 아울러 <strong>bnd_dong_00_2016.zip</strong>은 읍면동 단위 행정경계구역 데이터입니다. 이 세개의 압축파일을 적당한 곳에 저장한 압축을 해제합니다. 폴더를 유지한 상태로 압축을 해제하면 관리하기 편리합니다.</p>
+
+<h3>행정경계구역 데이터 불러오기</h3>
+
+<p>우리는 이번 예제에서 광역시도 단위로 된 단계구분도를 만들 예정이므로 <strong>bnd_sido_00_2016.zip</strong>만 압축을 해제하도록 하겠습니다. 압축을 해제하니 이번에는 4개의 파일이 생겼습니다. 우리는 이 중에서 <strong>shp</strong> 확장자 파일과 <strong>dbf</strong> 확장자 파일을 가지고 행정경계구역 데이터를 얻을 것입니다. 두 개의 데이터가 같은 폴더에 들어있어야 됩니다.</p>
+
+<pre><code class="r"># 데이터가 제대로 들어있는지 확인합니다. 
+list.dirs(path = &#39;./data&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;./data&quot;                  &quot;./data/bnd_sido_00_2015&quot;
+## [3] &quot;./data/bnd_sido_00_2016&quot;
+</code></pre>
+
+<pre><code class="r">list.files(path = &#39;./data/bnd_sido_00_2016&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;bnd_sido_00_2016.dbf&quot; &quot;bnd_sido_00_2016.prj&quot; &quot;bnd_sido_00_2016.shp&quot;
+## [4] &quot;bnd_sido_00_2016.shx&quot;
+</code></pre>
+
+<p>현재 작업경로에서 <strong>/data/bnd_sido_00_2016</strong> 폴더 안에 <strong>shx</strong> 및 <strong>dbf</strong> 파일이 저장되어 있는 것을 확인했으니 이제 불러오겠습니다. <strong>rgdal</strong> 패키지의 <code>readOGR()</code> 함수를 사용하면 됩니다. <code>dsn</code> 인자에는 행정경계구역 데이터가 들어있는 폴더를 지정해주면 되고, <code>layer</code> 인자에는 공통의 파일명을 확장자 없이 지정해주면 됩니다. 코드를 보면 쉽게 이해할 수 있습니다.</p>
+
+<pre><code class="r"># shp 파일을 불러옵니다. (광역시도 데이터)
+sido &lt;- 
+  rgdal::readOGR(
+    dsn = &#39;./data/bnd_sido_00_2016&#39;,
+    layer = &#39;bnd_sido_00_2016&#39;,
+    encoding = &#39;CP949&#39;)
+</code></pre>
+
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;/Users/drkevin/Documents/GitHub/MrKevinNa.github.io/rmds/data/bnd_sido_00_2016&quot;, layer: &quot;bnd_sido_00_2016&quot;
+## with 17 features
+## It has 6 fields
+## Integer64 fields read as strings:  OBJECTID
+</code></pre>
+
+<pre><code class="r"># sido 객체의 클래스를 확인합니다. 
+class(x = sido)
+</code></pre>
+
+<pre><code>## [1] &quot;SpatialPolygonsDataFrame&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;sp&quot;
+</code></pre>
+
+<p><code>sido</code> 객체의 클래스는 <strong>SpatitalPloygonsDataFrame</strong>입니다. 이것을 데이터프레임 형태로 변환해주어야 합니다. 이 때 사용하는 함수로는 <strong>ggplot2</strong> 패키지의 <code>fortify()</code> 함수입니다.</p>
+
+<pre><code class="r"># sido 객체를 데이터프레임으로 변환합니다. 
+sidoDf &lt;- fortify(model = sido)
+</code></pre>
+
+<pre><code>## Regions defined for each Polygons
+</code></pre>
+
+<pre><code class="r"># sidoDF의 구조를 확인합니다. 
+str(object = sidoDf)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    5346636 obs. of  7 variables:
+##  $ long : num  957671 957875 957985 957985 957985 ...
+##  $ lat  : num  1966937 1966792 1966830 1966830 1966830 ...
+##  $ order: int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ hole : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+##  $ piece: Factor w/ 4207 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ id   : chr  &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ group: Factor w/ 13781 levels &quot;0.1&quot;,&quot;1.1&quot;,&quot;1.2&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+</code></pre>
+
+<pre><code class="r"># 미리보기 합니다.
+head(x = sidoDf, n = 10L)
+</code></pre>
+
+<pre><code>##        long     lat order  hole piece id group
+## 1  957671.4 1966937     1 FALSE     1  0   0.1
+## 2  957875.3 1966792     2 FALSE     1  0   0.1
+## 3  957984.8 1966830     3 FALSE     1  0   0.1
+## 4  957984.8 1966830     4 FALSE     1  0   0.1
+## 5  957984.8 1966830     5 FALSE     1  0   0.1
+## 6  958154.4 1966775     6 FALSE     1  0   0.1
+## 7  958154.4 1966775     7 FALSE     1  0   0.1
+## 8  958294.3 1966848     8 FALSE     1  0   0.1
+## 9  958305.7 1966944     9 FALSE     1  0   0.1
+## 10 958364.3 1966924    10 FALSE     1  0   0.1
+</code></pre>
+
+<p><code>sidoDf</code> 객체는 데이터프레임이고 5,346,636행 7열이라는 것을 알 수 있습니다. 첫 10행만 미리보기 하니 7개 열은 long(경도), lat(위도), order(순번), hole, piece, id, group이었습니다. 경도와 위도의 숫자가 구글 지도 API에서 봤던 것과 다르죠? 바로 좌표계가 달라서 그렇습니다. 구글 지도 API에서 제공되는 좌표계는 <strong>UTM (WGS84 타원체) 좌표</strong> 기준이고, 행정경계구역 데이터는 <strong>UTM-K (GRS80 타원체) 좌표</strong> 기준입니다. </p>
+
+<p>너무 당연한 말이겠지만 좌표계가 다른 데이터를 하나의 지도로 출력할 수 없습니다. 그리고 제가 아는 바로는 우리나라 정부기관에서 제공하는 좌표계의 대부분이 <strong>UTM-K 좌표</strong> 기준으로 작성된 것입니다. 이런 점에서 공공데이터를 사용할 때 은근 스트레스를 받게 됩니다. 어렵게 구한 데이터의 좌표계가 서로 다르니 융합해서 사용할 수 없기 때문입니다. </p>
+
+<p>아울러 <strong>UTM-K 좌표</strong>로 <code>ggplot()</code>으로 지도 경계 이미지를 그릴 때 <code>coord_map()</code> 함수를 사용할 수 없습니다. 그러므로 <strong>UTM-K 좌표</strong>를 <strong>UTM 좌표</strong>로 변환해주는 작업이 필요합니다. 이번 포스팅을 작성하면서 관련 자료를 찾았습니다. 아래에 좌표를 변환하는 함수를 소개하였으니 참고하기 바랍니다. </p>
+
+<p>다시 진도를 나가겠습니다. 이번 지도 시각화 예제에 <code>sidoDf</code> 데이터 컬럼 거의 모두 다 사용합니다. 다만 &#39;서울, 경기&#39;와 같은 광역시도명이 없는데요. 이걸 만들어 붙이는 작업을 하도록 하겠습니다. </p>
+
+<pre><code class="r"># sido 객체의 data 요소를 확인합니다. 
+# sido 데이터는 S4 클래스이므로 &#39;@&#39; 기호를 사용해야 합니다. 
+sido@data
+</code></pre>
+
+<pre><code>##    OBJECTID BASE_YEAR SIDO_CD        SIDO_NM SHAPE_LENG  SHAPE_AREA
+## 0         1      2016      11     서울특별시   189478.1   605248658
+## 1         2      2016      21     부산광역시   526479.3   783988125
+## 2         3      2016      22     대구광역시   215638.4   879585938
+## 3         4      2016      23     인천광역시  1227623.2  1099356702
+## 4         5      2016      24     광주광역시   141014.9   498003505
+## 5         6      2016      25     대전광역시   157059.7   539472081
+## 6         7      2016      26     울산광역시   322752.3  1061392666
+## 7         8      2016      29 세종특별자치시   149141.4   464844343
+## 8         9      2016      31         경기도  1374254.7 10250080212
+## 9        10      2016      32         강원도  1152337.6 16809249077
+## 10       11      2016      33       충청북도   796054.9  7408394601
+## 11       12      2016      34       충청남도  1917052.6  8263089497
+## 12       13      2016      35       전라북도  1295413.9  8090368561
+## 13       14      2016      36       전라남도  7643275.8 12421378360
+## 14       15      2016      37       경상북도  1427854.7 19029174085
+## 15       16      2016      38       경상남도  3138760.6 10553277187
+## 16       17      2016      39 제주특별자치도   705159.4  1864750932
+</code></pre>
+
+<p>S4 클래스! 모르는 단어가 하나 나왔습니다. 사실 저도 거의 모르는 분야라 설명을 드리기는 어렵습니다만, R에는 3가지 객체지향 프로그래밍 시스템이 있는데 S3, S4, 그리고 R5입니다. S3와 S4 클래스의 차이로는 객체지향 구현 방식에 있다고 합니다. 우리가 그동안 마주쳤던 클래스는 S3입니다. 객체와 그 객체의 멤버를 연결하는 기호로 <code>$</code>를 사용합니다. 꽤 익숙하죠? 반면, S4 클래스는 방금 위에서 살펴본 것처럼 <code>@</code> 기호를 사용합니다.</p>
+
+<p>우리는 사용자 입장에서 R을 잘 쓰면 되잖아요. 물론 객체지향 프로그래밍이 어떤 것인지 이해하면 정말 좋겠지만 일단 R에서는 일반적으로 S3 클래스로 객체가 만들어지고 사용되고, 특별한 경우에 S4 클래스 객체를 만난다 정도로 마무리 하도록 하겠습니다.[1]</p>
+
+<p>아무튼 <code>sido@data</code>를 출력해보니 <code>sidoDf</code> 데이터에 필요한 광역시도명을 갖고 있는 것으로 보입니다. 한 가지 반가운 사실은 <code>sido@data</code>가 데이터프레임이라는 것입니다.</p>
+
+<pre><code class="r"># sido@data 클래스를 확인합니다. 
+class(x = sido@data)
+</code></pre>
+
+<pre><code>## [1] &quot;data.frame&quot;
+</code></pre>
+
+<pre><code class="r"># sido@data 구조를 확인합니다. 
+str(object = sido@data)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    17 obs. of  6 variables:
+##  $ OBJECTID  : chr  &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ BASE_YEAR : chr  &quot;2016&quot; &quot;2016&quot; &quot;2016&quot; &quot;2016&quot; ...
+##  $ SIDO_CD   : chr  &quot;11&quot; &quot;21&quot; &quot;22&quot; &quot;23&quot; ...
+##  $ SIDO_NM   : chr  &quot;서울특별시&quot; &quot;부산광역시&quot; &quot;대구광역시&quot; &quot;인천광역시&quot; ...
+##  $ SHAPE_LENG: num  189478 526479 215638 1227623 141015 ...
+##  $ SHAPE_AREA: num  605248658 783988125 879585938 1099356702 498003505 ...
+</code></pre>
+
+<p><code>sido@data</code>를 확인해보니 17행, 6열의 데이터프레임이었습니다. 17개 광역시도별 요약 데이터인 것으로 이해하면 될 것입니다. <code>sido@data</code>에서 <code>BASE_YEAR</code>, <code>SIDO_CD</code> 및 <code>SIDO_NM</code> 컬럼을 <code>sidoDf</code> 객체에 병합하면 문제가 해결될 것 같습니다. 그러면 두 개의 데이터프레임으로 병합할 때 어떤 컬럼을 기준으로 해야 할까요? <code>sidoDf</code>에는 <code>id</code>가 있습니다. 그래서 <code>sido@data</code>에서 <code>id</code>로 대체할만한 컬럼을 찾아보니, 행번호로 <code>id</code>를 만들면 될 것 같습니다.</p>
+
+<pre><code class="r"># sido@data에서 행번호를 id 컬럼으로 만듭니다. 
+sido@data$id &lt;- rownames(x = sido@data)
+</code></pre>
+
+<pre><code class="r"># 이제 두 데이터프레임을 병합니다. 
+sidoDf &lt;- merge(x = sidoDf,
+                y = sido@data[, c(&#39;id&#39;, &#39;BASE_YEAR&#39;, &#39;SIDO_CD&#39;, &#39;SIDO_NM&#39;)],
+                by = &#39;id&#39;,
+                all.x = TRUE)
+
+# id와 order 기준으로 오름차순 정렬합니다. 
+sidoDf &lt;- sidoDf[order(sidoDf$id, sidoDf$order), ]
+
+# 미리보기 합니다. 
+head(x = sidoDf, n = 10L)
+</code></pre>
+
+<pre><code>##    id     long     lat order  hole piece group BASE_YEAR SIDO_CD
+## 1   0 957671.4 1966937     1 FALSE     1   0.1      2016      11
+## 2   0 957875.3 1966792     2 FALSE     1   0.1      2016      11
+## 3   0 957984.8 1966830     3 FALSE     1   0.1      2016      11
+## 4   0 957984.8 1966830     4 FALSE     1   0.1      2016      11
+## 5   0 957984.8 1966830     5 FALSE     1   0.1      2016      11
+## 6   0 958154.4 1966775     6 FALSE     1   0.1      2016      11
+## 7   0 958154.4 1966775     7 FALSE     1   0.1      2016      11
+## 8   0 958294.3 1966848     8 FALSE     1   0.1      2016      11
+## 9   0 958305.7 1966944     9 FALSE     1   0.1      2016      11
+## 10  0 958364.3 1966924    10 FALSE     1   0.1      2016      11
+##       SIDO_NM
+## 1  서울특별시
+## 2  서울특별시
+## 3  서울특별시
+## 4  서울특별시
+## 5  서울특별시
+## 6  서울특별시
+## 7  서울특별시
+## 8  서울특별시
+## 9  서울특별시
+## 10 서울특별시
+</code></pre>
+
+<p>5백만 건이 넘는 데이터라 그런지 시간이 조금 걸립니다. 병합한 다음 반드시 <code>id</code>와 <code>order</code> 기준으로 오름차순 정렬을 해야 합니다. 그렇지 않으면 다각형을 그릴 때 정상적인 다각형이 만들어지지 않습니다.</p>
+
+<p>처음 10행을 미리보기 해보니 <code>SIDO_CD</code>와 <code>SIDO_NM</code>이 잘 들어가 있습니다. 컬럼명을 바꿔주면 보기 좋을 것 같습니다.</p>
+
+<pre><code class="r"># 새로 붙인 컬럼들의 이름을 변경합니다. 
+colnames(x = sidoDf)[8:10] &lt;- c(&#39;year&#39;, &#39;sidoCd&#39;, &#39;sidoNm&#39;)
+</code></pre>
+
+<p>광역시도명을 두 글자로 변환하면 좋겠습니다. 어떻게 하면 좋을까요? 서울특별시와 6대 광역시도, 세종특별자치시, 제주특별자치도 및 경기도와 강원도는 앞 두 글자만 따오면 될 것입니다. 그리고 나머지 지방도의 경우는 첫 번째 글자와 세 번째 글자인 &#39;남/북&#39;만 가져와서 붙이면 해결되겠죠?</p>
+
+<pre><code class="r"># 광역시도명을 두 글자로 줄입니다. 
+sidoDf$sidoNm2 &lt;- 
+  ifelse(test = str_detect(string = sidoDf$sidoNm, pattern = &#39;(남|북)도&#39;),
+         yes = str_c(str_sub(string = sidoDf$sidoNm, start = 1, end = 1),
+                     str_sub(string = sidoDf$sidoNm, start = 3, end = 3)),
+         no = str_sub(string = sidoDf$sidoNm, start = 1, end = 2))
+
+# 광역시도명의 빈도수를 확인합니다. 
+table(sidoDf$sidoNm2) %&gt;% sort()
+</code></pre>
+
+<pre><code>## 
+##    대전    세종    대구    광주    서울    충북    울산    경기    부산 
+##    4641    5609    5866    7423   10801   20454   74041   91129  107653 
+##    강원    경북    인천    제주    전북    충남    경남    전남 
+##  124080  176249  237123  258939  408359  427135  814653 2572481
+</code></pre>
+
+<p>광역시도별로 빈도수를 구하고 오름차순으로 정렬하니 전남 지역의 행 수가 가장 많습니다. 왜 그럴까요? 제 생각에는 전남 지역의 면적이 넓은 이유도 있겠지만 신안군에 섬들이 많아서 그런 것 같습니다.</p>
+
+<p>이로써 단계구분도에 필요한 데이터 준비는 다 됐습니다. 이제 <code>ggplot()</code> 함수로 기본형 지도를 그려볼 차례입니다. 그런데 한 가지 문제가 있습니다. 2016년 행정경계구역 데이터가 5,346,636건으로 2015년 733,766 건에 비해 7배 이상 많습니다. 갑자기 왜 이렇게 많아졌는지 통계청만 알고 있을테지만 이대로는 지도를 그리기 어려울 것입니다.</p>
+
+<p>썩 내키는 방법은 아니지만, 데이터를 조금 잘라보도록 하겠습니다. 예를 들어, order를 4로 나누었을 때 나머지가 1인 행만 남도록 하여 원래 데이터를 1/4로 줄이는 것입니다.</p>
+
+<pre><code class="r"># order를 4로 나누었을 때 나머지가 1인 행만 남깁니다. 
+sidoDf1 &lt;- sidoDf[sidoDf$order %% 4 == 1, ]
+
+# 새로 만든 데이터프레임의 건수를 확인합니다. 
+nrow(x = sidoDf1)
+</code></pre>
+
+<pre><code>## [1] 1336668
+</code></pre>
+
+<p>5백만 건이 넘는 데이터가 약 134만 건으로 줄었습니다. 이제 <code>ggplot()</code> 함수를 이용하여 지도 이미지를 생성해보겠습니다.</p>
+
+<pre><code class="r"># sidoDf1 데이터로 지도 이미지를 생성합니다. 
+sidoMap &lt;- 
+  ggplot(data = sidoDf1,
+         mapping = aes(x = long,
+                       y = lat,
+                       group = group)) + 
+  geom_polygon(fill = &#39;white&#39;,
+               color = &#39;black&#39;) + 
+  my_theme
+
+# sidoMap을 그립니다. 
+sidoMap
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-31-1.png" alt=""></p>
+
+<p>서해안과 남해안을 중심으로 섬들이 많습니다. 깔끔한 지도를 얻으려먼 섬과 같은 부속지역을 제외해야 합니다. <code>sidoDf1$piece == 1</code>인 조건을 만족하는 건만 남기면 됩니다.</p>
+
+<pre><code class="r"># 부속지역을 제외합니다.
+sidoDf2 &lt;- subset(x = sidoDf1, subset = sidoDf1$piece == 1)
+
+# 건수를 확인합니다. 
+nrow(x = sidoDf2)
+</code></pre>
+
+<pre><code>## [1] 321777
+</code></pre>
+
+<p>부속지역을 제외하니 다시 32만여 건으로 크게 줄었습니다. 그런데 이 데이터로 지도를 그려기 전에 고려해야 할 사항이 하나 있습니다. <code>ggplot()</code> 함수가 x, y 축의 범위를 자동으로 지정해주기 때문에 앞서 그린 지도가 가로로 퍼진 모양이 되었습니다. <code>map_data()</code> 함수로 받은 지도 데이터는 <strong>WGS84</strong> 좌표계라 그런지 <code>coord_map()</code> 함수가 적용되었는데, 통계청 행정경계구역 데이터는 <strong>GRS80</strong> 좌표계라 <code>coord_map()</code> 함수를 사용해 봐도 지도가 그려지지 않았습니다.</p>
+
+<p><strong>WGS84</strong> 좌표를 <strong>GRS80</strong> 좌표로 변환해주는 함수를 인터넷에서 찾아보니 괜찮은 블로그가 있었습니다. 그 블로그 내용을 참고하여 아래와 같이 변형해 보았습니다[2]. 이제 이 함수를 이용하여 <code>sidoDf2</code>의 위경도 좌표를 변환하겠습니다.</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다.
+library(sp)
+library(rgdal)
+library(magrittr)
+</code></pre>
+
+<pre><code class="r"># 좌표계를 변환하는 함수를 생성합니다. (GRS80 -&gt; WGS84)
+convertCoords &lt;- function(lon, lat) {
+
+  # 2개의 벡터를 입력 받아 데이터프레임으로 만들고
+  # SpatialPoints 타입으로 변환합니다.
+  xy &lt;- data.frame(lon = lon, lat = lat)
+  coordinates(obj = xy) &lt;- ~ lon + lat
+
+  # CRS(Coordinate Reference System)을 설정합니다. 
+  fmCRS &lt;- CRS(&#39;+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs&#39;)
+  toCRS &lt;- CRS(&#39;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&#39;)
+
+  # GRS80 좌표를 WGS84 좌표로 변환하여 반환합니다.
+  xy %&gt;% 
+    SpatialPoints(proj4string = fmCRS) %&gt;% 
+    spTransform(CRSobj = toCRS) %&gt;% 
+    SpatialPoints() %&gt;% 
+    as.data.frame() %&gt;% 
+    set_colnames(c(&#39;lonWGS84&#39;, &#39;latWGS84&#39;)) %&gt;% 
+    return()
+}
+
+# sidoDf 위경도 좌표를 변환합니다.
+changedCoords &lt;- convertCoords(lon = sidoDf2$long, lat = sidoDf2$lat)
+
+# 변환된 자표를 sidoDf에 열 기준으로 추가합니다.
+sidoDf2 &lt;- cbind(sidoDf2, changedCoords)
+</code></pre>
+
+<p><code>coord_map()</code>을 추가하여 WGS84 위경도 좌표로 지도를 그려보겠습니다.</p>
+
+<pre><code class="r"># 부속지역을 제외한 데이터로 지도 이미지를 생성합니다. 
+sidoMap &lt;- 
+  ggplot(data = sidoDf2,
+         mapping = aes(x = lonWGS84,
+                       y = latWGS84,
+                       group = group)) + 
+  geom_polygon(fill = &#39;white&#39;,
+               color = &#39;black&#39;) + 
+  my_theme + 
+  coord_map()
+
+# sidoMap을 그립니다. 
+sidoMap
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-34-1.png" alt=""></p>
+
+<p>예상했던 것보다 더 예쁘게 잘 그려졌습니다. 이제 이 지도 위에 특정 지역의 채우기 색을 지정해보겠습니다. 예를 들어, 광주광역시는 빨간색으로 채우고 대구광역시는 파란색으로 채우는 것입니다.</p>
+
+<pre><code class="r"># 광주광역시의 채우기 색을 &quot;red&quot;, 대구광역시 채우기 색을 &quot;blue&quot;로 변경합니다.
+sidoMap + 
+  geom_polygon(data = sidoDf2[sidoDf2$sidoNm2 == &#39;광주&#39;, ],
+               mapping = aes(x = lonWGS84,
+                             y = latWGS84,
+                             group = group),
+               fill = &#39;red&#39;) + 
+  geom_polygon(data = sidoDf2[sidoDf2$sidoNm2 == &#39;대구&#39;, ],
+               mapping = aes(x = lonWGS84,
+                             y = latWGS84,
+                             group = group),
+               fill = &#39;blue&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-35-1.png" alt=""></p>
+
+<p>광역시도별로 채우기 색을 지정할 수 있다는 것은 요약 통계량을 활용하여 단계구분도를 그릴 수 있다는 것을 의미합니다. 통계청에서 <strong>행정구역(시도)별 1인당 지역내총생산, 지역총소득, 개인소득 민간소비</strong> 데이터를 제공하고 있습니다. <a href="http://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1C65">링크</a>를 클릭하여 통계청으로 이동한 후 자료를 엑셀 파일로 내려받은 후 적당한 폴더로 옮겨놓습니다. 이 엑셀 파일을 읽어 <code>sidoStat</code>이라는 새 객체에 할당합니다.</p>
+
+<pre><code class="r"># 저장된 통계청 파일명을 지정합니다. 
+statFile &lt;- list.files(path = &#39;./data&#39;, pattern = &#39;행정구역&#39;)
+
+# 통계청 데이터를 불러옵니다.
+sidoStat &lt;- xlsx::read.xlsx(file = str_c(&#39;./data/&#39;, statFile),
+                            sheetName = &#39;데이터&#39;,
+                            startRow = 2)
+
+# 컬럼명을 변경합니다.
+colnames(sidoStat) &lt;- c(&#39;광역시도명&#39;, &#39;인당지역총생산&#39;, &#39;인당지역총소득&#39;, &#39;인당개인소득&#39;, &#39;인당민간소비&#39;)
+
+# 광역시도명을 두 글자로 줄입니다. 
+sidoStat$sidoNm2 &lt;- 
+  ifelse(test = str_detect(string = sidoStat$광역시도명, pattern = &#39;(남|북)도&#39;),
+         yes = str_c(str_sub(string = sidoStat$광역시도명, start = 1, end = 1),
+                     str_sub(string = sidoStat$광역시도명, start = 3, end = 3)),
+         no = str_sub(string = sidoStat$광역시도명, start = 1, end = 2))
+
+# sidoDf2에 광역시도명으로 병합합니다. 
+sidoDf2 &lt;- merge(x = sidoDf2,
+                 y = sidoStat[, 2:6],
+                 by = &#39;sidoNm2&#39;,
+                 all.x = TRUE)
+
+# id와 order 기준으로 오름차순 정렬합니다.
+sidoDf2 &lt;- sidoDf2[order(sidoDf2$id, sidoDf2$order), ]
+</code></pre>
+
+<p>이제 모든 준비가 다 완료되었습니다. 단계구분도를 여러 개 그리기 위해 함수로 만든 후 하나씩 그려보겠습니다.</p>
+
+<pre><code class="r"># 나만의 팔레트도 만들어서 적용해보겠습니다. 
+library(RColorBrewer)
+myPal &lt;- brewer.pal(n = 9, name = &#39;YlOrRd&#39;)
+
+
+# 단계구분도를 그리는 함수를 생성합니다. 
+drawChoropleth &lt;- function(var) {
+
+  # 채우기 기준 변수명을 지정합니다.
+  varNm &lt;- str_c(&#39;sidoDf2&#39;, var, sep = &#39;$&#39;) %&gt;% 
+    parse(text = .) %&gt;% 
+    eval()
+
+  # 단계구분도를 그립니다.
+  ggplot(data = sidoDf2,
+         mapping = aes(x = lonWGS84,
+                       y = latWGS84,
+                       group = group,
+                       fill = varNm)) + 
+    geom_polygon(color = &#39;gray30&#39;) + 
+    coord_map() + 
+    ggtitle(label = str_c(&#39;광역시도별&#39;, var, sep = &#39; &#39;)) + 
+    my_theme + 
+    theme(legend.position = c(0.9, 0.1),
+          legend.text = element_text(size = 8, face = &#39;bold&#39;),
+          legend.title = element_text(size = 10, face = &#39;bold&#39;)) + 
+    scale_fill_gradient(low = myPal[3],
+                        high = myPal[7])
+}
+
+# 단계구분도를 그립니다.
+drawChoropleth(var = &#39;인당개인소득&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-37-1.png" alt=""></p>
+
+<pre><code class="r">drawChoropleth(var = &#39;인당민간소비&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-25-R-%EC%8B%9C%EA%B0%81%ED%99%94-4/unnamed-chunk-37-2.png" alt=""></p>
+
+<p>이번 포스팅에서는 우리나라 광역시도 단위 단계구분도를 만들어 보았습니다. 이로써 시각화를 모두 마칩니다.</p>
+
+<p>[1] 객체지향 프로그래밍에 대해 더 자세한 내용이 궁금한 분들은 여러 자료를 찾아보기 바랍니다. <a href="http://drtagkim.blogspot.kr/p/r.html">이 블로그</a>도 좋습니다.</p>
+
+<p>[2] 좌표계 변환 함수는 <a href="https://goo.gl/8yxNWb">이 블로그</a>를 참고하였습니다.</p>
+
+</body>
+
+</html>

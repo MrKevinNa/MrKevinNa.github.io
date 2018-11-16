@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>분류모형의 성능 평가 기준</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>분류모형의 성능 평가 기준</h1>
+
+<p>Dr.Kevin
+5/31/2018</p>
+
+<p>분류모형의 성능을 평가하는 기준은 여러 가지가 있겠으나 일반적으로 많이 사용되는 두 가지 방법에 대해서 소개해드리겠습니다.</p>
+
+<h2><strong>혼동행렬 (Confusion Matrix)</strong></h2>
+
+<p>이전 포스팅에서 정확성(Accuracy)을 기준으로 분류모형의 성능을 평가하면 안 되는 점에 대해서 말씀드렸습니다. 분류모형의 성능을 나타내는 여러 가지 지표를 한 번에 확인할 수 있는 것으로 <strong>혼동행렬 (Confusion Matrix)</strong>을 사용합니다.</p>
+
+<p>혼동행렬 그 자체는 비교적 이해하기 쉬운 편이라 할 수 있지만, 각종 평가 지표들은 처음 보는 사람들에게 다소 복잡해 보입니다. 먼저 혼동행렬이 어떻게 생겼는지 확인한 후 각종 지표들에 대해서 소개해드리겠습니다.</p>
+
+<p><img src="https://i.ytimg.com/vi/AOIkPnKu0YA/maxresdefault.jpg" alt="혼동행렬 이미지">[1]</p>
+
+<p>위의 이미지를 보면, <code>table()</code> 함수를 이용하여 목표변수의 실제값(Actual)과 추정값(Estimated) 또는 예측값(Predicted)으로 빈도수를 확인하는 것과 같다는 것을 알 수 있습니다. 다만, 4개의 칸을 <strong>True Positive</strong>, <strong>False Positive</strong>, <strong>False Negative</strong>, 그리고 <strong>True Negative</strong>로 지정하고 이 4가지 항목을 가지고 다양한 지표들을 계산한다는 특징이 있습니다. 하나씩 살펴보도록 하겠습니다.</p>
+
+<ul>
+<li>  TP (True Positive) : 앞의 <code>True</code>는 실제값과 예측값이 같다는 것을 의미하고 뒤의 <code>Positive</code>는 예측값의 범주를 의미합니다. 목표변수에서 어떤 범주가 <code>Positive</code>인지는 혼동행렬을 실행한 결과 메시지에서 확인할 수 있습니다.</li>
+<li>  FP (False Positive) : 앞의 <code>False</code>는 실제값과 에측값이 서로 다르고, 모형은 <code>Positive</code>로 예측했다는 것을 의미합니다. 즉, 모형이 부정적인 사실을 긍정적인 것으로 오분류했다는 것이죠. 이것을 <strong>제1종 오류 (Type 1 Error)</strong>라고도 합니다. 예를 들어 암 검진을 한다고 했을 때 실제로 암환자가 정상으로 분류되는 경우를 말합니다.</li>
+<li>  FN (False Negative) : 앞의 <code>False</code>는 실제값과 에측값이 서로 다르고, 모형은 <code>Negative</code>로 예측했다는 것을 의미합니다. 이것을 <strong>제2종 오류 (Type 2 Error)</strong>라고도 하는데, 암 검진의 예를 들면 정상인을 암환자로 분류하는 경우를 말합니다. 재검을 받으면 정상으로 분류될 가능성이 높겠죠? 제1종 오류와 제2종 오류는 Positive가 어떤 범주인지에 따라 경중이 정해진다고 할 수 있습니다.</li>
+<li>  TN (True Negative) : 앞의 <code>True</code>는 실제값과 예측값이 같다는 것이고, 모형은 <code>Negative</code>로 예측했다는 것을 의미합니다.</li>
+</ul>
+
+<p>이렇게 4가지 항목에 대해 충분히 이해를 했다면 다음의 내용을 반드시 알아두어야 합니다.</p>
+
+<ul>
+<li>  실제값이 긍정인 건수의 합 (P) = TP + FN</li>
+<li>  실제값이 부정인 건수의 합 (N) = FP + TN</li>
+<li>  전체 건수의 합 (T) = TP + FN + FP + TN = P + N</li>
+</ul>
+
+<p>혼동행렬을 보면 쉽게 고개를 끄덕일 수 있지만 혼동행렬 없이 기호만 봐서는 언뜻 이해가 되지 않을 수 있습니다. (실은 제가 그랬습니다. ㅎㅎ) 그러니 반복 확인하여 꼭 암기하기 바랍니다.</p>
+
+<h3>혼동행렬을 통해 계산되는 분류 성능 평가 지표들[2]</h3>
+
+<ul>
+<li><p><strong>정확도</strong> : 예측값과 실제값이 서로 같은 개수를 전체 합으로 나눈 것</p>
+
+<p>\[ \text {Accuracy(ACC)} = \frac {\text {TP + TN}} {\text {P + N}} \]</p></li>
+<li><p><strong>민감도</strong> : 실제값이 긍정인 것 중에서 모형이 맞춘 비율</p>
+
+<p>\[ \text {Sensitivity or True Positive Rate(TPR)} = \frac {\text {TP}} {\text {P}} \]</p></li>
+<li><p><strong>정밀도</strong> : 모형이 긍정이라고 한 것 중에서 실제값이 긍정인 비율</p>
+
+<p>\[ \text {Precision or Positive Predictive Value(PPV)} = \frac {\text {TP}} {\text {TP + FP}} \]</p></li>
+<li><p><strong>특이도</strong> : 실제값이 부정인 것 중에서 모형이 맞춘 비율</p>
+
+<p>\[ \text {Specificity 또는 True Negative Rate(TNR)} = \frac {\text {TN}} {\text {N}} \]</p></li>
+<li><p><strong>1-특이도</strong> : 실제값이 부정인 것 중에서 모형이 긍정으로 오분류한 비율</p>
+
+<p>\[ \text {False Positive Rate(FPR)} = \frac {\text {FP}} {\text {N}} \]</p></li>
+<li><p><strong>F1 점수</strong> : 민감도와 정밀도의 조화평균</p>
+
+<p>\[ \text {F1 Score} = \frac {2}{\frac {1}{\text{민감도}} + \frac {1}{\text{정밀도}}} = \frac {2}{\frac{\text{TP+FN}} {\text{TP}} + \frac {\text{TP+FP}}{\text{TP}}} = \frac {2 \text{TP}} {2\text {TP} + \text {FP} + \text {FN}} \]</p></li>
+</ul>
+
+<p>이 6가지 평가 지표들은 반드시 암기하는 수준으로 알고 있어야 합니다. (사실 정확도는 암기하지 않아도 자연스럽게 알고 있는 것이지만, 이 중에서 가장 쓸모없는 것입니다.) 특히 <strong>F1 점수</strong>는 분류모형의 성능 평가 지표가 많이 사용되는 것 중 하나이며, 제가 가장 중요하다고 생각하는데요. 그 이유는 다음과 같습니다.</p>
+
+<p>만약 분류모형이 민감도를 100%로 만들려면 어떻게 하면 될까요? 바로 모두 <code>Positive</code>로 예측하면 됩니다. 그렇게 되면 혼동행렬은 <code>TP</code> 또는 <code>FP</code>만 생길텐데요. 민감도의 분모에 해당하는 <code>FN</code>은 0이 되므로 민감도는 100%가 됩니다. 그런데 이렇게 하면 정밀도가 매우 낮은 숫자가 됩니다. 따라서 민감도와 정밀도 모두 좋은 모델이 되러면 <code>TP</code>와 <code>TN</code>을 늘리는 모형이어야 합니다. 결국 F1 점수가 클수록 분류모형의 성능이 좋습니다.</p>
+
+<p>그런데 왜 산술평균 대신 조화평균을 사용할까요? 만약 산술평균로 계산한다고 가정해보겠습니다. 이 경우, 어느 한 쪽이 높은 갑슬 가지면 (예를 들어 민감도가 100%이면) 비록 다른 한 쪽이 낮은 값을 가지게 되더라도 높은 쪽의 영향을 크게 받으므로 산술평균값은 비교적 큰 값을 갖기 때문입니다. 하지만, 조화평균은 어느 한 쪽이 낮을 경우, 그 결과도 크게 낮아집니다. 조화평균이 평균속도를 내는 방식이라는 점을 상기하면 이해하기 쉽습니다. 예를 들어, 100km 거리를 100km/h로 갔다가 돌아올 때는 25km/h로 왔다면 평균시속은 얼마가 될까요? 직접 계산해보시기 바랍니다.</p>
+
+<p>비록 설명은 장황하였지만, 위의 지표들을 계산하는 함수는 아주 간단합니다. <strong>caret</strong> 패키지의 <code>confusionMatrix()</code> 함수를 사용하면 혼동행렬과 각종 지표들을 한 번에 확인할 수 있습니다. 다만 F1 점수는 이 함수로 얻을 수 없으므로 <code>table()</code>의 결과값을 사용하여 직접 계산해야 합니다. R 코드는 분류모형 예제에서 다루도록 하겠습니다.</p>
+
+<h2><strong>ROC 커브와 AUROC</strong></h2>
+
+<p>ROC는 Receiver Operating Characteristic의 머릿글자인데, 쉽게 말하면 x축은 <strong>1-특이도 (FPR)</strong>, y축은 <strong>민감도 (TPR)</strong>로 놓고 이진분류 모형의 예측 정확도를 평가하는데 사용되는 곡선입니다. <strong>FPR</strong>과 <strong>TPR</strong>은 반비례 관계에 있습니다. 그러니까 분류모형이 <code>Positive</code>로 예측한 것 중 <code>TP</code>가 증가하면 <code>FP</code>는 감소합니다.</p>
+
+<p><img src="https://i.stack.imgur.com/PRfzr.png" alt="ROC 커브">[3]</p>
+
+<p>위 그림에서 보는 바와 같이 2차원 평면에서 왼쪽 아래 모서리에서 오른쪽 위 모서리까지 점선이 있습니다. 만약 분류모형의 성능이 임의로 뽑는 것과 다르지 않다면 ROC 커브는 이 직선과 겹치게 됩니다. 반대로 분류모형의 성능이 뛰어날수록 ROC 커브는 왼쪽 위 모서리에 가까워집니다. y축이 TRP인 것을 감안하면 실제값이 긍정인 것 중에서 예측모형이 긍정으로 맞춘 비율이 100%에 가까워지기 때문입니다.</p>
+
+<p>AUROC는 Area Under ROC 커브의 머릿글자로 ROC 커브 아래 면적을 의미합니다. 최대값이 1이고, 최소값은 0.5가 됩니다. AUROC 역시 F1 점수처럼 클수록 분류모형의 성능이 좋다는 것을 의미합니다. ROC 커브는 <strong>ROCR</strong> 패키지의 <code>prediction()</code> 함수와 <code>performance()</code> 함수를 사용하여 그릴 수 있으며, AUROC는 <strong>pROC</strong> 패키지의 <code>auc()</code> 함수를 계산할 수 있습니다.</p>
+
+<p>이상으로 분류모형의 성능을 비교하는 주요 지표 2가지를 알아보았습니다. 분류모형을 소개하는 포스팅에서 R 코드를 상세하게 소개하도록 하겠습니다.</p>
+
+<p>[1] 출처 : <a href="https://www.youtube.com/watch?v=AOIkPnKu0YA">https://www.youtube.com/watch?v=AOIkPnKu0YA</a></p>
+
+<p>[2] 보다 자세한 내용은 <a href="https://goo.gl/YDJZaY">관련 위키피디아</a>를 참고하기 바랍니다.</p>
+
+<p>[3] 출처 : <a href="https://goo.gl/1bGcLa">https://goo.gl/1bGcLa</a></p>
+
+</body>
+
+</html>

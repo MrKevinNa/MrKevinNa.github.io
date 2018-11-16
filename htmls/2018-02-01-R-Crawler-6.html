@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Open API 데이터 수집하기</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Open API 데이터 수집하기</h1>
+
+<p>Dr.Kevin
+2/1/2018</p>
+
+<p><strong>API</strong>는 <strong>Application Programming Interface</strong>의 머릿글자로 응용프로그램 프로그래밍 인터페이스라고 할 수 있는데요. 저도 전문적인 것은 모릅니다. 다만 제가 사용하는 방식으로 설명을 대신하면 다음과 같습니다.</p>
+
+<p><strong>사용자</strong>인 제가 <strong>API 서비스 제공자</strong>인 공공데이터 포털에게 원하는 데이터를 <strong>요청(Request)</strong>하고 <strong>응답(Response)</strong>받는 방식으로 해당 데이터를 <strong>XML</strong> 또는 <strong>JSON</strong> 형태로 제공받는 것입니다. 그리고 Open API는 서비스를 신청하는 모든 사람에게 열려있다는 의미입니다. 사용자가 어떤 데이터에 대해 <strong>활용신청</strong>을 하면 API 서비스 제공자는 <strong>인증키</strong>를 발급해주어야 하고, 나중에 사용자가 해당 서비스를 요청하려면 발급받은 인증키를 요청 <code>URL</code>에 포함시켜야 하는 거죠.</p>
+
+<p><strong>Open API</strong>가 무료라고 해도 <strong>일별 호출수</strong>를 제한하는 경우가 일반적이고, 일별 호출수 한도를 초과하여 사용하려는 사용자에게 과금하는 경우도 있습니다. 우리나라 정부는 <a href="https://www.data.go.kr">공공데이터 포털</a>을 통해 정부기관에서 보유하고 있는 공공데이터를 무료로 공개하고 있습니다. 물론 일별 호출수 한도가 있구요.</p>
+
+<p>현재 공공데이터 포털에서 데이터를 제공하는 형태는 크게 2가지로, <strong>파일데이터</strong>와 <strong>Open API</strong>가 있습니다. <strong>파일데이터</strong>는 우리에게 아주 익숙한 형태(예컨데, xlsx 또는 csv 파일)로 다운로드 받을 수 있게 한 것입니다. 하지만 <strong>Open API</strong>를 이용하면 한 번에 많은 파일을 다운로드하고 다시 R에서 읽어오는 등의 수작업을 반자동화할 수 있습니다.</p>
+
+<p>이미 언급한 바와 같이 공공데이터 Open API를 사용하려면 미리 활용신청을 해야 합니다. 이번 포스트에서는 <strong>조달청 나라장터 낙찰정보</strong>에 대한 <strong>Open API 인증키</strong>를 받고 원하는 데이터를 수집하는 방법에 대해서 소개하겠습니다.</p>
+
+<h3>공공데이터 포털 인증키 발급받기</h3>
+
+<p>인증키 발급방법을 아래와 같이 몇 장의 화면 캡쳐 이미지로 설명을 하겠습니다. 먼저 공공데이터 포털에 접속하여 회원가입을 하고 로그인까지 합니다.</p>
+
+<ol>
+<li> 공공데이터 포털 메인화면 상단 검색창에 <strong>나라장터</strong>를 입력합니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%8F%AC%ED%84%B8_%EB%A9%94%EC%9D%B8%ED%99%94%EB%A9%B4.png" alt=""></p>
+
+<ol>
+<li> 검색 결과에서 검색창 바로 아래 전체, 파일데이터, 오픈API, 표준데이터 메뉴가 보일 것입니다. 이 중에서 <strong>오픈API</strong>를 선택하고 아래 목록에서 <strong>조달청_낙찰정보</strong>를 클릭합니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_OpenAPI_%EB%A6%AC%EC%8A%A4%ED%8A%B8.png" alt=""></p>
+
+<ol>
+<li> 조달청_낙찰정보 상세화면이 열리면 아래 그림에서 보이는 것처럼 <strong>활용신청</strong>을 클릭합니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_%EB%82%99%EC%B0%B0%EC%A0%95%EB%B3%B4_API.png" alt=""></p>
+
+<ol>
+<li> 개발계정 신청화면으로 이동하면, 나머지 항목은 그대로 둔 채 화면 아래쪽에 있는 <strong>상세기능정보</strong>로 이동하여 상세기능 중 필요한 항목을 선택합니다. 모두 선택해도 됩니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_%EB%82%99%EC%B0%B0%EC%A0%95%EB%B3%B4_API_Key_%EC%8B%A0%EC%B2%AD1.png" alt=""></p>
+
+<ol>
+<li> 상세기능을 다 선택했다면 <strong>라이센스표시</strong>에서 <strong>동의합니다</strong>를 선택한 후, <strong>신청</strong>버튼을 클릭합니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_%EB%82%99%EC%B0%B0%EC%A0%95%EB%B3%B4_API_Key_%EC%8B%A0%EC%B2%AD2.png" alt=""></p>
+
+<ol>
+<li> 위 과정을 모두 거치면 아래 이미지와 같이 개발계정 신청이 완료됩니다. 웹페이지 가운데에 확인창을 클릭하면 <strong>마이페이지 &gt; 개발계정</strong> 화면으로 이동하여 (이미 승인받은 다른 항목이 있다면) 승인받은 목록을 한 번에 확인할 수 있습니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_%EB%82%99%EC%B0%B0%EC%A0%95%EB%B3%B4_API_Key_%EC%8B%A0%EC%B2%AD3.png" alt=""></p>
+
+<ol>
+<li> <strong>마이페이지 &gt; 개발계정</strong>에서 방금 신청한 <strong>나라장터 낙찰정보서비스</strong>를 클릭하면 <strong>개발계정 상세보기</strong> 화면으로 이동하는데, 여기에서 <strong>인증키</strong>를 확인할 수 있습니다. 나중에 데이터를 요청할 때 사용해야 하므로 복사한 다음 R에서 적당한 객체명을 붙여 할당해놓습니다.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_%EB%82%99%EC%B0%B0%EC%A0%95%EB%B3%B4_API_Key_%ED%99%95%EC%9D%B8.png" alt=""></p>
+
+<p>한 가지 중요한 것은, 위 이미지에서 <strong>참고문서</strong>를 잘 읽어봐야 한다는 것입니다. 일단은 적당한 폴더에 저장합니다. 나중에 따로 설명하도록 하겠습니다.</p>
+
+<p>이상으로 공공데이터 포털 Open API 신청하는 것을 소개했습니다. 다른 데이터 항목들에 대해서는 인증키 신청방법이 같으니 필요한 항목은 미리미리 신청하시기 바랍니다.</p>
+
+<h3>조달청 나라장터 낙찰리스트 수집하기</h3>
+
+<p>바로 위에서 언급한 참고문서인 <strong>조달청_OpenAPI활용가이드_나라장터_낙찰정보서비스_1.1.docx</strong>를 엽니다. 4페이지 아래 표를 보면, <strong>나라장터 낙찰 정보서비스</strong>에서 물품, 공사, 용역, 외자 등의 항목에 대해 조회할 수 있다는 것을 알 수 있습니다. 이 표에 있는 <strong>오퍼레이션</strong>은 서비스 요청할 때 사용됩니다.</p>
+
+<p>6~12페이지에 걸쳐 <strong>낙찰된 목록 현황 물품조회</strong>에 대한 오퍼레이션 명세를 확인할 수 있습니다. 간단하게 설명하자면 <strong>요청 메시지 명세</strong> 테이블에 있는 항목을 조합하여 서비스 요청을 하면 정상적으로 응답을 받게 될 경우, <strong>응답 메시지 명세</strong> 테이블에 있는 항목을 받을 수 있다는 것입니다. 응답 데이터 형태는 <strong>XML</strong>이며, <code>HTML</code>처럼 처리하면 됩니다. 하지만 <strong>rvest</strong> 패키지의 <code>read_xml()</code> 함수와 <code>xml_nodes()</code> 함수 등을 이용해서 처리한다는 점에서 기존 방식과 다릅니다. 그리고 <code>tag</code>의 인자명에 대해 대소문자 구분을 합니다. 반면에, <code>read_html()</code> 함수는 <code>tag</code>의 인자명에 대해 대소문자 구분을 하지 않는다는 차이도 있습니다.</p>
+
+<p>예시를 보면 더욱 쉽게 이해할 수 있습니다. 11페이지 <strong>요청 / 응답 메시지 예제</strong>를 보시기 바랍니다. 웹크롤링을 할 때 <code>GET()</code> 함수의 인자로 <code>url</code>을 넣어서 요청을 하는데, <strong>Open API</strong>를 이용할 때에도 <code>URL</code>을 조합하여 요청하면 됩니다. <code>URL</code>의 요소로는 앞에서 언급한 <strong>요청 메시지 명세</strong>를 참고하면 되구요. 요청이 정상적으로 처리되면 <strong>응답 메시지 명세</strong>에서 보이는 형태의 데이터를 받을 수 있습니다. 이 <code>XML</code>을 우리가 알고 있는 <strong>rvest</strong> 함수들로 정리해주면 끝입니다.</p>
+
+<p>백문이 불여일견이고, 백견이 불여일각이며, 백각이 불여일행[1]이니, 지금부터 Open API 방식으로 공공데이터를 수집하는 코드를 소개하겠습니다. 먼저 요청 <code>URL</code>의 공동부분(main)과 조회항목(이 예제에서는 &#39;물품&#39;)을 설정하고, API 인증키는 <code>key</code>에 할당합니다. 그리고 요청 메시지 명세에 있는 나머지 항목들을 순서대로 정리하여 <code>URL</code>을 조립해보겠습니다.</p>
+
+<pre><code class="r"># URL의 공통부분을 설정합니다.
+main &lt;- &#39;http://apis.data.go.kr/1230000/ScsbidInfoService/&#39;
+
+# 여러 항목 중 &#39;물품&#39;을 지정합니다.
+item &lt;- &#39;getScsbidListSttusThng&#39;
+</code></pre>
+
+<pre><code class="r"># API 인증키(ServiceKey)를 key에 할당합니다.
+key &lt;- &#39;여기에 인증키를 복사해서 붙여넣습니다&#39;
+</code></pre>
+
+<pre><code class="r"># 한 페이지 당 출력할 건수(numOfRows)를 지정합니다.
+rows &lt;- 2
+
+# 페이지 번호(pageNo)를 설정합니다.
+page &lt;- 1
+
+# 조회구분(inqryDiv)을 설정합니다. 
+inqry &lt;- 1
+
+# 조회시작일시(inqryBgnDt)를 설정합니다. 
+bgnDate &lt;- 20180101
+
+# 조회종료일시(inqryEndDt)를 설정합니다. 
+endDate &lt;- 20180131
+</code></pre>
+
+<pre><code class="r"># 이제 url을 조립합니다. 
+# 이 때 요소를 묶어주는 구분자(?, &amp;)를 주의깊게 확인하기 바랍니다!
+url &lt;- str_c(main,
+             item,
+             str_c(&#39;?ServiceKey=&#39;, key),
+             str_c(&#39;&amp;numOfRows=&#39;, rows),
+             str_c(&#39;&amp;pageNo=&#39;, page),
+             str_c(&#39;&amp;inqryDiv=&#39;, inqry),
+             str_c(&#39;&amp;inqryBgnDt=&#39;, bgnDate),
+             str_c(&#39;&amp;inqryEndDt=&#39;, endDate)
+             )
+
+# 조립한 url을 출력합니다.
+cat(url)
+</code></pre>
+
+<p>각자의 인증키를 넣은 <code>url</code>을 조립했으면 출력된 결과를 복사해서 웹브라우저 주소창에 붙여넣기 해보겠습니다. 그러면 아래와 같은 이미지가 보일 것입니다. 이 형태가 <strong>XML</strong>입니다. XML은 HTML과 비슷해보이지만 사용자 입장에서는 필요한 데이터만 군더더기 없이 깔끔하게 제공되기 때문에 HTML보다 다루기 쉽다는 장점이 있습니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-01-R-Crawler-6/%EC%A1%B0%EB%8B%AC%EC%B2%AD_%EB%82%98%EB%9D%BC%EC%9E%A5%ED%84%B0_%EB%82%99%EC%B0%B0%EC%A0%95%EB%B3%B4_XML_%EC%98%88%EC%8B%9C.png" alt=""></p>
+
+<p>위 이미지의 맨 아래를 보면 전체 건수가 4,257건(2018년 4월 5일 재실행 기준)임을 알 수 있습니다. 그리고 현재 2건의 데이터가 화면에 보이며, 그 2건은 <code>&lt;item&gt;</code> 태그로 묶여서 각각 18개의 세부 항목이 제공되고 있습니다.</p>
+
+<p>그럼 이 <code>url</code>로 요청하고 응답받은 XML을 정리하는 방법에 대해 알려드리겠습니다. 간단하게 <code>GET()</code> 함수를 이용하여 요청하면 됩니다.</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다. 
+library(httr)
+library(rvest)
+library(dplyr)
+library(stringr)
+library(magrittr)
+</code></pre>
+
+<pre><code class="r"># url로 요청합니다.
+resp &lt;- GET(url)
+
+# 응답 상태코드를 확인합니다. 
+status_code(resp)
+</code></pre>
+
+<pre><code>## [1] 200
+</code></pre>
+
+<p>응답 상태코드가 <code>정상(200)</code>입니다. 응답받은 <code>resp</code> 객체에서 관심 있는 <code>element</code>를 확인해보면 낙찰리스트 각 건들이 <code>body &gt; items &gt; item</code>의 하위 <code>element</code>로 제공되고 있습니다. 따라서 <code>&lt;item&gt;</code> 단위로 데이터를 정리하면 됩니다. 에시로 <strong>입찰공고번호(bidNtceNo)</strong>만 추출해보면 다음과 같습니다.</p>
+
+<pre><code class="r"># 입찰공고번호(bidNtceNo)만 추출합니다. 
+read_xml(resp) %&gt;% 
+  xml_nodes(&#39;item&#39;) %&gt;% 
+  xml_node(&#39;bidNtceNo&#39;) %&gt;% 
+  xml_text()
+</code></pre>
+
+<pre><code>## [1] &quot;20171233674&quot; &quot;20171232329&quot;
+</code></pre>
+
+<p>위에서 보면 알 수 있듯이 18개 항목 중 필요한 부분만 수집할 수 있습니다. 이 과정을 좀 더 간단하게 하기 위해 위 코드에서 첫 두 줄을 실행하여 <code>items</code>에 할당하기로 합니다. 그리고 아래 두 줄을 사용자 정의 함수로 만들면 코드를 보다 간결하게 만들 수 있습니다.</p>
+
+<pre><code class="r"># 반복되는 부분을 items 객체에 할당합니다. 
+items &lt;- resp %&gt;% read_xml() %&gt;% xml_nodes(&#39;item&#39;)
+
+# 필요 항목만 추출하는 사용자 정의 함수를 생성합니다. 
+getXmlText &lt;- function(x, var) {
+  result &lt;- x %&gt;% xml_node(var) %&gt;% xml_text()
+  return(result)
+}
+</code></pre>
+
+<p>이제 새로 만든 사용자 정의 함수의 <code>x</code> 인자에는 <code>items</code>, <code>var</code> 인자에는 <code>bidNtceNo</code> 같은 태그를 (따옴표로 씌워서) 할당하면 해당 태그에 속한 텍스트를 벡터로 얻을 수 있습니다.</p>
+
+<pre><code class="r"># 사용자 정의 함수로 텍스트 데이터 얻기 예제를 실행합니다. 
+입찰공고번호 &lt;- getXmlText(items, &#39;bidNtceNo&#39;)
+
+# 결과를 확인합니다. 
+print(입찰공고번호)
+</code></pre>
+
+<pre><code>## [1] &quot;20171233674&quot; &quot;20171232329&quot;
+</code></pre>
+
+<p>이렇게 얻은 각각의 텍스트 벡터들을 묶어 하나의 데이터프레임을 만들어 보겠습니다.</p>
+
+<pre><code class="r"># 데이터프레임으로 정리합니다. 
+df &lt;- data.frame(
+  공고번호   = getXmlText(items, &#39;bidNtceNo&#39;),
+  입찰공고명 = getXmlText(items, &#39;bidNtceNm&#39;),
+  참가업체수 = getXmlText(items, &#39;prtcptCnum&#39;),
+  낙찰업체명 = getXmlText(items, &#39;bidwinnrNm&#39;),
+  사업자번호 = getXmlText(items, &#39;bidwinnrBizno&#39;),
+  대표자명   = getXmlText(items, &#39;bidwinnrCeoNm&#39;),
+  업체주소   = getXmlText(items, &#39;bidwinnrAdrs&#39;),
+  전화번호   = getXmlText(items, &#39;bidwinnrTelNo&#39;),
+  낙찰금액   = getXmlText(items, &#39;sucsfbidAmt&#39;)
+)
+</code></pre>
+
+<p>위와 같이 함으로써 한 페이지에 보이는 <code>XML</code>을 데이터프레임 형태로 저장할 수 있습니다.</p>
+
+<p>만약 전체 건을 모두 수집하려면 어떻게 해야 할까요? <code>url</code> 요소 중 <strong>한 페이지 결과 수</strong>를 <code>1,000</code>으로 다시 지정하고 <strong>페이지 번호</strong>를 1~5까지 순환하며 반복실행하면 간단하게 해결될 것입니다.</p>
+
+<p>그런데 기왕이면 가능한 모든 것을 자동화하도록 해보겠습니다. 일단 전체 제공 건수를 모른다고 가정하고 이 숫자를 확인한 후 페이지 수를 계산하는 코드를 만들어 봅시다.</p>
+
+<pre><code class="r"># 전체 건수를 확인합니다. 
+totalCnt &lt;- resp %&gt;% 
+  read_xml() %&gt;% 
+  xml_node(&#39;totalCount&#39;) %&gt;% 
+  xml_text() %&gt;% 
+  as.numeric()
+
+# 전체 건수를 출력하여 확인합니다. 
+print(totalCnt)
+</code></pre>
+
+<pre><code>## [1] 4257
+</code></pre>
+
+<pre><code class="r"># 한 페이지당 노출 건수를 재지정합니다. 
+rows &lt;- 1000
+
+# 한 페이지당 1,000개 노출 시 필요 페이지 수를 계산합니다.
+# ceiling()는 올림된 수를 반환하는 함수입니다. 
+pages &lt;- ceiling(totalCnt / rows)
+
+# 페이지수를 출력하여 확인합니다. 
+print(pages)
+</code></pre>
+
+<pre><code>## [1] 5
+</code></pre>
+
+<p>이제 마지막으로 최종 결과 객체를 빈 데이터 프레임으로 생성한 후, <code>rbind()</code> 함수를 이용하여 행 기준으로 추가해주면 끝입니다.</p>
+
+<pre><code class="r"># 순환 함수 실행에 앞서 최종 결과 객체를 생성합니다. 
+compList &lt;- data.frame()
+
+# 순환 함수를 실행합니다. 
+for (i in 1:pages) {
+
+  # url 조립. 페이지 부분을 i로 변경해야 합니다!
+  url &lt;- str_c(
+    main,
+    item,
+    str_c(&#39;?ServiceKey=&#39;, key),
+    str_c(&#39;&amp;numOfRows=&#39;, rows),
+    str_c(&#39;&amp;pageNo=&#39;, i),
+    str_c(&#39;&amp;inqryDiv=&#39;, inqry),
+    str_c(&#39;&amp;inqryBgnDt=&#39;, bgnDate),
+    str_c(&#39;&amp;inqryEndDt=&#39;, endDate)
+    )
+
+  # url로 요청합니다.
+  resp &lt;- GET(url)
+
+  # 반복되는 부분을 items 객체에 할당합니다.
+  items &lt;- resp %&gt;% read_xml() %&gt;% xml_nodes(&#39;item&#39;)
+
+  # 데이터 프레임으로 정리합니다.
+  df &lt;- data.frame(
+    공고번호   = getXmlText(items, &#39;bidNtceNo&#39;),
+    입찰공고명 = getXmlText(items, &#39;bidNtceNm&#39;),
+    참가업체수 = getXmlText(items, &#39;prtcptCnum&#39;),
+    낙찰업체명 = getXmlText(items, &#39;bidwinnrNm&#39;),
+    사업자번호 = getXmlText(items, &#39;bidwinnrBizno&#39;),
+    대표자명   = getXmlText(items, &#39;bidwinnrCeoNm&#39;),
+    업체주소   = getXmlText(items, &#39;bidwinnrAdrs&#39;),
+    전화번호   = getXmlText(items, &#39;bidwinnrTelNo&#39;),
+    낙찰금액   = getXmlText(items, &#39;sucsfbidAmt&#39;)
+  )
+
+  # 행 기준으로 추가합니다.
+  compList &lt;- rbind(compList, df)
+}
+</code></pre>
+
+<p>생성된 객체의 데이터 구조를 확인하겠습니다.</p>
+
+<pre><code class="r"># 데이터 구조를 확인합니다.
+str(object = compList)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    4257 obs. of  9 variables:
+##  $ 공고번호  : chr  &quot;20171233674&quot; &quot;20171232329&quot; &quot;20171219328&quot; &quot;20171213601&quot; ...
+##  $ 입찰공고명: chr  &quot;2018년 본청 공용차랑 유류 단가계약&quot; &quot;2018년도 보건환경연구원북부지원 실험분석용 특수가스 단가계약&quot; &quot;2018학년도 국제고등학교 교복(동복,하복)학교주관구매업체 선정입찰(2단계경쟁)공고&quot; &quot;2018학년도 광주제일고등학교 교복(동복, 하복) 학교주관구매 입찰 공고&quot; ...
+##  $ 참가업체수: chr  &quot;2&quot; &quot;7&quot; &quot;2&quot; &quot;2&quot; ...
+##  $ 낙찰업체명: chr  &quot;대창주유소&quot; &quot;동서산업가스&quot; &quot;스마트학생복서방,일곡점&quot; &quot;런던베이직(북구점)&quot; ...
+##  $ 사업자번호: chr  &quot;4331200178&quot; &quot;7280200290&quot; &quot;4090354378&quot; &quot;4091208503&quot; ...
+##  $ 대표자명  : chr  &quot;박병창&quot; &quot;손민호&quot; &quot;이병식&quot; &quot;이천호&quot; ...
+##  $ 업체주소  : chr  &quot;경상북도 예천군 예천읍 충효로 154 대창주유소&quot; &quot;경상북도 영천시 도남공단1길 4-0 (도남동)&quot; &quot;광주광역시 북구 풍향동 496-24&quot; &quot;광주광역시 북구 독립로237번길 22-0 (누문동) 1,2층&quot; ...
+##  $ 전화번호  : chr  &quot;054-654-2085&quot; &quot;054-334-2600&quot; &quot;062-511-1104&quot; &quot;062-526-5657&quot; ...
+##  $ 낙찰금액  : chr  &quot;2849&quot; &quot;1000500&quot; &quot;285500&quot; &quot;280000&quot; ...
+</code></pre>
+
+<p>이번에 생성한 데이터 프레임이 모두 4,257건과 9개 컬럼을 갖는 것으로 확인되었습니다.</p>
+
+<p>이상으로 <strong>Open API를 활용하여 공공데이터를 수집하는 방법</strong>에 대해 소개해드렸습니다. 공공데이터 포털 뿐만 아니라 서울데이터광장, 금융감독원 및 한국은행 등 국가기관에서 다양한 데이터를 Open API로 공개하고 있으니 원하는 데이터가 있으면 손쉽게 수집하여 데이터 분석에 활용하시기 바랍니다!</p>
+
+<p>[1] 궁금하신 분은 <a href="http://blog.koreadaily.com/view/myhome.html?fod_style=B&amp;med_usrid=sam1&amp;cid=901635&amp;fod_no=16">여기</a>를 방문해 보세요</p>
+
+</body>
+
+</html>

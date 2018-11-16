@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>통계청 Open API 활용법</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>통계청 Open API 활용법</h1>
+
+<p>Dr.Kevin
+7/22/2018</p>
+
+<p>통계청에서 운영하고 있는 <strong><a href="http://kosis.kr/index/index.do">KOSIS 국가통계포털</a></strong>에 접속하면 100대 지표를 비롯한 다양한 통계데이터를 확인하고 xlsx 및 csv 파일 형태로 제공받을 수 있습니다. 만약 같은 통계자료를 시기와 조건을 달리하여 반복적으로 수집해야 한다면 수작업으로 자료를 저장하는 방식은 상당히 고통스러울 것입니다. 따라서 이런 문제를 해결하기 위해 통계청에서 제공하고 있는 Open API 서비스를 활용하는 방법을 소개해드리고자 합니다.</p>
+
+<p>KOSIS 국가통계포털에 접속하여 맨 아래 메뉴를 보면 <strong>OpendAPI</strong>가 있습니다. 메뉴를 클릭하면 새 창으로 이동하는데 웹페이지 상단에 <strong><a href="http://kosis.kr/openapi">KOSIS 공유서비스 사이트</a></strong>가 보이고, 그 아래 URL을 클릭하면 <strong>KOSIS 공유서비스</strong>라는 새 창이 열립니다. 이 사이트에서 API를 활용하는 방법에 대한 힌트를 얻을 수 있습니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/KOSIS_main.png" alt=""></p>
+
+<p>위 그림과 같이 새로 열린 웹페이지 화면 중앙에 <strong>공유서비스 활용 절차</strong>에서 알 수 있듯이 이 서비스를 이용하려면 먼저 로그인을 해야 합니다. 아직 통계청 ONE ID가 없다면 이번 기회에 가입하시기 바랍니다. 통계청 ONE ID로 로그인했다는 가정 하에 진행하도록 하겠습니다.</p>
+
+<p>로그인을 하고 나면 <strong>활용신청</strong> 단계에서 양식에 맞게 작성한 다음 사용자 인증키를 발급받아야 합니다. 저는 이미 신청을 완료한 관계로 (안타깝지만) 이 과정을 재현할 수 없게 되어 있습니다. 각자 알아서 이 과정을 잘 진행하시기 바랍니다. 활용신청 단계를 마무리하면 <strong>자동승인</strong>을 거쳐 <strong>신청현황</strong>으로 이동합니다.</p>
+
+<h2>통계목록 저장하기</h2>
+
+<p>제 생각에 통계청 Open API가 공공데이터 포털보다 더 복잡하게 구성되어 있는 것 같습니다. 차근차근 하나씩 해보면서 얼마나 복잡하게 구성되어 있는지 확인해보도록 하겠습니다. 메인화면 중앙 메뉴에서 <strong>신청현황</strong>을 클릭하여 이동하면 <strong>통계목록</strong> 페이지가 열립니다. 이 화면에서 <strong>사용자 인증키</strong>와 <strong>URL</strong> 그리고 <strong>기술문서</strong> 등을 확인할 수 있습니다. 기술문서는 API를 활용할 때 자주 참조해야 하므로 적당한 폴더에 저장해놓기 바랍니다.</p>
+
+<p>다시 화면으로 돌아와서 맨 아래 녹색 버튼으로 <strong>URL 생성</strong>을 클릭합니다. 그럼 아래와 같은 화면이 열릴 것입니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%ED%86%B5%EA%B3%84%EB%AA%A9%EB%A1%9D_main.png" alt=""></p>
+
+<p>위 화면은 상단 가로 메뉴 중 <strong>서비스이용</strong>의 하위 메뉴화면이라고 이해하면 됩니다. 하위 메뉴가 여러 가지 있지만 그 중에서 <strong>통계목록</strong> 메뉴 화면이 열린 것입니다. 이 화면에서 목록구분에서는 <strong>국내통계 주제별</strong>을 선택하고 아래 목록조회의 목록ID 오른쪽에 있는 돋보기 아이콘을 클릭하여 <strong>인구가구</strong>를 선택합니다. 결과유형은 <strong>JSON</strong>으로 선택한 후 아래 녹색버튼 중 오른쪽에 있는 <strong>결과값보기</strong>를 클릭하면 화면 아래로 <strong>데이터 보기</strong>와 <strong>결과값 보기</strong>가 새로 생깁니다. 데이터 보기는 <strong>인구가구</strong>의 하위 목록에 대해 테이블로 출력한 결과이고 결과값 보기는 JSON 형태로 출력된 것입니다. 이제 <strong>URL복사</strong>를 클릭하여 아래와 같이 실습을 해보겠습니다.</p>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다. 
+library(httr)
+library(rvest)
+library(dplyr)
+library(stringr)
+library(magrittr)
+library(jsonlite)
+</code></pre>
+
+<pre><code class="r"># KOSIS 화면에서 복사한 URL을 저장합니다.
+URL &lt;- &#39;여기에 복사한 URL를 붙여넣습니다.&#39;
+
+# 발급받은 인증키를 저장합니다.
+mykey &lt;- &#39;여기에 발급받은 인증키를 입력합니다.&#39;
+</code></pre>
+
+<p>그런데 <code>URL</code>을 잘 쪼개보면 다음과 같이 분리되는 것을 알 수 있습니다. <strong>stringr</strong> 패키지의 <code>str_c()</code> 함수로 쪼갠 항목들을 하나의 <code>URL</code>로 조립해 보겠습니다. 아래 코드를 볼 때 주목해야 하는 것은 <code>URL</code>이 어떻게 분리되는 것인가 입니다.</p>
+
+<pre><code class="r"># URL을 분리 후, 재조립 해보겠습니다. 
+URL &lt;- 
+  str_c(
+    &#39;http://kosis.kr/openapi/statisticsList.do&#39;,
+    str_c(&#39;?method=&#39;, &#39;getList&#39;), 
+    str_c(&#39;&amp;apiKey=&#39;, mykey), 
+    str_c(&#39;&amp;vwCd=&#39;, &#39;MT_ZTITLE&#39;), 
+    str_c(&#39;&amp;parentListId=&#39;, &#39;A&#39;), 
+    str_c(&#39;&amp;format=&#39;, &#39;json&#39;), 
+    str_c(&#39;&amp;jsonVD=&#39;, &#39;Y&#39;)
+    )
+</code></pre>
+
+<p>KOSIS 화면에서 복사한 <code>URL</code>의 첫 번째 항목은 <strong>신청현황</strong> 웹페이지에서 봤던 <strong>URL</strong>과 같습니다. 그리고 세 번째 항목은 각자 발급받은 인증키라 할 수 있습니다. 나머지 항목 중 <strong>method</strong>는 <strong>통계목록</strong>에 공통요인이고, <strong>vwCd</strong>는 <strong>목록조회</strong>의 대분류에 속하며, 이번 예제의 경우 <strong>국내통계 주제별</strong>에는 <strong>MT_ZTITLE</strong>가 할당되었음을 알 수 있습니다. 아울러 <strong>parentListId</strong>는 <strong>목록조회</strong>의 중분류와 같고, 이번 예제의 경우 <strong>인구가구</strong>에는 <strong>A</strong>가 할당되었습니다. 이들 항목에 대한 상세한 내용은 이미 저장한 <strong>기술문서</strong>를 참조하거나 <strong>목록조회</strong>의 항목을 번갈아가며 확인하시기 바랍니다. 즉, 필요한 항목에 할당되는 값을 미리 확인해두어야 합니다.</p>
+
+<p>그러면 이제 이 <code>URL</code>을 가지고 HTTP Request를 실행하여 Response를 받아보겠습니다. <strong>httr</strong> 패키지의 <code>GET()</code> 함수를 이용하면 됩니다.</p>
+
+<pre><code class="r"># http request를 합니다. 
+resp &lt;- GET(url = URL)
+
+# response의 status_code를 확인합니다.
+status_code(x = resp)
+</code></pre>
+
+<pre><code>## [1] 200
+</code></pre>
+
+<p>출력 결과가 <code>200</code>으로 정상인 것을 알 수 있습니다. <code>resp</code> 객체에 저장된 내용을 출력하여 육안으로 확인해보겠습니다.</p>
+
+<pre><code class="r"># resp를 출력합니다. 
+cat(content(x = resp, as = &#39;text&#39;))
+</code></pre>
+
+<pre><code>## No encoding supplied: defaulting to UTF-8.
+
+## [{&quot;LIST_NM&quot;:&quot;인구총조사&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A1&quot;},{&quot;LIST_NM&quot;:&quot;국내인구이동통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A34&quot;},{&quot;LIST_NM&quot;:&quot;국제인구이동통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A31&quot;},{&quot;LIST_NM&quot;:&quot;병무통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;144_14401&quot;},{&quot;LIST_NM&quot;:&quot;생명표&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A5&quot;},{&quot;LIST_NM&quot;:&quot;인구동향조사&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A2&quot;},{&quot;LIST_NM&quot;:&quot;장래가구추계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A42&quot;},{&quot;LIST_NM&quot;:&quot;장래인구추계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A41&quot;},{&quot;LIST_NM&quot;:&quot;주민등록인구현황&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A6&quot;},{&quot;LIST_NM&quot;:&quot;지방자치단체공무원인사통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;110_11027&quot;},{&quot;LIST_NM&quot;:&quot;지방자치단체외국인주민현황&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;110_11025&quot;},{&quot;LIST_NM&quot;:&quot;체류외국인통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A8&quot;},{&quot;LIST_NM&quot;:&quot;출입국자통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;A32&quot;},{&quot;LIST_NM&quot;:&quot;공무원총조사&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;P3_110_16301_01&quot;},{&quot;LIST_NM&quot;:&quot;국가공무원인사통계&quot;,&quot;VW_CD&quot;:&quot;MT_ZTITLE&quot;,&quot;VW_NM&quot;:&quot;국내통계 주제별&quot;,&quot;LIST_ID&quot;:&quot;P3_110_16302_01&quot;}]
+</code></pre>
+
+<p>KOSIS 화면의 <strong>결과값 보기</strong>와 같은 내용이 출력되었음을 알 수 있습니다. 그럼 <code>resp</code> 객체로부터 데이터를 추출하여 저장하는 방법에 대해 소개해드리겠습니다. 우리는 앞서 <strong>JSON</strong> 형태로 데이터를 받기로 지정하였습니다. 따라서 <code>resp</code> 객체는 json 형태로 데이터가 저장되어 있으며, 이 데이터를 다루기 위해 <strong>jsonlite</strong> 패키지의 <code>fromJSON()</code> 함수를 이용하면 손쉽게 텍스트를 추출할 수 있습니다. 다만 <code>fromJSON()</code> 함수는 텍스트를 할당받으므로 <code>resp</code>를 문자 벡터로 변환해주어야 합니다.</p>
+
+<pre><code class="r"># resp 객체로부터 텍스트를 추출합니다. 
+list &lt;- fromJSON(txt = resp %&gt;% as.character())
+</code></pre>
+
+<pre><code>## No encoding supplied: defaulting to UTF-8.
+</code></pre>
+
+<pre><code class="r"># list 객체의 구조를 확인합니다. 
+str(object = list)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    15 obs. of  4 variables:
+##  $ LIST_NM: chr  &quot;인구총조사&quot; &quot;국내인구이동통계&quot; &quot;국제인구이동통계&quot; &quot;병무통계&quot; ...
+##  $ VW_CD  : chr  &quot;MT_ZTITLE&quot; &quot;MT_ZTITLE&quot; &quot;MT_ZTITLE&quot; &quot;MT_ZTITLE&quot; ...
+##  $ VW_NM  : chr  &quot;국내통계 주제별&quot; &quot;국내통계 주제별&quot; &quot;국내통계 주제별&quot; &quot;국내통계 주제별&quot; ...
+##  $ LIST_ID: chr  &quot;A1&quot; &quot;A34&quot; &quot;A31&quot; &quot;144_14401&quot; ...
+</code></pre>
+
+<pre><code class="r"># list 객체를 출력합니다. 
+print(list)
+</code></pre>
+
+<pre><code>##                       LIST_NM     VW_CD           VW_NM         LIST_ID
+## 1                  인구총조사 MT_ZTITLE 국내통계 주제별              A1
+## 2            국내인구이동통계 MT_ZTITLE 국내통계 주제별             A34
+## 3            국제인구이동통계 MT_ZTITLE 국내통계 주제별             A31
+## 4                    병무통계 MT_ZTITLE 국내통계 주제별       144_14401
+## 5                      생명표 MT_ZTITLE 국내통계 주제별              A5
+## 6                인구동향조사 MT_ZTITLE 국내통계 주제별              A2
+## 7                장래가구추계 MT_ZTITLE 국내통계 주제별             A42
+## 8                장래인구추계 MT_ZTITLE 국내통계 주제별             A41
+## 9            주민등록인구현황 MT_ZTITLE 국내통계 주제별              A6
+## 10 지방자치단체공무원인사통계 MT_ZTITLE 국내통계 주제별       110_11027
+## 11 지방자치단체외국인주민현황 MT_ZTITLE 국내통계 주제별       110_11025
+## 12             체류외국인통계 MT_ZTITLE 국내통계 주제별              A8
+## 13               출입국자통계 MT_ZTITLE 국내통계 주제별             A32
+## 14               공무원총조사 MT_ZTITLE 국내통계 주제별 P3_110_16301_01
+## 15         국가공무원인사통계 MT_ZTITLE 국내통계 주제별 P3_110_16302_01
+</code></pre>
+
+<p><code>str()</code> 함수를 이용하여 새로 생성한 <code>list</code> 객체는 15행, 4열을 갖는 데이터프레임이라는 것을 알 수 있습니다. 15행은 <strong>국내통계 주제별</strong> 목록의 하위 목록임을 알 수 있으며, <code>list</code>의 4번째 컬럼인 <code>LIST_ID</code>는 각 하위 목록의 코드로 추정됩니다. 따라서 위에서 <code>URL</code>을 조립한 코드로 돌아가서 <code>parentListId</code> 항목에 <code>list</code> 객체의 <code>LIST_ID</code> 중 하나를 할당하면 해당 목록에 대한 하위 목록을 확인할 수 있습니다.</p>
+
+<p>반복문을 이용하여 <strong>국내통계 주제별</strong> 목록의 15개 하위 목록에 대한 하위 목록들을 모두 수집해보겠습니다.</p>
+
+<pre><code class="r"># 결과를 저장할 리스트 객체를 생성합니다.
+result &lt;- list()
+
+# 반복문을 수행할 횟수를 지정합니다.
+n &lt;- nrow(x = list)
+
+# 반복문을 사용하여 모든 리스트를 수집합니다.
+for (i in 1:n) {
+
+  # listId를 할당합니다.
+  listId &lt;- list$LIST_ID[i]
+
+  # URL을 조립합니다.
+  URL &lt;- 
+    str_c(
+      &#39;http://kosis.kr/openapi/statisticsList.do&#39;,
+      str_c(&#39;?method=&#39;, &#39;getList&#39;), 
+      str_c(&#39;&amp;apiKey=&#39;, mykey), 
+      str_c(&#39;&amp;vwCd=&#39;, &#39;MT_ZTITLE&#39;), 
+      str_c(&#39;&amp;parentListId=&#39;, listId), 
+      str_c(&#39;&amp;format=&#39;, &#39;json&#39;), 
+      str_c(&#39;&amp;jsonVD=&#39;, &#39;Y&#39;)
+    )
+
+  # 에러가 발생할 때 건너뛰고 실행하도록 설정합니다. 
+  tryCatch({
+
+    # HTTP Request
+    resp &lt;- GET(url = URL)
+
+    # resp 객체로부터 텍스트를 추출한 후 결과 객체에 추가합니다. 
+    result[[i]] &lt;- fromJSON(txt = resp %&gt;% as.character())
+
+  }, error = function(e) print(&#39;An error occurs!!!&#39;))
+
+  # 1초 간격으로 실행되도록 설정합니다.
+  Sys.sleep(time = 1)
+}
+</code></pre>
+
+<pre><code>## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+## No encoding supplied: defaulting to UTF-8.
+
+## [1] &quot;An error occurs!!!&quot;
+
+## No encoding supplied: defaulting to UTF-8.
+
+## [1] &quot;An error occurs!!!&quot;
+</code></pre>
+
+<p>14~15번 행에 대해서는 에러가 발생하였습니다. 따라서 <code>result</code>는 총 13개 요소를 갖는 리스트 객체로 생성되었습니다. 실제로 확인해보겠습니다.</p>
+
+<pre><code class="r"># result 객체의 요소 개수를 확인합니다.
+length(x = result)
+</code></pre>
+
+<pre><code>## [1] 13
+</code></pre>
+
+<pre><code class="r"># 각 요소의 클래스를 확인합니다.
+lapply(X = result, FUN = function(x) class(x = x))
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] &quot;data.frame&quot;
+## 
+## [[2]]
+## [1] &quot;data.frame&quot;
+## 
+## [[3]]
+## [1] &quot;data.frame&quot;
+## 
+## [[4]]
+## [1] &quot;data.frame&quot;
+## 
+## [[5]]
+## [1] &quot;data.frame&quot;
+## 
+## [[6]]
+## [1] &quot;data.frame&quot;
+## 
+## [[7]]
+## [1] &quot;data.frame&quot;
+## 
+## [[8]]
+## [1] &quot;data.frame&quot;
+## 
+## [[9]]
+## [1] &quot;data.frame&quot;
+## 
+## [[10]]
+## [1] &quot;data.frame&quot;
+## 
+## [[11]]
+## [1] &quot;data.frame&quot;
+## 
+## [[12]]
+## [1] &quot;data.frame&quot;
+## 
+## [[13]]
+## [1] &quot;data.frame&quot;
+</code></pre>
+
+<pre><code class="r"># 각 요소의 차원수를 확인합니다.
+lapply(X = result, FUN = function(x) dim(x = x))
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] 4 4
+## 
+## [[2]]
+## [1] 5 7
+## 
+## [[3]]
+## [1] 7 5
+## 
+## [[4]]
+## [1] 9 4
+## 
+## [[5]]
+## [1] 5 5
+## 
+## [[6]]
+## [1] 7 7
+## 
+## [[7]]
+## [1] 2 4
+## 
+## [[8]]
+## [1] 2 4
+## 
+## [[9]]
+## [1] 7 5
+## 
+## [[10]]
+## [1] 21  4
+## 
+## [[11]]
+## [1] 2 4
+## 
+## [[12]]
+## [1] 28  5
+## 
+## [[13]]
+## [1] 16  5
+</code></pre>
+
+<p><code>result</code>에 13개의 요소가 저장되어 있는데 모두 데이터프레임이며, 각 데이터프레임의 차원수는 제각각이라는 것을 확인할 수 있습니다. 이상에서 알 수 있듯이 통계청에서 제공하는 통계목록을 저장하는 일이 생각보다 상당히 까다로운 일이라는 것입니다. 사용자 입장에서 편의성을 높일 수 있도록 설계되었다면 좋았을 것 같은데, 지금 상태만으로는 사용자가 필요로 하는 통계자료를 하나씩 확인하여 코드로 만드는 작업을 해야할 것 같습니다.</p>
+
+<h2>통계자료 저장하기</h2>
+
+<p>이제 실제 통계자료를 수집하는 방법에 대해 알아보도록 하겠습니다. 화면 상단에 있는 <strong>서비스이용</strong>를 선택한 후 하위 메뉴 중 <strong>통계자료</strong>를 선택하면 아래와 같은 화면이 열립니다. 제가 이번 포스팅을 작성하기에 앞서 이미 활용신청을 했기 때문에 그 부분에 대해서는 설명할 수 없다는 것이 안타깝습니다. 다만 <strong>자료등록</strong>과 <strong>URL생성</strong> 방법을 소개함으로써 통계청의 자료를 수집하는 방법에 대해 소개하도록 하겠습니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%ED%86%B5%EA%B3%84%EC%9E%90%EB%A3%8C_main.png" alt=""></p>
+
+<p>위 화면에서 <strong>자료등록</strong> 버튼을 클릭합니다. 그러면 아래와 같은 화면이 열립니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%EC%9E%90%EB%A3%8C%EB%93%B1%EB%A1%9D_main.png" alt=""></p>
+
+<p>화면 가운데 입력항목 중 우측 상단에 있는 <strong>통계조사명</strong>의 돋보기 아이콘을 클릭하면 새 창이 열립니다. 그 화면에서 <strong>작성기관</strong> 항목에는 <code>통계청</code>을 입력하고 <strong>통계조사명</strong> 항목에는 <code>인구</code>를 입력한 후 검색을 클릭해보겠습니다. 그 결과가 아래와 같습니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%ED%86%B5%EA%B3%84%EC%A1%B0%EC%82%AC%EB%AA%85_%EA%B2%80%EC%83%89%EA%B2%B0%EA%B3%BC.png" alt=""></p>
+
+<p>이 화면에서 <strong>경제활동인구조사</strong>를 선택해보겠습니다. 녹색 <strong>선택</strong> 버튼을 클릭하면 팝업이 사라지면서 <strong>자료등록</strong> 화면으로 이동합니다. 이 화면에서 화면 상단에 있는 <strong>검색</strong> 버튼을 클릭하면 <strong>경제활동인구조사</strong>에 속한 다양한 통계표명 목록이 화면에 출력됩니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%ED%86%B5%EA%B3%84%ED%91%9C%EB%AA%85_%EB%AA%A9%EB%A1%9D.png" alt=""></p>
+
+<p>목록이 꽤 많군요. 이 중에서 원하는 통계표명을 골라 <strong>사용여부</strong>를 체크하고 <strong>통계표등록</strong>을 클릭합니다. 이번 예제에서는 6번째에 위치한 <strong>성/연령별 경제활동인구 (구직기간1주기준)</strong>을 선택하겠습니다. <strong>통계표등록</strong>을 클릭하면 아래와 같이 <strong>등록된자료</strong> 목록을 보여줍니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%EB%93%B1%EB%A1%9D%EB%90%9C%EC%9E%90%EB%A3%8C_%EB%AA%A9%EB%A1%9D.png" alt=""></p>
+
+<p>이제 목록에 있는 <strong>성/연령별 경제활동인구 (구직기간1주기준)</strong> 행의 맨 우측에 있는 <strong>URL생성</strong> 버튼을 클릭합니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%EB%93%B1%EB%A1%9D%EB%90%9C%EC%9E%90%EB%A3%8C_URL%EC%83%9D%EC%84%B1.png" alt=""></p>
+
+<p>이번에는 <strong>URL생성</strong>이라는 입력화면으로 이동하였습니다. (정말 이걸 작성하고 있는 저도 힘든데 이걸 읽고 따라오시는 여러분도 많이 힘드시겠군요. 거의 다 왔으니 끝까지 힘을 내보도록 하겠습니다.) 새 화면에서 <strong>활용 자료명</strong>의 공란에는 적당한 내용을 입력합니다. <strong>분류/항목선택</strong>으로 이동하면 <strong>분류</strong>와 <strong>항목</strong>이 보일 것입니다. <strong>분류</strong>에서는 <strong>성별</strong>, <strong>연령계층별</strong>로 선택하도록 되어 있는데 검정색 <strong>선택</strong> 버튼을 클릭하여 팝업이 생기면 모든 항목을 선택합니다. <strong>항목</strong>에서는 <strong>전체선택</strong>을 클릭합니다. 이상과 같이 선택한 다음 화면 하단에 있는 녹색 <strong>URL생성</strong> 버튼을 클릭하면 끝납니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-02-23-R-Crawler-6-%EB%B6%80%EB%A1%9D-%ED%86%B5%EA%B3%84%EC%B2%AD/%EB%93%B1%EB%A1%9D%EB%90%9C%EC%9E%90%EB%A3%8C_URL%EC%83%9D%EC%84%B1%EC%99%84%EB%A3%8C.png" alt=""></p>
+
+<p>이제 정말 다 왔습니다. 위 화면에서 <strong>데이터 포맷</strong>이 <strong>JSON</strong>인지 확인하고 <strong>조회기간 설정</strong>을 <strong>기간설정</strong>으로 변경한 다음 검정색 <strong>URL보기</strong> 버튼을 클릭하면 아래에 <strong>생성된 URL</strong>이 출력됩니다. 이 <code>URL</code>을 각 요소별로 분해하고 각 요소별로 적당한 값을 할당하는 방식으로 조립하면 원하는 조건에 맞는 통계표를 수집할 수 있을 것입니다. 실습을 하고 이번 포스팅을 마치도록 하겠습니다.</p>
+
+<pre><code class="r"># KOSIS 화면에서 복사한 URL을 저장합니다.
+URL &lt;- &#39;여기에 복사한 URL를 붙여넣습니다.&#39;
+</code></pre>
+
+<p>KOSIS 화면에서 복사한 <code>URL</code>을 하나하나 뜯어보면 공통항목이 <code>statisticsList.do</code>에서 <code>statisticsData.do</code>로 바뀌었음을 알 수 있습니다. 인증키는 그대로 사용할 수 있는데, 정말 특이한 점은 <code>userStatsId</code>가 추가되었다는 점입니다. <code>userStatsId</code>를 뜯어보니 <strong>통계청 ONE ID</strong>와 <strong>통계표</strong> 그리고 <strong>통계표 URL 생성 시점</strong>을 조합한 것으로 보입니다. 이 항목은 <strong>생성된 URL</strong>을 출력했을 때에만 확인할 수 있는 것 같습니다. 아무튼 인증키와 함께 통계표마다 <code>userStatsId</code>를 기억하고 있어야 Open API를 사용할 수 있을 것 같구요. 이러한 점이 사용하는 데 꽤나 불편을 초래하는 것 같습니다. (정말 너무하네~~)</p>
+
+<p>아무튼 <code>userStatsId</code>를 따로 저장한 다음 <code>조회시작년월(startPrdDe)</code>과 <code>조회종료년월(endPrdDe)</code>을 원하는 시점으로 바꿔가며 <code>URL</code>을 조립하면 원하는 시점의 통계표를 수집할 수 있습니다.</p>
+
+<pre><code class="r"># URL에서 userStatsId만 추출하여 따로 저장합니다.
+userStatsId &lt;- &#39;여기에 userStatsId를 붙여넣습니다.&#39;
+</code></pre>
+
+<pre><code class="r"># URL을 분리 후, 재조립합니다. 
+URL &lt;- 
+  str_c(
+    &#39;http://kosis.kr/openapi/statisticsData.do&#39;,
+    str_c(&#39;?method=&#39;, &#39;getList&#39;), 
+    str_c(&#39;&amp;apiKey=&#39;, mykey), 
+    str_c(&#39;&amp;format=&#39;, &#39;json&#39;), 
+    str_c(&#39;&amp;jsonVD=&#39;, &#39;Y&#39;), 
+    str_c(&#39;&amp;userStatsId=&#39;, userStatsId), 
+    str_c(&#39;&amp;prdSe=&#39;, &#39;M&#39;), 
+    str_c(&#39;&amp;startPrdDe=&#39;, &#39;201401&#39;), 
+    str_c(&#39;&amp;endPrdDe=&#39;, &#39;201401&#39;)
+    )
+</code></pre>
+
+<pre><code class="r"># http request를 합니다. 
+resp &lt;- GET(url = URL)
+
+# response 상태코드를 확인합니다.
+status_code(x = resp)
+</code></pre>
+
+<pre><code>## [1] 200
+</code></pre>
+
+<pre><code class="r"># JSON 형태의 response를 데이터프레임으로 저장합니다.
+stat &lt;- fromJSON(txt = resp %&gt;% as.character())
+</code></pre>
+
+<pre><code>## No encoding supplied: defaulting to UTF-8.
+</code></pre>
+
+<pre><code class="r"># 통계표를 미리보기 합니다.
+head(x = stat, n = 10L)
+</code></pre>
+
+<pre><code>##                                      TBL_NM PRD_DE     TBL_ID
+## 1  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 2  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 3  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 4  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 5  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 6  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 7  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 8  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 9  성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+## 10 성/연령별 경제활동인구 (구직기간1주기준) 201412 DT_1D07012
+##            ITM_NM                   ITM_NM_ENG ITM_ID UNIT_NM ORG_ID
+## 1    15세이상인구   Pop. 15 years old and over    T10    천명    101
+## 2    경제활동인구     Economically active pop.    T20    천명    101
+## 3          취업자             Employed persons    T30    천명    101
+## 4          실업자           Unemployed persons    T40    천명    101
+## 5  비경제활동인구 Not economically active pop.    T50    천명    101
+## 6  경제활동참가율           Participation rate    T60       %    101
+## 7          실업률            Unemployment rate    T80       %    101
+## 8          고용률  Employment/population ratio    T90       %    101
+## 9    15세이상인구   Pop. 15 years old and over    T10    천명    101
+## 10   경제활동인구     Economically active pop.    T20    천명    101
+##        UNIT_NM_ENG C1_OBJ_NM C1_OBJ_NM_ENG  C2_OBJ_NM C2_OBJ_NM_ENG
+## 1  Thousand Person      성별     By gender 연령계층별  By age group
+## 2  Thousand Person      성별     By gender 연령계층별  By age group
+## 3  Thousand Person      성별     By gender 연령계층별  By age group
+## 4  Thousand Person      성별     By gender 연령계층별  By age group
+## 5  Thousand Person      성별     By gender 연령계층별  By age group
+## 6          Percent      성별     By gender 연령계층별  By age group
+## 7                %      성별     By gender 연령계층별  By age group
+## 8                %      성별     By gender 연령계층별  By age group
+## 9  Thousand Person      성별     By gender 연령계층별  By age group
+## 10 Thousand Person      성별     By gender 연령계층별  By age group
+##         DT PRD_SE C2 C1 C1_NM     C2_NM C1_NM_ENG       C2_NM_ENG
+## 1  42728.4      M 00  0    계        계     Total           Total
+## 2  26159.2      M 00  0    계        계     Total           Total
+## 3  25383.8      M 00  0    계        계     Total           Total
+## 4    775.4      M 00  0    계        계     Total           Total
+## 5  16569.2      M 00  0    계        계     Total           Total
+## 6     61.2      M 00  0    계        계     Total           Total
+## 7        3      M 00  0    계        계     Total           Total
+## 8     59.4      M 00  0    계        계     Total           Total
+## 9   3146.1      M 10  0    계 15 - 19세     Total 15-19 Years old
+## 10   272.6      M 10  0    계 15 - 19세     Total 15-19 Years old
+</code></pre>
+
+<p>이상으로 통계청 Open API를 이용하는 방법에 대해서 살펴봤습니다. 중간에 반복하여 기술하였지만 통계청 Open API는 사용하기가 매우 까다롭게 설계되어 있음을 알 수 있었습니다. 그래도 같은 항목에 대해 기간을 바꿔가며 수집할 때 수작업보다는 효율적일 수 있으니 인내심을 가지고 도전해보시기 바랍니다.</p>
+
+</body>
+
+</html>

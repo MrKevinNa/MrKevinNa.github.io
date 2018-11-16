@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>leaflet 패키지를 활용한 지도 시각화</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>leaflet 패키지를 활용한 지도 시각화</h1>
+
+<p>Dr.Kevin
+5/18/2018</p>
+
+<p>이번 포스팅은 <a href="https://mrkevinna.github.io/R-%EC%8B%9C%EA%B0%81%ED%99%94-3/"><strong>R 시각화 3</strong></a>의 두 번째 부록입니다. 첫 번째 부록에서 서울 지하철 2호선의 승하차 데이터에 위경도 좌표를 붙이고 <code>qmap()</code> 함수를 활용하여 정적인 지도 시각화를 했습니다. 이번에는 <strong>leaflet</strong> 패키지를 활용하여 동적인 지도 이미지를 만들어 보겠습니다.</p>
+
+<h3>동적인 지도 이미지 만들기</h3>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다. 
+library(leaflet)
+</code></pre>
+
+<pre><code class="r"># RDS 파일을 불러옵니다. 
+subwayNo2 &lt;- readRDS(file = &#39;./Data/Seoul_Subway_Line_No2.RDS&#39;)
+</code></pre>
+
+<p><strong>leaflet</strong> 패키지를 활용하는 간단한 방법은 <code>leaflet()</code> 함수를 활용하여 <code>leaflet</code> 객체를 만들고 다양한 타일을 추가함으로써 지도처럼 보이게 하는 것입니다. <code>leaflet</code> 객체를 만들 때, 지도 위에 표시하고 싶은 항목들을 지정해주어야 하는데요. 정적인 이미지와 같이 아무런 동작 없이 정보를 출력할 수 있고, 아니면 마우스로 클릭하면 말풍선처럼 출력하고 사라지게 할 수 있습니다. 또는 해당 위치에 마우스 포인터를 놓았을 때 정보가 출력되도록 할 수도 있습니다.</p>
+
+<p>첫 번째 예제로는 지도 위에 서울 지하철 2호선 역별로 승차승객수의 크기에 비례하여 원을 그리고, 해당 역의 승차승객수를 말풍선으로 출력한 후 마우스로 제거할 수 있도록 하는 방법입니다.</p>
+
+<p>이번 포스팅에서 소개해드릴 <strong>leaflet</strong> 패키지의 주요 함수는 아래와 같습니다.</p>
+
+<ul>
+<li>  <code>leaflet()</code> : 시각화할 데이터를 지정합니다.</li>
+<li>  <code>setView()</code> : 불러올 지도를 설정합니다.</li>
+<li>  <code>addCircles()</code> : 원 모양의 이미지를 추가합니다.</li>
+<li>  <code>addPopups()</code> : 팝업 이미지를 추가합니다.</li>
+</ul>
+
+<pre><code class="r"># 지도의 중심을 중위값으로 지정합니다.
+center &lt;- c(median(x = subwayNo2$lon), median(x = subwayNo2$lat))
+
+# leaflet() 함수를 사용하여 leafletObj 객체를 생성합니다.
+leafletObj &lt;-   
+  subwayNo2 %&gt;% 
+  leaflet() %&gt;% 
+  setView(lng = center[1],
+          lat = center[2],
+          zoom = 14) %&gt;% 
+  addCircles(lng = ~ lon,
+             lat = ~ lat,
+             radius = ~ sqrt(승차승객수) / 2,
+             weight = 1,
+             color = NULL,
+             opacity = 1.0,
+             fillColor = ~ &#39;darkgreen&#39;,
+             fillOpacity = 0.5) %&gt;% 
+  addPopups(lng = ~ lon,
+            lat = ~ lat,
+            popup = ~ str_c(지하철역, &#39;(&#39;, 승차승객수, &#39;)&#39;),
+            options = popupOptions(minWidth = 20,
+                                   closeOnClick = FALSE,
+                                   closeButton = TRUE))
+
+# 생성한 leafletObj 객체에 타일을 추가하여 지도로 시각화합니다.
+leafletObj %&gt;% addTiles()
+</code></pre>
+
+<iframe src="https://drkevin.shinyapps.io/Subway_Line2_1/" height="480" width="740" frameborder="0" allowfullscreen></iframe>
+
+<p>지도 왼쪽 상단에 있는 <strong>+ / -</strong> 버튼을 클릭하면 지도를 확대하거나 축소할 수 있습니다. 마우스의 휠을 이용하여 확대하거나 축소하는 것도 가능합니다. 그런데 지도 때문에 서울 지하철 2호선 역마다 추가한 정보가 잘 보이지 않네요. 타일을 바꿔보겠습니다.</p>
+
+<pre><code class="r"># &#39;CartoDB.Positron&#39; 타일로 변경합니다.
+leafletObj %&gt;% addProviderTiles(provider = &#39;CartoDB.Positron&#39;)
+</code></pre>
+
+<iframe src="https://drkevin.shinyapps.io/Subway_Line2_2/" height="480" width="740" frameborder="0" allowfullscreen></iframe>
+
+<p>이제 아주 잘 보입니다. 추가할 수 있는 타일은 이 외에도 &#39;Stamen.Toner&#39;, &#39;Stamen.TonerLines&#39;, &#39;Acetate.terrain&#39; 등이 있으니 직접 해보기 바랍니다.</p>
+
+<p>두 번째 예제로는 첫 번째 예제와 큰 차이가 없지만, 어떤 지하철역의 원을 클릭했을 때 승차승객수를 말풍선으로 출력하는 방법에서 차이가 있습니다. 마찬가지로 마우스로 클릭하여 없앨 수도 있습니다.</p>
+
+<pre><code class="r"># 처음부터 말풍선을 출력하는 대신 원을 클릭할 때만 생기도록 합니다.
+subwayNo2 %&gt;% 
+  leaflet() %&gt;% 
+  setView(lng = center[1],
+          lat = center[2],
+          zoom = 14) %&gt;% 
+  addCircles(lng = ~ lon,
+             lat = ~ lat,
+             radius = ~ sqrt(승차승객수) / 2,
+             weight = 1,
+             color = NULL,
+             opacity = 1.0, 
+             popup = ~ str_c(지하철역, &#39;(&#39;, 승차승객수, &#39;)&#39;),
+             fillColor = ~ &#39;darkgreen&#39;,
+             fillOpacity = 0.5) %&gt;% 
+  addProviderTiles(provider = &#39;CartoDB.Positron&#39;)
+</code></pre>
+
+<iframe src="https://drkevin.shinyapps.io/Subway_Line2_3/" height="480" width="740" frameborder="0" allowfullscreen></iframe>
+
+<p>지금까지 작업한 결과를 HTML로 저장하려면 <strong>Viewer</strong> 패널의 <strong>Export</strong>를 클릭한 후 아래 메뉴에서 <strong>Save as Web Page</strong>를 선택하면 됩니다. 그러면 해당 HTML 파일을 더블 클릭하였을 때 웹 브라우저에서 이미지를 확인할 수 있습니다.</p>
+
+<p><del>한편 이번 포스팅에서는 동적인 지도 이미지를 구현하지 못하였는데, 아쉬움을 달래기 위해  <strong>shinyapps.io</strong>로 작업한 링크를 붙입니다. <a href="https://drkevin.shinyapps.io/SeoulSubwayLineNo2/"><strong>leaflet</strong> 패키지를 활용한 동적인 지도 이미지 포스팅 바로가기</a></del></p>
+
+<p>위와 같이 링크를 추가하는 대신 각각의 코드 아래에 동적인 지도 이미지를 삽입하는 것으로 대신하였습니다. 개별 shinyapp으로 만들어서 shinyapps.io에 등록한 후 <iframe>을 사용하면 가능합니다. </p>
+
+<p>이상으로 <strong>leaflet</strong> 패키지에 대해서 간단하게 살펴보았습니다.[1]</p>
+
+<p>[1] leaflet 패키지에 관한 더 많은 자세한 정보는 <a href="https://rstudio.github.io/leaflet/">여기</a>에서 찾아보기 바랍니다.</p>
+
+</body>
+
+</html>

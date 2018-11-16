@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Google Map Api를 활용한 지도 시각화</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Google Map Api를 활용한 지도 시각화</h1>
+
+<p>Dr.Kevin
+5/3/2018</p>
+
+<p>이번 포스팅에서는 지도를 활용하는 몇 가지 방법에 대해 소개해드릴까 합니다. 사실 해보고 나면 크게 어렵지 않은데 해보기 전에는 상당히 까다로울 것 같은 느낌을 갖게 되는 것이 바로 지도 시각화가 아닌가 싶습니다. 저도 예전에 실제로 해보기 전에는 그렇게 생각했었습니다. 하지만 3년 전인 2015년에 처음으로 단계구분도(choropleth)를 그려보고, <strong>leaflet</strong> 패키지로 구글 지도 위에 다양한 정보를 동적 이미지로 담아 HTML 형태로 공유하는 과정을 거치면서 지도 시각화의 매력에 푹 빠졌던 기억이 납니다. 긴말 없이 바로 <strong>ggmap</strong>부터 시작하겠습니다.</p>
+
+<h2><strong>ggmap</strong> 패키지로 구글 지도 API를 이용한 공간 데이터 시각화</h2>
+
+<p><strong>ggmap</strong> 패키지의 <code>get_map()</code> 함수와 <code>ggmap()</code> 함수를 이용하면 여러 가지 종류의 지도를 불러올 수 있습니다. <code>get_map()</code> 함수로 불러올 지도에 대한 조건을 정한 후, <code>ggmap()</code> 함수로 지도를 출력하는 과정을 거칩니다.</p>
+
+<p>그런데 이번 포스팅을 하면서 <code>geocode()</code> 함수나 <code>mutate_geocode()</code> 함수에서 도중에 에러가 발생하곤 하였습니다. 에러가 발생한 건을 다시 실행해보면 대부분 멀쩡하게 실행이 되었구요. 구글링을 해보니 현재 CRAN에 등록되어 있는 <strong>ggmap</strong> 패키지 버전이 <strong>2.6.1</strong>인데 이런 문제가 종종 발생하는 것 같습니다. 해결방안으로는 github에 등록되어 있는 <strong>2.7</strong> 버전의 <code>google_register()</code> 함수를 사용하여 <strong>구글 지도 API 인증키</strong>를 등록해야 한다는 것입니다. 따라서 다음 코드를 참고하여 <strong>ggmap</strong> 패키지를 설치하기 바랍니다.</p>
+
+<h3><strong>ggmap</strong> 패키지 2.7 버전 설치하고 인증키 등록하기</h3>
+
+<p>CRAN이 아닌 github에 등록된 패키지를 설치하려면 <code>devtools</code> 패키지의 <code>install_github()</code> 함수를 사용해야 합니다. 아래와 같이 해보겠습니다.</p>
+
+<pre><code class="r"># ggmap 2.7을 설치합니다. (아직 CRAN에 등록되어 있지 않습니다.)
+devtools::install_github(&#39;dkahle/ggmap&#39;)
+</code></pre>
+
+<pre><code class="r"># 필요 패키지를 불러옵니다. 
+library(ggmap)
+</code></pre>
+
+<p>혹시 <strong>ggmap</strong> 패키지를 설치한 후 <code>library()</code> 함수로 불러올 때 에러가 발생한다면 일단 RStudio를 껐다가 다시 켜보세요. 그러면 정상적으로 불러올 수 있습니다. <strong>ggmap</strong> 패키지를 불러왔다면 이제 <strong>구글 지도 API 인증키</strong>를 발급받고 등록해야 합니다. 구글 지도 API 인증키를 발급받는 방법을 단계별로 설명해드리겠습니다.</p>
+
+<p><a href="https://developers.google.com/maps/documentation/geocoding/get-api-key">인증키 발급받으러 가기</a>를 클릭하면 아래와 같은 웹페이지가 열립니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/%EA%B5%AC%EA%B8%80%20%EC%A7%80%EB%8F%84%20API%20%EC%9D%B8%EC%A6%9D%ED%82%A4%20%EB%B0%9C%EA%B8%89_1.png" alt=""></p>
+
+<p>가장 아래에 있는 <strong>키 가져오기</strong> 버튼을 클릭합니다. 그러면 아래와 같이 화면 중앙에 팝업 이미지가 하나 생성됩니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/%EA%B5%AC%EA%B8%80%20%EC%A7%80%EB%8F%84%20API%20%EC%9D%B8%EC%A6%9D%ED%82%A4%20%EB%B0%9C%EA%B8%89_2.png" alt=""></p>
+
+<p><strong>Select or create project</strong> 오른쪽 끝에 있는 역삼각형 기호를 클릭했을 때, 예전에 구글 지도 API를 발급받은 적이 있으면 아래 이미지와 같이 해당 항목들이 주르르 뜰 것입니다. 없어도 문제는 없습니다. 여기서 바로 발급받을 수 있으니까요. 그냥 <strong>+ Create a new project</strong>를 클릭하면 됩니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/%EA%B5%AC%EA%B8%80%20%EC%A7%80%EB%8F%84%20API%20%EC%9D%B8%EC%A6%9D%ED%82%A4%20%EB%B0%9C%EA%B8%89_3.png" alt=""></p>
+
+<p>프로젝트명으로 <strong>My Project</strong>라는 추천이 마음에 들면 우측 하단의 <strong>NEXT</strong> 버튼을 클릭하고, 그렇지 않다면 자신이 마음에 드는 프로젝트명으로 바꾼 뒤 <strong>NEXT</strong> 버튼을 클릭합니다.</p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/%EA%B5%AC%EA%B8%80%20%EC%A7%80%EB%8F%84%20API%20%EC%9D%B8%EC%A6%9D%ED%82%A4%20%EB%B0%9C%EA%B8%89_4.png" alt=""></p>
+
+<p>4~5초 정도 시간이 경과하면 새로운 프로젝트가 생성되고 아래 이미지와 같이 <strong>인증키</strong>가 발급되었습니다. 이제 이 인증키를 복사한 뒤 RStudio로 이동하여 등록하면 됩니다. </p>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/%EA%B5%AC%EA%B8%80%20%EC%A7%80%EB%8F%84%20API%20%EC%9D%B8%EC%A6%9D%ED%82%A4%20%EB%B0%9C%EA%B8%89_5.png" alt=""></p>
+
+<pre><code class="r"># 구글 지도 API 인증키를 등록합니다. 
+register_google(key = &#39;자신의 구글 지도 API 인증키를 입력하세요&#39;)
+</code></pre>
+
+<p>여기까지 잘 따라왔다면 인증키 등록은 완료되었습니다. 하지만 여전히 문제는 남아있습니다. 바로 구글 지도 API 인증키가 정상적으로 동작하려면 (정확한 것은 아니지만) 꽤 오랜 시간, 예를 들어 한나절(약 6시간) 정도 소요되는 것 같습니다. 따라서 일단 잠시동안 이 포스팅은 잊고 다른 작업을 먼저 하시기 바랍니다. </p>
+
+<p>참고로, 인증키 등록이 완료되지 않았다고 판단하는 근거로는 <code>register_google()</code> 함수를 실행한 후 <code>qmap()</code> 함수로 지도를 불러올 때 <strong>cannot open: HTTP status was &#39;403 Forbidden&#39;</strong> 에러가 뜬다는 것입니다. 즉, 구글 지도 API 서버에서 인증키가 등록되지 않았다는 것이죠. 그러므로 RStudio에서 <code>register_google()</code> 함수로 인증키를 등록한 후 <code>qmap()</code> 함수를 실행했을 때 정상적으로 지도가 불려와지면 구글 지도 API 서버에 인증키가 등록되었다고 판단할 수 있습니다. </p>
+
+<h3>구글 지도 그리기</h3>
+
+<p><code>get_map()</code> 함수에서 사용되는 주요 인자들에 대해 살펴보도록 하겠습니다.</p>
+
+<ul>
+<li>  location : 불러올 지역의 중심을 &#39;지역명&#39;, &#39;주소&#39;, 또는 <code>c(lon = 경도, lat = 위도)</code>처럼 위경도 좌표로 지정합니다. Windows 사용자들은 &#39;지역명&#39;이나 &#39;주소&#39;를 한글로 지정하려면 반드시 <code>enc2utf8()</code> 함수를 이용하여 한글의 인코딩 방식을 <strong>UTF-8</strong>으로 변경해주어야 합니다.</li>
+<li>  zoom : 2 ~ 21 사이의 정수를 입력합니다. 숫자가 커질수록 확대된 지도가 출력됩니다. 예를 들어 3은 대륙(Continent), 10은 도시(City), 21은 건물(Building) 크기 입니다.</li>
+<li>  maptype : &#39;terrain&#39;, &#39;terrain-background&#39;, &#39;satellite&#39;, &#39;roadmap&#39;, &#39;hybrid&#39;, &#39;toner&#39;, &#39;watercolor&#39; 중에서 하나를 지정합니다.</li>
+<li>  source : &#39;google&#39;, &#39;osm&#39;, &#39;stamen&#39;, &#39;cloudmade&#39; 중 하나를 선택하면 됩니다. 이번 포스팅에서는 &#39;google&#39;만 사용할 예정입니다.</li>
+</ul>
+
+<p>이제 서울특별시 지역 구글 지도를 그려봅시다. 진행에 앞서 <strong>ggmap</strong> 패키지를 불러오는 것과 구글 지도 API 인증키 등록도 완료했는지 확인하기 바랍니다. </p>
+
+<pre><code class="r"># 서울특별시 지역의 구글 지도를 불러옵니다. 
+# 지도 타입은 &#39;roadmap&#39;으로 지정합니다.
+get_map(location = &#39;서울&#39;,
+        zoom = 14,
+        maptype = &#39;roadmap&#39;,
+        source = &#39;google&#39;) %&gt;% 
+  ggmap()
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/unnamed-chunk-5-1.png" alt=""></p>
+
+<p>지도의 중심에 시청역이 있습니다. 그런데 Windows 사용자들은 아마 제대로 실행이 안 되었을 겁니다. 그 이유는, 위에서도 언급한 것처럼 <code>location</code> 인자에 한글을 지정하려면 <code>enc2utf8()</code> 함수를 이용하여 <strong>UTF-8</strong>으로 인코딩 방식을 바꿔주어야 하기 때문입니다. 따라서 Windows 사용자들은 위 코드 대신 아래 코드를 실행하기 바랍니다. </p>
+
+<pre><code class="r"># Windows 사용자만 따라해보세요. 
+get_map(location = enc2utf8(x = &#39;서울&#39;),
+        zoom = 14,
+        maptype = &#39;roadmap&#39;,
+        source = &#39;google&#39;) %&gt;% 
+  ggmap()
+</code></pre>
+
+<p>이번에는 <code>maptype</code>을 &#39;terrain&#39;으로 바꿔보겠습니다. </p>
+
+<pre><code class="r"># 서울특별시 지역의 구글 지도를 불러옵니다. 
+# 지도 타입은 &#39;terrain&#39;으로 지정합니다.
+get_map(location = &#39;서울&#39;,
+        zoom = 14,
+        maptype = &#39;terrain&#39;,
+        source = &#39;google&#39;) %&gt;% 
+  ggmap()
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/unnamed-chunk-6-1.png" alt=""></p>
+
+<p>이 지도는 &#39;roadmap&#39;에 등고선이 추가된 것으로 보입니다. 참고로 <code>source</code> 인자에 &#39;google&#39;을 선택하면 <code>maptype</code> 인자에 &#39;terrain&#39;, &#39;terrain-background&#39;, &#39;satellite&#39;, &#39;roadmap&#39;, &#39;hybrid&#39; 등 다섯 가지의 지도 형태를 지정할 수 있습니다.</p>
+
+<p>그런데 이렇게 하는 것보다 조금 더 나은 방법이 있습니다. 바로 <code>qmap()</code> 함수를 사용하는 것입니다. 이 함수는 두 함수를 하나로 합친 것이라고 이해하면 됩니다. 아울러 x축과 y축을 모두 지우기 때문에 <code>ggmap()</code> 함수보다 더 큰 지도를 출력한다는 장점이 있습니다.</p>
+
+<pre><code class="r"># qmap() 함수를 이용하여 지도를 그립니다. 
+# 지도를 확대하고 지도 형태를 위성사진으로 바꿉니다.
+qmap(location = &#39;서울&#39;,
+     zoom = 18,
+     maptype = &#39;satellite&#39;,
+     source = &#39;google&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/unnamed-chunk-7-1.png" alt=""></p>
+
+<p>출력된 위성 사진을 보니, 언제 찍힌 것인지 확인할 수 없지만 서울특별시청사와 광장이 잘 보입니다. <code>maptype</code>을 &#39;hybrid&#39;로 변경하면 위성사진에 지리정보를 추가할 수 있으니 궁금한 분은 직접 해보기 바랍니다.</p>
+
+<h3>구글 지도에서 좌표 얻기</h3>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/%EA%B5%AC%EA%B8%80%EC%A7%80%EB%8F%84_%EC%97%AC%EC%9D%98%EB%8F%84.png" alt=""></p>
+
+<p>위 그림에서와 같이 웹 브라우저에서 구글 지도에 접속한 다음 키워드(여의도)를 입력하면 <code>URL</code>창에 위도와 경도가 있음을 알 수 있습니다. 위 그림에서는 <strong>@37.5285092,126.9187502</strong>로 되어 있습니다. 콤마(,)를 구분자로 앞의 숫자가 위도(latitude), 뒤의 숫자가 경도(longitude)입니다. 이 좌표값을 <code>qmap()</code> 함수의 <code>location</code> 인자에 할당하면 그 좌표를 중심으로 하는 지도를 불러올 수 있습니다.</p>
+
+<pre><code class="r"># 좌표값으로 지도를 불러옵니다.
+qmap(location = c(lon = 126.9187502,
+                  lat = 37.5285092),
+     zoom = 14,
+     maptype = &#39;satellite&#39;,
+     source = &#39;google&#39;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/unnamed-chunk-8-1.png" alt=""></p>
+
+<p>구글 지도의 위성사진 줌 크기는 약 15까지 가능한 것으로 보입니다. 하지만 <code>qmap()</code> 함수를 사용하면 21까지 확대해 볼 수 있습니다. 위 코드에서 <code>zoom = 21</code>로 변경하고 실행해보니 어두운 그림자만 보입니다. 궁금한 분은 직접 해보세요.</p>
+
+<h3>구글 지도 API를 이용하여 위경도 좌표 얻기 (WGS84)</h3>
+
+<p>이제 위경도 좌표만 있으면 원하는 구글 지도를 불러올 수 있다는 것을 알았습니다. 문제는 위경도 좌표를 얻는 방법을 알아야 한다는 것이겠죠? 지금처럼 매번 웹 브라우저에서 구글 지도에 접속해서 위경도 좌표를 얻는 것은 시간도 많이 걸릴 뿐만 아니라 일의 능률도 현저히 감소하기 때문입니다.</p>
+
+<p>반가운 소식은 <strong>ggmap</strong> 패키지의 <code>geocode()</code> 함수 또는 <code>mutate_geocode()</code> 함수를 이용하면 원하는 위치의 위경도 좌표를 손쉽게 얻을 수 있다는 것입니다.</p>
+
+<p>그런데 진도를 더 나가기 앞서 한 가지 알려드릴 사항이 있습니다. <strong>구글 지도 API</strong>의 일별 한도가 있다는 것입니다. 그러니까 하루에 2,500번만 가능합니다. 아마도 IP 단위로 일별 한도가 계산되는 듯 합니다. 개인의 취미생활로 위경도 좌표를 수집하거나 지도 데이터를 불러오는 것이라면 하루 2,500번이 충분할 것이라고 봅니다만, 뭔가 큰 프로젝트를 위해 데이터를 수집하기에는 꽤 부족한 양입니다. 유료로 전환하면 하루에 10만 번으로 한도가 늘어난다고는 합니다. 현재 일별 잔여한도가 얼마나 남았는지를 확인하는 방법을 알려드리겠습니다.</p>
+
+<pre><code class="r"># 구글 지도 API 일별 잔여 한도를 확인합니다. 
+geocodeQueryCheck()
+</code></pre>
+
+<pre><code>## 2497 geocoding queries remaining.
+</code></pre>
+
+<p>혹시 일별 한도 2,500번이 적다고 생각하시는 분은 <strong>네이버 지도 API</strong>를 사용하기 바랍니다. 몇 년 전에 지리 정보 관련 프로젝트를 할 때 사용했었는데, 당시에는 하루 한도가 10만 번이었던 것으로 기억합니다. 무료였습니다. 이 포스팅을 작성하면서 다시 들어가보니 20만 번으로 늘어났네요. 여전히 무료입니다. 그런데 파이썬을 사용해서 데이터를 수집했었습니다. 나중에 시간이 생기면 R로 위경도 좌표 수집하는 코드를 짜보도록 하겠습니다.</p>
+
+<p>다시 돌아와서, 이제 잔여 한도가 충분하다는 것을 알았으니 지역명 또는 주소로 위경도 좌표 얻는 방법을 알아보도록 하죠. <code>geocode()</code> 함수를 이용하면 됩니다. 다만 주의해야 할 점은 구글 지도의 주소창에 출력되는 위경도 좌표와는 출력 순서가 다르다는 것입니다. 사실 숫자 크기만으로도 우리는 어떤 것이 위도이고, 어떤 것이 경도인지 쉽게 가늠할 수 있죠.</p>
+
+<p><code>geocode()</code> 함수를 사용하는 법은 간단합니다. 다음과 같은 3가지 주요 인자들만 사용하면 됩니다.</p>
+
+<ul>
+<li><code>location</code> : &#39;지역명&#39; 또는 &#39;주소&#39; 할당</li>
+<li><code>output</code> : &#39;latlon&#39;(위도와 경도만), &#39;latlona&#39;(위도, 경도 &amp; 주소까지), &#39;more&#39;(위도, 경도, 동서남북 끝점, 주소, 국가 등. 이상 데이터 프레임 형태로 제공) 등</li>
+<li><code>source</code> : 당연히 &#39;google&#39;이겠죠?</li>
+</ul>
+
+<pre><code class="r"># 지역명으로 위경도 좌표만 얻습니다. 
+geocode(location = &#39;서울&#39;,
+        output = &#39;latlon&#39;,
+        source = &#39;google&#39;)
+</code></pre>
+
+<pre><code>##       lon      lat
+## 1 126.978 37.56654
+</code></pre>
+
+<p>위경도 좌표에 주소도 함께 제공받는 방법도 있습니다. <code>output</code> 인자에 <code>latlona</code>를 할당하면 됩니다.</p>
+
+<pre><code class="r"># 지역명으로 위경도 좌표와 주소도 함께 얻습니다. 
+geocode(location = &#39;서울&#39;,
+        output = &#39;latlona&#39;,
+        source = &#39;google&#39;)
+</code></pre>
+
+<pre><code>##       lon      lat            address
+## 1 126.978 37.56654 seoul, south korea
+</code></pre>
+
+<p>위 코드를 실행해보니 서울특별시의 중심인 서울특별시청사의 위경도 좌표와 영문 주소가 함께 출력되었습니다. 혹시 한글 주소도 받을 수 있을까요? 방법이 있습니다! <code>location</code> 인자에 할당하는 지역명에 &#39;&amp;language=ko&#39;를 붙여쓴 후 <code>enc2utf8()</code> 함수에 할당하면 됩니다.</p>
+
+<pre><code class="r"># 한글 주소를 얻는 방법입니다.
+# enc2utf8() 함수에 지역명과 &#39;&amp;language=ko&#39;를 붙여써서 할당합니다. 
+geocode(location = enc2utf8(x = &#39;서울&amp;language=ko&#39;),
+        output = &#39;latlona&#39;,
+        source = &#39;google&#39;)
+</code></pre>
+
+<pre><code>##        lon      lat                                                address
+## 1 126.9367 37.55755 south korea, 31-39번지 5층, 6층 서대문구 서울특별시 kr
+</code></pre>
+
+<p>다음으로 <code>output</code> 인자에 <code>more</code>를 할당하면 어떻게 될까요?</p>
+
+<pre><code class="r"># &#39;output&#39; 인자에 &#39;more&#39;를 할당하면 더 많은 정보를 얻을 수 있습니다. 
+geocode(location = &#39;서울&#39;,
+        output = &#39;more&#39;,
+        source = &#39;google&#39;)
+</code></pre>
+
+<pre><code>##       lon      lat     type     loctype            address   north   south
+## 1 126.978 37.56654 locality approximate seoul, south korea 37.6956 37.4346
+##       east     west locality administrative_area_level_1     country
+## 1 127.1823 126.7968    Seoul                       Seoul South Korea
+</code></pre>
+
+<h3>지도 시각화 예제 1</h3>
+
+<p>주소로 위경도 좌표를 얻는 방법과 위경도 좌표로 지도 불러오는 방법을 알았으니 이제 그 위에 여러 가지 시각화 작업을 추가해보도록 하겠습니다. 지도를 불러온 후, 중심 지점에 표식을 추가하는 예제입니다.</p>
+
+<pre><code class="r"># 제가 근무하고 있는 건물 주소로 위경도 좌표를 얻고, myLoc 객체에 할당합니다.
+myLoc &lt;- geocode(location = &#39;서울특별시 영등포구 의사당대로 82&#39;,
+                 output = &#39;latlon&#39;,
+                 source = &#39;google&#39;)
+
+# myLoc 위경도 좌표를 지도의 중심으로 정합니다.
+center &lt;- c(myLoc$lon, myLoc$lat)
+
+# 중심을 기준으로 지도를 불러옵니다. 
+# &#39;maptype&#39;을 &#39;hybrid&#39;로 지정하면 &#39;satellite&#39;에 주변 지리 정보가 추가됩니다.
+qmap(location = center,
+     zoom = 18,
+     maptype = &#39;hybrid&#39;,
+     source = &#39;google&#39;) + 
+  geom_point(data = myLoc,
+             mapping = aes(x = lon,
+                           y = lat),
+             shape = &#39;*&#39;,
+             color = &#39;yellow&#39;,
+             stroke = 10, 
+             size = 12)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/unnamed-chunk-14-1.png" alt=""></p>
+
+<h3>지도 시각화 예제 2</h3>
+
+<p><a href="https://ko.wikipedia.org/wiki/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%EC%9D%98_%EB%8C%80%ED%95%99_%EB%AA%A9%EB%A1%9D">서울특별시의 대학 목록</a> 웹페이지에서 각 대학교의 이름을 수집하고, 그 이름을 기준으로 위경도 좌표를 얻은 후, 지도 위에 위치를 출력하는 예제를 실습해보겠습니다.</p>
+
+<p>웹페이지를 방문해보니 총 5개의 표(table)가 있고, 그 중에 첫 번째 표인 &#39;종합대학&#39; 목록을 수집하면 될 것 같습니다. 우리는 지난 6번에 걸친 포스팅을 통해 웬만한 글은 다 수집할 수 있게 되었습니다. 그렇죠? <sup>^</sup> 이번에는 크롤링에 사용할 수 있는, 기존에 설명드렸던 방식과 다르면서도 아주 간단한 함수를 하나 소개해드리겠습니다. <code>readLines()</code> 함수입니다.</p>
+
+<pre><code class="r"># 서울특별시의 대학 목록 웹페이지에서 &#39;종합대학&#39; 목록을 수집합니다. 
+
+# 웹사이트의 url을 지정합니다. 원래 url이 상당히 길어서 압축하였습니다.
+url &lt;- &#39;https://goo.gl/Hlv3Hd&#39;
+
+# readLines() 함수로 웹페이지에 접속하여 HTML을 텍스트로 받아옵니다.
+text &lt;- readLines(con = url)
+
+# text 객체의 처음 6줄만 미리보기 합니다.
+head(x = text, n = 6L)
+</code></pre>
+
+<pre><code>## [1] &quot;&lt;!DOCTYPE html&gt;&quot;                                                                                                                                    
+## [2] &quot;&lt;html class=\&quot;client-nojs\&quot; lang=\&quot;ko\&quot; dir=\&quot;ltr\&quot;&gt;&quot;                                                                                               
+## [3] &quot;&lt;head&gt;&quot;                                                                                                                                             
+## [4] &quot;&lt;meta charset=\&quot;UTF-8\&quot;/&gt;&quot;                                                                                                                          
+## [5] &quot;&lt;title&gt;서울특별시의 대학 목록 - 위키백과, 우리 모두의 백과사전&lt;/title&gt;&quot;                                                                             
+## [6] &quot;&lt;script&gt;document.documentElement.className = document.documentElement.className.replace( /(^|\\s)client-nojs(\\s|$)/, \&quot;$1client-js$2\&quot; );&lt;/script&gt;&quot;
+</code></pre>
+
+<p><code>text</code> 객체를 미리보기 해보니 HTML의 각 요소(element)가 한 줄씩 저장되어 있습니다. 그런데 Windows 사용자들은 한글이 깨져서 보일 것입니다. 그렇다면 인코딩 방식을 바꿔주어야 합니다. 미리보기 4번째 줄에 <strong><meta charset=\\"UTF-8\\"/></strong>으로 되어 있는 것을 확인하셨다면 이 웹페이지는 <strong>UTF-8</strong>으로 작성된 것이므로 <code>iconv()</code> 함수를 이용하여 인코딩 방식을 바꿔주어야 합니다. 다음과 같이 해보도록 하겠습니다.</p>
+
+<pre><code class="r"># text 객체의 한글 인코딩 방식을 &#39;UTF-8&#39;에서 &#39;CP949&#39;로 바꿉니다. 
+# Windows 사용자만 실행하면 됩니다. 
+text &lt;- iconv(x = text, from = &#39;UTF-8&#39;, to = &#39;CP949&#39;)
+
+# 다시 미리보기 합니다 
+head(x = text, n = 6L)
+</code></pre>
+
+<p>이제 한글이 제대로 잘 보입니다. 다음으로 우리가 수집하려는 데이터가 어떻게 저장되어 있는지 확인해봐야 합니다. 웹페이지에서 &#39;종합대학&#39;으로 되어 있는 표를 수집하기로 했는데, <code>text</code> 객체는 문자형 벡터이므로 <code>html_table()</code> 함수를 사용할 수 없습니다. 따라서 &#39;종합대학&#39; 표의 첫 번째 학교인 &#39;서울과학기술대학교&#39;로 검색하여 해당 HTML element가 어떻게 되어 있는지 보도록 하겠습니다.</p>
+
+<pre><code class="r"># 종합대학 표의 학교(행)별 HTML element 형태를 확인합니다.
+str_subset(string = text, pattern = &#39;서울과학기술대학교&#39;)
+</code></pre>
+
+<pre><code>## [1] &quot;&lt;td&gt;&lt;a href=\&quot;/wiki/%EC%84%9C%EC%9A%B8%EA%B3%BC%ED%95%99%EA%B8%B0%EC%88%A0%EB%8C%80%ED%95%99%EA%B5%90\&quot; title=\&quot;서울과학기술대학교\&quot;&gt;서울과학기술대학교&lt;/a&gt;&lt;/td&gt;&quot;    
+## [2] &quot;&lt;ul&gt;&lt;li&gt;&lt;a href=\&quot;/wiki/%EC%84%9C%EC%9A%B8%EA%B3%BC%ED%95%99%EA%B8%B0%EC%88%A0%EB%8C%80%ED%95%99%EA%B5%90\&quot; title=\&quot;서울과학기술대학교\&quot;&gt;서울과학기술대학교&lt;/a&gt;&lt;/li&gt;&quot;
+</code></pre>
+
+<p><code>&lt;td&gt;</code>로 시작해서 <code>&lt;a href=\&quot; ~~ \&quot;&gt;서울과학기술대학교&lt;/a&gt;</code> 형태로 되어 있습니다. 모든 대학교가 &#39;학교&#39;로 끝나는 것에 주목하기 바랍니다. 이와 같이 반복되는 패턴을 찾을 때에는 <code>str_extract()</code> 함수를 사용하고 <code>pattern</code> 인자에 <strong>정규표현식(줄여서 정규식)</strong>을 지정해주면 깔끔하게 해결할 수 있습니다. 아직 정규식에 대해서 따로 정리한 적이 없지만, 이번 예제에 해당하는 정규식을 소개하자면 &#39;후방탐색&#39;을 사용하면 됩니다.</p>
+
+<pre><code class="r"># 정규표현식을 사용하여 대학교 이름만 추출하여 univNames 객체에 할당합니다. 
+univNames &lt;- text %&gt;% 
+  str_subset(pattern = &#39;(^&lt;td&gt;).+(학교&lt;/a&gt;&lt;/td&gt;$)&#39;) %&gt;% 
+  str_extract(pattern = &#39;(?&lt;=\&quot;&gt;).+(학교)&#39;)
+</code></pre>
+
+<p>첫 번째 코드에 대해 간략하게 설명하면 다음과 같습니다. <code>str_subset()</code> 함수는 <code>text</code> 객체에서 <code>(^&lt;td&gt;).+(학교&lt;/a&gt;&lt;/td&gt;$)</code> 패턴을 갖는 모든 요소를 그대로 다 가져오라는 것입니다. <code>(^&lt;td&gt;).+(학교&lt;/a&gt;&lt;/td&gt;$)</code> 이 부분이 정규식입니다. 소괄호로 묶인 부분은 그룹으로 묶어서 처리하라는 것입니다. 그룹으로 묶는 이유는 반복되는 패턴을 찾을 때 사용하기도 하는데 저는 그냥 보기 좋게 뭉치를 하나로 묶는 용도로 사용합니다. 첫 뭉치 <code>(^&lt;td&gt;)</code>에서 <code>^</code>는 <code>&lt;td&gt;</code>로 시작하는 요소를 찾으라는 의미입니다. <code>.+</code>는 어떤 글자라도(<code>.</code>) 하나부터 무한대 개수를 갖는 조건을 만족(<code>+</code>)하는 문자를 찾으라는 의미입니다. 마지막 뭉치 <code>(학교&lt;/a&gt;&lt;/td&gt;$)</code>에서 <code>$</code>는 <code>학교&lt;/a&gt;&lt;/td&gt;</code>로 끝나는 문자를 찾으라는 의미입니다. 즉, 위 세 가지 조건을 동시에 만족하는 요소를 찾아오라는 것이죠.</p>
+
+<p>그리고 <code>str_extract()</code> 함수는 이전 단계에서 가져온 문자열 벡터 각 요소에서 <code>(?&lt;=\&quot;&gt;).+(학교)</code> 패턴만 추출하라는 것입니다. <code>(?&lt;=\&quot;&gt;)</code> 이 부분이 후방탐색인데요. 소괄호 안의 <code>?&lt;=</code> 기호는 <code>\&quot;&gt;</code> 글자 다음에 오는 글자 중 <code>.+(학교)</code>을 만족하는 글자를 찾으라는 의미입니다. 여기에서 중요한 것은 <code>\&quot;&gt;</code>을 제외하고 가져오라는 것입니다. 만약 정규식에서 <code>?&lt;=</code> 기호를 제외하고 <code>(\&quot;&gt;).+(학교)</code>처럼 지정한다면 &#39;\&quot;&gt;서울과학기술대학교&#39;처럼 결과가 출력될 것입니다. 정규식을 글로 설명하려니 생각보다 어렵고 내용이 좀 길어졌네요.[1]</p>
+
+<pre><code class="r"># univNames를 출력합니다.
+print(univNames)
+</code></pre>
+
+<pre><code>##  [1] &quot;서울과학기술대학교&quot;           &quot;서울대학교&quot;                  
+##  [3] &quot;서울시립대학교&quot;               &quot;가톨릭대학교&quot;                
+##  [5] &quot;건국대학교&quot;                   &quot;경기대학교&quot;                  
+##  [7] &quot;경희대학교&quot;                   &quot;고려대학교&quot;                  
+##  [9] &quot;광운대학교&quot;                   &quot;국민대학교&quot;                  
+## [11] &quot;케이씨대학교&quot;                 &quot;덕성여자대학교&quot;              
+## [13] &quot;동국대학교&quot;                   &quot;동덕여자대학교&quot;              
+## [15] &quot;명지대학교&quot;                   &quot;삼육대학교&quot;                  
+## [17] &quot;상명대학교&quot;                   &quot;서강대학교&quot;                  
+## [19] &quot;서경대학교&quot;                   &quot;서울기독대학교&quot;              
+## [21] &quot;서울여자대학교&quot;               &quot;성공회대학교&quot;                
+## [23] &quot;성균관대학교&quot;                 &quot;성신여자대학교&quot;              
+## [25] &quot;세종대학교&quot;                   &quot;숙명여자대학교&quot;              
+## [27] &quot;숭실대학교&quot;                   &quot;연세대학교&quot;                  
+## [29] &quot;이화여자대학교&quot;               &quot;중앙대학교&quot;                  
+## [31] &quot;총신대학교&quot;                   &quot;추계예술대학교&quot;              
+## [33] &quot;한국성서대학교&quot;               &quot;한국외국어대학교&quot;            
+## [35] &quot;한성대학교&quot;                   &quot;한양대학교&quot;                  
+## [37] &quot;서울한영대학교&quot;               &quot;홍익대학교&quot;                  
+## [39] &quot;서울교육대학교&quot;               &quot;육군사관학교&quot;                
+## [41] &quot;한국방송통신대학교&quot;           &quot;한국예술종합학교&quot;            
+## [43] &quot;한국체육대학교&quot;               &quot;감리교신학대학교&quot;            
+## [45] &quot;장로회신학대학교&quot;             &quot;동양미래대학교&quot;              
+## [47] &quot;배화여자대학교&quot;               &quot;삼육보건대학교&quot;              
+## [49] &quot;서울여자간호대학교&quot;           &quot;서일대학교&quot;                  
+## [51] &quot;숭의여자대학교&quot;               &quot;인덕대학교&quot;                  
+## [53] &quot;한양여자대학교&quot;               &quot;개신대학원대학교&quot;            
+## [55] &quot;국제신학대학원대학교&quot;         &quot;국제영어대학원대학교&quot;        
+## [57] &quot;동방문화대학원대학교&quot;         &quot;베뢰아국제대학원대학교&quot;      
+## [59] &quot;북한대학원대학교&quot;             &quot;서울과학종합대학원대학교&quot;    
+## [61] &quot;서울미디어대학원대학교&quot;       &quot;서울벤처대학원대학교&quot;        
+## [63] &quot;서울불교대학원대학교&quot;         &quot;서울사회복지대학원대학교&quot;    
+## [65] &quot;서울성경신학대학원대학교&quot;     &quot;서울외국어대학원대학교&quot;      
+## [67] &quot;순복음대학원대학교&quot;           &quot;예명대학원대학교&quot;            
+## [69] &quot;용문상담심리대학원대학교&quot;     &quot;치유상담대학원대학교&quot;        
+## [71] &quot;한국상담대학원대학교&quot;         &quot;한림국제대학원대학교&quot;        
+## [73] &quot;한반도국제대학원대학교&quot;       &quot;횃불트리니티신학대학원대학교&quot;
+</code></pre>
+
+<p>대학교명이 총 74개 수집되었습니다. 그런데 우리가 수집하려는 대학교 목록은 &#39;종합대학&#39; 표에 있는 학교들이었고, 홍익대학교로 끝나는 38개였습니다.</p>
+
+<pre><code class="r"># &#39;홍익대학교&#39;의 위치를 확인합니다. 
+which(x = univNames == &#39;홍익대학교&#39;)
+</code></pre>
+
+<pre><code>## [1] 38
+</code></pre>
+
+<pre><code class="r"># univNames 객체를 1~38번까지 한정하여 재지정합니다.
+univNames &lt;- univNames[1:38]
+</code></pre>
+
+<p>대학교명을 수집하였으니 이제 학교명으로 위경도 좌표를 구해야 되겠죠? <code>geocode()</code> 함수를 사용하면 됩니다. 38개 데이터를 순환하며 위경도 좌표를 수집해야 하니 시간이 조금 소요됩니다.</p>
+
+<pre><code class="r"># 대학교명으로 위경도 좌표를 얻습니다. 
+univCoords &lt;- geocode(location = univNames, 
+                      output = &#39;latlona&#39;,
+                      source = &#39;google&#39;)
+
+# 대학교명 벡터에 위경도 좌표를 열 기준으로 붙입니다.
+univCoords &lt;- cbind(univNames, univCoords)
+
+# 미리보기 합니다. 
+head(x = univCoords, n = 10L)
+</code></pre>
+
+<pre><code>##             univNames      lon      lat
+## 1  서울과학기술대학교 127.0775 37.63167
+## 2          서울대학교 126.9519 37.45988
+## 3      서울시립대학교 127.0588 37.58387
+## 4        가톨릭대학교 127.0043 37.58592
+## 5          건국대학교 127.0793 37.54076
+## 6          경기대학교 127.0358 37.30048
+## 7          경희대학교 127.0525 37.59620
+## 8          고려대학교 127.0278 37.59080
+## 9          광운대학교 127.0597 37.61950
+## 10         국민대학교 126.9977 37.60964
+##                                                                                address
+## 1                             south korea, seoul, nowon-gu, gongneung-dong, 공릉로 232
+## 2                                           1 gwanak-ro, gwanak-gu, seoul, south korea
+## 3          163 seoulsiripdae-ro, jeonnong 2(i)-dong, dongdaemun-gu, seoul, south korea
+## 4                296-12 changgyeonggung-ro, hyehwa-dong, jongno-gu, seoul, south korea
+## 5                 120 neungdong-ro, jayang 1(il)-dong, gwangjin-gu, seoul, south korea
+## 6  154-42 gwanggyosan-ro, woncheon-dong, yeongtong-gu, suwon, gyeonggi-do, south korea
+## 7                     26 kyungheedae-ro, hoegi-dong, dongdaemun-gu, seoul, south korea
+## 8                       145 anam-ro, anamdong 5(o)-ga, seongbuk-gu, seoul, south korea
+## 9                       20 gwangun-ro, wolgye 1(il)-dong, nowon-gu, seoul, south korea
+## 10                  77 jeongneung-ro, jeongneung-dong, seongbuk-gu, seoul, south korea
+</code></pre>
+
+<p>혹시 영어 주소는 마음에 들지 않다면 한글 주소 받는 방법은 앞에서 배웠으니 따로 해보시기 바랍니다. 힌트를 하나 드리자면 <code>str_c()</code> 함수를 이용하는 것입니다. 또는 <code>paste()</code>나 <code>paste0()</code> 함수를 사용해도 됩니다.</p>
+
+<p>방금 위 작업을 <code>mutate_geocode()</code> 함수로도 할 수 있습니다. 이 함수는 <code>data</code> 인자에 데이터프레임 객체를 할당받고, <code>location</code> 인자에는 데이터프레임의 컬럼명을 할당받습니다. 그리고 결과로 데이터프레임에 새로운 컬럼을 생성해줍니다. <code>geocode()</code>와 마찬가지로 비슷한 시간이 소요됩니다. 하지만 이 함수를 쓰는 것이 좀 더 쉽고 편리한 방법 같죠? 아쉬운 점은 위도와 경도 좌표만 새로운 컬럼으로 생성된다는 것입니다. 만약 주소가 필요하다면 위에 알려드린 방법을 사용하기 바랍니다.</p>
+
+<pre><code class="r"># univNames 객체로 univDf라는 데이터프레임을 생성합니다. 
+# 이 때, 문자 벡터가 범주형으로 변환되지 않도록 합니다. 
+univDf &lt;- data.frame(univ = univNames, stringsAsFactors = FALSE)
+
+# mutate_geocode() 함수를 이용하여 위경도 좌표를 얻습니다. 
+univDf &lt;- mutate_geocode(data = univDf, location = univ)
+
+# univDf의 구조를 파악하고 미리보기 합니다.
+str(object = univDf)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    38 obs. of  3 variables:
+##  $ univ: chr  &quot;서울과학기술대학교&quot; &quot;서울대학교&quot; &quot;서울시립대학교&quot; &quot;가톨릭대학교&quot; ...
+##  $ lon : num  127 127 127 127 127 ...
+##  $ lat : num  37.6 37.5 37.6 37.6 37.5 ...
+</code></pre>
+
+<pre><code class="r">head(x = univDf, n = 10L)
+</code></pre>
+
+<pre><code>##                  univ      lon      lat
+## 1  서울과학기술대학교 127.0775 37.63167
+## 2          서울대학교 126.9519 37.45988
+## 3      서울시립대학교 127.0588 37.58387
+## 4        가톨릭대학교 127.0043 37.58592
+## 5          건국대학교 127.0793 37.54076
+## 6          경기대학교 127.0358 37.30048
+## 7          경희대학교 127.0525 37.59620
+## 8          고려대학교 127.0278 37.59080
+## 9          광운대학교 127.0597 37.61950
+## 10         국민대학교 126.9977 37.60964
+</code></pre>
+
+<p>이제 38개 대학교의 위경도 좌표를 구했으니 지도를 불러오고 그 위에 대학교 위치를 표시해보겠습니다. 중심좌표를 먼저 계산해야 합니다. 각 대학교 위경도 좌표의 평균을 중심으로 지정하도록 하겠습니다.</p>
+
+<pre><code class="r"># 불러올 지도의 중심을 대학교들의 위경도 좌표 평균으로 정합니다. 
+center &lt;- c(mean(x = univDf$lon), mean(x = univDf$lat))
+</code></pre>
+
+<p>중심을 잡았으니, <code>qmap()</code> 함수의 <code>location</code> 인자에 중심을 지정하고 &#39;roadmap&#39; 타입의 지도를 불러온 뒤, 각 대학교의 위경도 좌표를 기준으로 점을 추가합니다. 이번 예제에서는 점 대신 역삼각형 기호를 사용하도록 하겠습니다. 아울러 기호 옆에 대학교명을 추가로 출력하면 좋겠군요.</p>
+
+<pre><code class="r"># 지도를 불러오고 학교 위치에 맞게 역삼각형 기호를 출력합니다. 
+qmap(location = center,
+     zoom = 11,
+     maptype = &#39;satellite&#39;,
+     source = &#39;google&#39;) + 
+  geom_point(data = univDf, 
+             aes(x = lon,
+                 y = lat), 
+             shape = &#39;▼&#39;, 
+             color = &#39;red&#39;, 
+             size = 4) + 
+  geom_text(data = univDf,
+            aes(x = lon,
+                y = lat,
+                label = univ),
+            color = &#39;white&#39;,
+            hjust = 0.5,
+            vjust = -1.0,
+            size = 2.5,
+            fontface = &#39;bold&#39;,
+            family = &#39;NanumGothic&#39;)
+</code></pre>
+
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).
+
+## Warning: Removed 1 rows containing missing values (geom_text).
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2018-05-03-R-%EC%8B%9C%EA%B0%81%ED%99%94-3/unnamed-chunk-24-1.png" alt=""></p>
+
+<p>이번 예제를 잘 따라해봤다면 이제 <strong>서울 지하철 2호선 노선도</strong>를 시각화하는 것쯤은 혼자서도 해볼 수 있겠죠? 참고로 나무위키에 <a href="https://goo.gl/HR4PJx"><strong>서울 지하철 2호선</strong></a>이 작성되어 있습니다. 웹페이지를 방문해보니 아랫쪽에 서울 지하철 2호선 노선 표가 있습니다.</p>
+
+<p>그럼 이번 포스팅은 이 정도로 워밍업을 마치고 다음 포스팅에서는 <strong>ggplot2</strong> 패키지를 활용한 지도 시각화에 대해서 알아보도록 하겠습니다.</p>
+
+<p>[1] R 정규표현식에 대해서 좀 더 공부하려면 <a href="https://goo.gl/A32uEP">이곳</a>을 방문해보기 바랍니다.</p>
+
+</body>
+
+</html>

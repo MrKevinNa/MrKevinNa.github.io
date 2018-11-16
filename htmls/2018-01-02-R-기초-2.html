@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>R 객체의 인덱싱과 슬라이싱</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>R 객체의 인덱싱과 슬라이싱</h1>
+
+<p>Dr.Kevin
+1/2/2018</p>
+
+<h2>객체별 인덱싱, 원소의 추가, 삭제 및 변경하기</h2>
+
+<ul>
+<li>  R은 대괄호(square brackets, <code>[]</code>)를 사용하여 원하는 객체에 대하여 특정 위치의 데이터를 찾고, 자를 수 있습니다.</li>
+<li>  객체에 따라 인덱싱, 원소의 추가/삭제/변경하는 방법에 차이가 있습니다.</li>
+<li>  데이터 전처리 과정에서 가장 유용하게 사용되는 방법이므로 반드시 숙달하여야 합니다.</li>
+</ul>
+
+<h2>벡터</h2>
+
+<ul>
+<li>  벡터는 1차원이므로, 대괄호 안에 위치에 해당하는 숫자 벡터를 할당합니다.</li>
+<li>  숫자 벡터 앞에 <code>-</code> 기호를 넣으면 해당 조건에 맞는 요소들을 삭제합니다.</li>
+</ul>
+
+<pre><code class="r"># 1에서 10의 정수를 갖는 벡터 a를 생성하고 결과를 출력합니다. 
+a &lt;- letters[1:10]
+print(a)
+</code></pre>
+
+<pre><code>##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 3번째 데이터를 출력합니다. 
+print(a[3])
+</code></pre>
+
+<pre><code>## [1] &quot;c&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 5번째 데이터를 출력합니다. 
+print(a[5])
+</code></pre>
+
+<pre><code>## [1] &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 3, 5번째 데이터를 출력합니다. 
+print(a[c(3, 5)])
+</code></pre>
+
+<pre><code>## [1] &quot;c&quot; &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 마지막 데이터를 출력합니다.
+# length() 함수는 벡터의 길이를 반환해줍니다. 
+print(length(a))
+</code></pre>
+
+<pre><code>## [1] 10
+</code></pre>
+
+<pre><code class="r">print(a[length(a)])
+</code></pre>
+
+<pre><code>## [1] &quot;j&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 11번째 위치에 새로운 원소를 추가하고 출력합니다. 
+a[11] &lt;- &quot;A&quot;
+print(a)
+</code></pre>
+
+<pre><code>##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;A&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 1번째 원소를 제거하고 출력합니다. 
+a &lt;- a[-1]
+print(a)
+</code></pre>
+
+<pre><code>##  [1] &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;A&quot;
+</code></pre>
+
+<pre><code class="r"># 벡터 a의 10번째 원소 &quot;A&quot;를 &quot;B&quot;로 변경하고 출력합니다. 
+a[10] &lt;- &quot;B&quot;
+print(a)
+</code></pre>
+
+<pre><code>##  [1] &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;B&quot;
+</code></pre>
+
+<h2>행렬</h2>
+
+<ul>
+<li>  행렬은 2차원이므로, 대괄호 안에 컴마(,)를 구분자로 2개의 숫자 벡터를 할당합니다.</li>
+<li>  앞의 숫자 벡터로는 행을 찾고, 뒤의 숫자 벡터로는 열을 찾습니다.</li>
+<li>  특정한 숫자를 입력하지 않으면 해당 행 또는 열 전체를 인식합니다.</li>
+</ul>
+
+<pre><code class="r"># 1부터 12의 정수를 갖는 벡터로 3행 4열을 갖는 행렬 b를 생성합니다.
+b &lt;- matrix(data = 1:12, nrow = 3)
+print(b)
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 1행 전체를 출력합니다. 
+print(b[1, ])
+</code></pre>
+
+<pre><code>## [1]  1  4  7 10
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 2열 전체를 출력합니다. 
+print(b[, 2])
+</code></pre>
+
+<pre><code>## [1] 4 5 6
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 1행, 2열을 출력합니다. 
+print(b[1, 2])
+</code></pre>
+
+<pre><code>## [1] 4
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 2~3행, 4열을 출력합니다. 
+print(b[c(2, 3), 4])
+</code></pre>
+
+<pre><code>## [1] 11 12
+</code></pre>
+
+<pre><code class="r"># 행렬 b에 13~16인 값을 갖는 숫자 벡터를 행 기준으로 추가합니다. 
+# 이 때 rbind() 함수를 사용하여 행 추가를 할 수 있습니다. 
+# 단, 열의 수가 같아야 합니다. 
+b &lt;- rbind(b, c(13:16))
+print(b)
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12
+## [4,]   13   14   15   16
+</code></pre>
+
+<pre><code class="r"># 행렬 b에 20~23인 값을 갖는 숫자 벡터를 열 기준으로 추가합니다. 
+# 이 때 cbind() 함수를 사용하여 열 추가를 할 수 있습니다. 
+# 단, 행의 수가 같아야 합니다. 
+b &lt;- cbind(b, c(20:23))
+print(b)
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    4    7   10   20
+## [2,]    2    5    8   11   21
+## [3,]    3    6    9   12   22
+## [4,]   13   14   15   16   23
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 1행 전체를 삭제합니다. 
+b &lt;- b[-1, ]
+print(b)
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    2    5    8   11   21
+## [2,]    3    6    9   12   22
+## [3,]   13   14   15   16   23
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 4열 전체를 삭제합니다. 
+b &lt;- b[, -4]
+print(b)
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    2    5    8   21
+## [2,]    3    6    9   22
+## [3,]   13   14   15   23
+</code></pre>
+
+<pre><code class="r"># 행렬 b의 1행 2열의 원소를 99로 변경합니다. 
+b[1, 2] &lt;- 99
+print(b)
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    2   99    8   21
+## [2,]    3    6    9   22
+## [3,]   13   14   15   23
+</code></pre>
+
+<h2>배열</h2>
+
+<ul>
+<li>  배열을 인덱싱할 때는 대괄호 안에 &quot;행, 열, 층&quot;의 순서로 위치를 지정합니다.</li>
+</ul>
+
+<pre><code class="r"># 1~12 정수형 벡터를 2*3 행렬을 3층으로 쌓은 배열을 생성합니다. 
+c &lt;- array(1:12, c(2, 3, 3))
+print(c)
+</code></pre>
+
+<pre><code>## , , 1
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+## 
+## , , 2
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   11
+## [2,]    8   10   12
+## 
+## , , 3
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+</code></pre>
+
+<pre><code class="r"># 1번째 행렬의 1열 2행에 속하는 원소를 출력합니다. 
+print(c[1, 2, 1])
+</code></pre>
+
+<pre><code>## [1] 3
+</code></pre>
+
+<pre><code class="r"># 2번째 행렬의 1~2열 2~3행에 속하는 원소를 출력합니다. 
+print(c[1:2, 2:3, 2])
+</code></pre>
+
+<pre><code>##      [,1] [,2]
+## [1,]    9   11
+## [2,]   10   12
+</code></pre>
+
+<pre><code class="r"># 3번째 행렬을 모두 삭제합니다. 
+c &lt;- c[, , -3]
+print(c)
+</code></pre>
+
+<pre><code>## , , 1
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+## 
+## , , 2
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   11
+## [2,]    8   10   12
+</code></pre>
+
+<pre><code class="r"># 모든 행렬의 3열의 원소를 99로 변경합니다. 
+c[, 3, ] &lt;- 99
+print(c)
+</code></pre>
+
+<pre><code>## , , 1
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3   99
+## [2,]    2    4   99
+## 
+## , , 2
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   99
+## [2,]    8   10   99
+</code></pre>
+
+<h2>데이터프레임</h2>
+
+<ul>
+<li>  데이터프레임 인덱싱은 행렬과 유사합니다.</li>
+<li>  인덱스를 지정하는 방법에 따라 출력되는 속성이 서로 다릅니다.</li>
+</ul>
+
+<pre><code class="r"># 먼저 3개의 열을 갖는 데이터프레임을 생성합니다. 
+a &lt;- 1:10
+b &lt;- letters[1:10]
+c &lt;- rep(c(T, F), 5)
+d &lt;- data.frame(num = a, cha = b, log = c)
+print(d)
+</code></pre>
+
+<pre><code>##    num cha   log
+## 1    1   a  TRUE
+## 2    2   b FALSE
+## 3    3   c  TRUE
+## 4    4   d FALSE
+## 5    5   e  TRUE
+## 6    6   f FALSE
+## 7    7   g  TRUE
+## 8    8   h FALSE
+## 9    9   i  TRUE
+## 10  10   j FALSE
+</code></pre>
+
+<pre><code class="r"># 1행 전체를 출력합니다. (데이터프레임)
+print(d[1, ])
+</code></pre>
+
+<pre><code>##   num cha  log
+## 1   1   a TRUE
+</code></pre>
+
+<pre><code class="r"># 2열 전체를 출력합니다. (벡터)
+print(d[, 2])
+</code></pre>
+
+<pre><code>##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot;
+</code></pre>
+
+<pre><code class="r"># 1행, 2열에 속하는 원소를 출력합니다. (벡터)
+print(d[1, 2])
+</code></pre>
+
+<pre><code>## [1] &quot;a&quot;
+</code></pre>
+
+<pre><code class="r"># 1, 5행 전체를 출력합니다. (데이터프레임)
+print(d[c(1, 5), ])
+</code></pre>
+
+<pre><code>##   num cha  log
+## 1   1   a TRUE
+## 5   5   e TRUE
+</code></pre>
+
+<pre><code class="r"># 1, 3열 전체를 출력합니다. (데이터프레임)
+print(d[, c(1, 3)])
+</code></pre>
+
+<pre><code>##    num   log
+## 1    1  TRUE
+## 2    2 FALSE
+## 3    3  TRUE
+## 4    4 FALSE
+## 5    5  TRUE
+## 6    6 FALSE
+## 7    7  TRUE
+## 8    8 FALSE
+## 9    9  TRUE
+## 10  10 FALSE
+</code></pre>
+
+<pre><code class="r"># 컬럼명이 num인 열 전체를 출력합니다. (벡터)
+print(d$num)
+</code></pre>
+
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+
+<pre><code class="r"># 컬럼명이 cha인 열의 1~5번째 원소만 출력합니다. (벡터)
+print(d$cha[1:5])
+</code></pre>
+
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 컬럼명이 log인 열의 6~10번째 원소만 출력합니다. (벡터)
+print(d$log[6:10])
+</code></pre>
+
+<pre><code>## [1] FALSE  TRUE FALSE  TRUE FALSE
+</code></pre>
+
+<pre><code class="r"># 컬럼명이 num인 열 전체를 출력합니다. 
+print(d[, 1])
+</code></pre>
+
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+
+<pre><code class="r">print(d[, &quot;num&quot;])
+</code></pre>
+
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+
+<pre><code class="r"># 데이터프레임 객체를 컴마(,) 없이 인덱싱할 경우 컬럼명으로 인식되며
+# 결과 객체는 데이터프레임 속성을 갖습니다. 
+print(d[1])
+</code></pre>
+
+<pre><code>##    num
+## 1    1
+## 2    2
+## 3    3
+## 4    4
+## 5    5
+## 6    6
+## 7    7
+## 8    8
+## 9    9
+## 10  10
+</code></pre>
+
+<pre><code class="r">print(d[&quot;num&quot;])
+</code></pre>
+
+<pre><code>##    num
+## 1    1
+## 2    2
+## 3    3
+## 4    4
+## 5    5
+## 6    6
+## 7    7
+## 8    8
+## 9    9
+## 10  10
+</code></pre>
+
+<pre><code class="r"># 데이터프레임은 리스트이므로 아래와 같이 인덱싱을 하면 벡터를 출력합니다. 
+print(d[[1]])
+</code></pre>
+
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+
+<pre><code class="r"># 컬럼명이 num, cha인 열 전체를 출력합니다.
+# 인덱스를 지정하는 방법에 따라 출력되는 속성이 서로 다릅니다.
+print(d[, c(1, 2)])
+</code></pre>
+
+<pre><code>##    num cha
+## 1    1   a
+## 2    2   b
+## 3    3   c
+## 4    4   d
+## 5    5   e
+## 6    6   f
+## 7    7   g
+## 8    8   h
+## 9    9   i
+## 10  10   j
+</code></pre>
+
+<pre><code class="r">print(d[, c(&quot;num&quot;, &quot;cha&quot;)])
+</code></pre>
+
+<pre><code>##    num cha
+## 1    1   a
+## 2    2   b
+## 3    3   c
+## 4    4   d
+## 5    5   e
+## 6    6   f
+## 7    7   g
+## 8    8   h
+## 9    9   i
+## 10  10   j
+</code></pre>
+
+<pre><code class="r"># 데이터프레임 객체를 컴마(,) 없이 인덱싱할 경우 컬럼명이 지정됩니다. 
+print(d[c(&quot;num&quot;, &quot;cha&quot;)])
+</code></pre>
+
+<pre><code>##    num cha
+## 1    1   a
+## 2    2   b
+## 3    3   c
+## 4    4   d
+## 5    5   e
+## 6    6   f
+## 7    7   g
+## 8    8   h
+## 9    9   i
+## 10  10   j
+</code></pre>
+
+<pre><code class="r">print(d[c(1, 2)])
+</code></pre>
+
+<pre><code>##    num cha
+## 1    1   a
+## 2    2   b
+## 3    3   c
+## 4    4   d
+## 5    5   e
+## 6    6   f
+## 7    7   g
+## 8    8   h
+## 9    9   i
+## 10  10   j
+</code></pre>
+
+<pre><code class="r"># 2열 전체를 데이터프레임으로 가져온 후, 그 데이터프레임의 1~5열을 출력합니다. 
+# d[2]는 데이터프레임이므로 뒤에 오는 대괄호 안에 컴마(,)가 추가되어야 합니다.
+print(d[2][1:5, ])
+</code></pre>
+
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 2번 전체를 벡터로 가져온 후, 그 벡터의 1~5번째 원소를 출력합니다. 
+# d[[2]]는 벡터이므로 뒤에 오는 대괄호 안에 컴마(,)가 없어야 합니다.
+print(d[[2]][1:5])
+</code></pre>
+
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 데이터프레임에 열과 행을 추가할 때, 행렬과 같은 방식을 사용하면 됩니다. 
+# 행 기준으로 추가하려면 rbind() 함수를 사용합니다.  
+d &lt;- rbind(d, c(11, &quot;k&quot;, TRUE))
+print(d)
+</code></pre>
+
+<pre><code>##    num cha   log
+## 1    1   a  TRUE
+## 2    2   b FALSE
+## 3    3   c  TRUE
+## 4    4   d FALSE
+## 5    5   e  TRUE
+## 6    6   f FALSE
+## 7    7   g  TRUE
+## 8    8   h FALSE
+## 9    9   i  TRUE
+## 10  10   j FALSE
+## 11  11   k  TRUE
+</code></pre>
+
+<pre><code class="r"># 열 기준으로 추가하려면 cbind() 함수를 사용합니다.  
+d &lt;- cbind(d, add = seq(from = 1, to = 10, length.out = 11))
+print(d)
+</code></pre>
+
+<pre><code>##    num cha   log  add
+## 1    1   a  TRUE  1.0
+## 2    2   b FALSE  1.9
+## 3    3   c  TRUE  2.8
+## 4    4   d FALSE  3.7
+## 5    5   e  TRUE  4.6
+## 6    6   f FALSE  5.5
+## 7    7   g  TRUE  6.4
+## 8    8   h FALSE  7.3
+## 9    9   i  TRUE  8.2
+## 10  10   j FALSE  9.1
+## 11  11   k  TRUE 10.0
+</code></pre>
+
+<pre><code class="r"># 11행 전체를 삭제합니다. 
+d &lt;- d[-11, ]
+print(d)
+</code></pre>
+
+<pre><code>##    num cha   log add
+## 1    1   a  TRUE 1.0
+## 2    2   b FALSE 1.9
+## 3    3   c  TRUE 2.8
+## 4    4   d FALSE 3.7
+## 5    5   e  TRUE 4.6
+## 6    6   f FALSE 5.5
+## 7    7   g  TRUE 6.4
+## 8    8   h FALSE 7.3
+## 9    9   i  TRUE 8.2
+## 10  10   j FALSE 9.1
+</code></pre>
+
+<pre><code class="r"># 3열 전체를 삭제합니다. 
+d &lt;- d[, -3]
+print(d)
+</code></pre>
+
+<pre><code>##    num cha add
+## 1    1   a 1.0
+## 2    2   b 1.9
+## 3    3   c 2.8
+## 4    4   d 3.7
+## 5    5   e 4.6
+## 6    6   f 5.5
+## 7    7   g 6.4
+## 8    8   h 7.3
+## 9    9   i 8.2
+## 10  10   j 9.1
+</code></pre>
+
+<pre><code class="r"># 5행, 2열에 속하는 원소를 NA로 변경합니다. 
+d[5,2] &lt;- NA
+print(d)
+</code></pre>
+
+<pre><code>##    num  cha add
+## 1    1    a 1.0
+## 2    2    b 1.9
+## 3    3    c 2.8
+## 4    4    d 3.7
+## 5    5 &lt;NA&gt; 4.6
+## 6    6    f 5.5
+## 7    7    g 6.4
+## 8    8    h 7.3
+## 9    9    i 8.2
+## 10  10    j 9.1
+</code></pre>
+
+<h2>리스트</h2>
+
+<ul>
+<li>  리스트 객체를 인덱싱할 때는 홑대괄호(<code>[]</code>)와 겹대괄호(<code>[[]]</code>)에 따라 결과가 다릅니다.</li>
+<li>  홑대괄호를 사용하면, 리스트로 출력합니다.</li>
+<li>  겹대괄호를 사용하면, 해당 원소의 속성대로 출력합니다.</li>
+</ul>
+
+<pre><code class="r"># 다양한 속성을 가진 객체들을 생성합니다. 
+a &lt;- 1:8
+b &lt;- letters[1:12]
+c &lt;- rep(c(T, F), 3)
+d &lt;- list(num = a, cha = b, log = c)
+
+# 위에서 생성한 객체들을 원소로 갖는 리스트를 생성합니다. 
+# 리스트는 리스트를 원소로 가질 수 있습니다.
+e &lt;- list(a, b, c, d)
+print(e)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] 1 2 3 4 5 6 7 8
+## 
+## [[2]]
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## [[3]]
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+## 
+## [[4]]
+## [[4]]$num
+## [1] 1 2 3 4 5 6 7 8
+## 
+## [[4]]$cha
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## [[4]]$log
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+</code></pre>
+
+<pre><code class="r"># 리스트 e의 2번째 원소를 리스트로 출력합니다. 
+print(e[2])
+</code></pre>
+
+<pre><code>## [[1]]
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+</code></pre>
+
+<pre><code class="r"># 리스트 e의 2번째 원소를 원래 속성인 벡터로 출력합니다. 
+print(e[[2]])
+</code></pre>
+
+<pre><code>##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+</code></pre>
+
+<pre><code class="r"># 위 벡터의 1~5번째 원소들을 출력합니다. 
+print(e[[2]][1:5])
+</code></pre>
+
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 리스트 e의 4번째 원소를 리스트로 출력합니다. 
+print(e[[4]])
+</code></pre>
+
+<pre><code>## $num
+## [1] 1 2 3 4 5 6 7 8
+## 
+## $cha
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## $log
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+</code></pre>
+
+<pre><code class="r"># 리스트 e의 4번째 원소인 리스트에서 다시 2번째 원소를 벡터로 출력합니다. 
+print(e[[4]][[2]])
+</code></pre>
+
+<pre><code>##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+</code></pre>
+
+<pre><code class="r"># 위 벡터의 1~5번째 원소들을 출력합니다. 
+print(e[[4]][[2]][1:5])
+</code></pre>
+
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot;
+</code></pre>
+
+<pre><code class="r"># 리스트 e에 새로운 원소를 추가합니다. 
+e[[5]] &lt;- c(&quot;가&quot;, &quot;나&quot;, &quot;다&quot;, &quot;라&quot;)
+print(e)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] 1 2 3 4 5 6 7 8
+## 
+## [[2]]
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## [[3]]
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+## 
+## [[4]]
+## [[4]]$num
+## [1] 1 2 3 4 5 6 7 8
+## 
+## [[4]]$cha
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## [[4]]$log
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+## 
+## 
+## [[5]]
+## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot;
+</code></pre>
+
+<pre><code class="r"># 리스트 e의 4번째 요소를 삭제합니다. 
+e &lt;- e[-4]
+print(e)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] 1 2 3 4 5 6 7 8
+## 
+## [[2]]
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## [[3]]
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+## 
+## [[4]]
+## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot;
+</code></pre>
+
+<pre><code class="r"># 리스트 e의 1번째 요소를 변경합니다. 
+e[[1]] &lt;- 11:18
+print(e)
+</code></pre>
+
+<pre><code>## [[1]]
+## [1] 11 12 13 14 15 16 17 18
+## 
+## [[2]]
+##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot;
+## 
+## [[3]]
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+## 
+## [[4]]
+## [1] &quot;가&quot; &quot;나&quot; &quot;다&quot; &quot;라&quot;
+</code></pre>
+
+</body>
+
+</html>
