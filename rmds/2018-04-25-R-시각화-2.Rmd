@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 300)
 library(readxl)
 
 # xlsx 파일을 읽어, dataXls에 할당합니다. 
-hitters <- read_excel(path = './data/2017_Baseball_hitter_stat.xlsx', sheet = NULL)
+hitters <- read_excel(path = '../data/2017_Baseball_hitter_stat.xlsx', sheet = NULL)
 
 # 불필요한 열(순위)을 삭제합니다.
 hitters <- hitters[, -1]
@@ -544,7 +544,8 @@ ggline +
              size = 4,
              family = 'NanumGothic',
             fontface = 'bold') +
-  scale_x_continuous(limits = c(0.269, 0.302))
+  scale_x_continuous(limits = c(0.269, 0.302)) + 
+  theme_classic(base_family = 'NanumGothic')
 ```
 
 ## 추가사항
