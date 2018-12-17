@@ -6,7 +6,7 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+knitr::opts_chunk$set(echo = TRUE, dpi = 300, fig.height = 8)
 ```
 
 2018년 프로야구는 **SK 와이번즈**의 우승으로 막을 내렸습니다. 그저 TV로만 가끔 관심 있는 경기를 시청하는 미지근한 팬의 한 명으로서, 올해 많은 고생을 한 프로야구 관계자분들께 감사하다는 말씀을 드리고 싶습니다. 
