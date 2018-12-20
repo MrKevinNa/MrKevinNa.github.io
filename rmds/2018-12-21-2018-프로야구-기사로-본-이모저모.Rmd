@@ -265,11 +265,9 @@ checkResponse <- function(data, resp, top = 5, cap) {
   dtn <- deparse(expr = substitute(expr = data))
   var <- str_c(dtn, resp, sep = '$') %>% parse(text = .) %>% eval()
   
-  # 반응 항목 컬럼의 위치(열번호)를 지정합니다. 
-  loc <- str_detect(string = colnames(x = data), pattern = resp) %>% which()
-  
   # 가장 많은 표를 얻은 기사만 추출합니다.
-  article <- data[order(var, decreasing = TRUE), c(4:6, 9, 16, loc)] %>% head(n = top)
+  cols <- c('date', 'title', 'press', 'rname', 'resp', resp)
+  article <- data[order(var, decreasing = TRUE), cols] %>% head(n = top)
   
   # 상위 기사를 출력합니다. 
   kable(x = article, row.names = FALSE, caption = cap)
