@@ -1,7 +1,7 @@
 ---
 title: '탐색적 데이터 분석(EDA)'
 author: 'Dr.Kevin'
-date: '12/21/2018'
+date: '12/20/2018'
 output: github_document
 ---
 
@@ -37,7 +37,7 @@ news <- readRDS(file = '../data/naver_baseball_news_2018.RDS')
 str(object = news)
 ```
 
-제가 불러온 마스터 데이터는 `42390` 행, `19` 열을 갖는 데이터 프레임입니다. 
+제가 불러온 마스터 데이터는 `42390` 행, `18` 열을 갖는 데이터 프레임입니다. 
 
 다음으로 막대그래프에 적용할 나의 테마를 설정하면 준비가 완료됩니다. 
 
