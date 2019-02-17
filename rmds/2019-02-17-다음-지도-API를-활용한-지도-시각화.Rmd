@@ -1,0 +1,261 @@
+---
+title: '다음 지도 API 활용법 #1'
+subtitle: '지리 정보 수집 및 지도 시각화'
+author: 'Dr.Kevin'
+date: 2019-02-17T19:00:00-09:00
+categories: ['R']
+tags: ['R Markdown', 'Daum Map API', 'Visualization']
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+```
+
+이번 포스팅에서는 [다음 지도 API](http://apis.map.daum.net/)를 활용한 지도 시각화를 준비하였습니다. 제가 **구글 지도 API**와 **네이버 지도 API**를 모두 사용해봤는데요. **구글 지도 API**는 일별 한도가 `2,500`건 밖에 되지 않습니다. **네이버 지도 API**는 일별 한도가 `10만` 건으로 한도는 넉넉하지만 최근에 개편되면서 뭔가 불편해졌다는 느낌을 받았습니다. 그런데 **다음 지도 API**는 일별 한도가 `30만` 건이기도 하고, 다양한 정보를 얻을 수 있어 사용하기에 아주 좋은 서비스라는 생각을 갖게 되었습니다. 이번 포스팅에서는 **APP KEY를 발급**받는 것부터 시작하여 **지리 정보를 수집**하고 **지도 위에 시각화**하는 간단한 예제를 공개합니다.
+
+## 다음 지도 APP KEY 발급받기 
+
+다음 지도 APP KEY를 발급받으려면, 당연히 카카도 계정이 있어야 합니다. 카카오 계정이 없는 분은 새로 만들고 나서 진행하시기 바랍니다. 다음 지도 APP KEY 발급은 아래와 같이 진행됩니다. 
+
+1. [다음 지도 API 웹페이지](http://apis.map.daum.net/)로 이동합니다. 화면이 열리면 가운데 **Web** 버튼을 클릭합니다. 
+
+1. 이동한 웹페이지에서 하늘색 동그란 버튼이 있습니다. **시작하기**를 클릭합니다. 
+
+1. **준비하기** 항목에 다음 지도 Javascript API Key 발급과 관련한 상세 설명이 있습니다. 1번의 [카카오 개발자사이트](https://developers.kakao.com)를 클릭하여 해당 웹페이지로 이동합니다. 
+
+1. 새로 열린 창에 노란색 아이콘들이 여러 개 보입니다. 맨 아래 **앱 개발 시작하기**를 클릭합니다. 만약 로그인된 상태라면 **내 애플리케이션** 페이지로 이동하고, 로그아웃 상태라면 로그인 화면으로 이동합니다. 이 상태에서 로그인하면 **내 애플리케이션** 페이지로 이동합니다. 
+
+1. 이미 APP을 만든 적이 있다면 화면 상단에 **APP** 버튼이 보일 것입니다. **APP** 버튼을 클릭하면 해당 APP 관련 페이지로 이동하는데 **앱 키 표시**를 선택하면 `4`개의 키가 보일 것입니다. 그 중에서 **REST API 키**를 이용합니다. 만약 **APP** 버튼이 없다면 왼쪽 세로 메뉴에 있는 **앱 만들기**를 클릭합니다. 
+
+1. **이름**에 원하는 앱의 이름을 넣고 **앱 만들기** 버튼을 클릭하면 끝입니다. 아이콘 이미지를 변경할 수 있으나 저는 생략했습니다. 모든 과정을 순조롭게 따라왔다면 화면 중앙에 `4`개의 키가 보일 것입니다. 그 중에서 우리는 **REST API 키**를 이용할 것이므로 **REST API 키**를 복사하여 RStudio의 Source 창에 붙여넣습니다. 
+
+1. 새로 만든 **APP**을 클릭해서 상단에 **사용 가능**으로 되어 있는지 확인하셔야 합니다. 만약 **사용 불가**로 되어 있으면 사용자 정보를 입력해야 합니다.
+
+### 다음 지도 APP KEY를 환경설정에 저장하는 방법 
+
+다음 지도 API에서 지리 정보를 수집하려면 APP KEY를 알아야 하는데 매번 웹 페이지에 접속해서 복사하는 것은 상당히 귀찮은 일입니다. 따라서 간편하게 해결할 수 있는 방법을 알려드리겠습니다. 
+
+```{r eval=FALSE}
+# RStudio Source 창에서 아래와 같이 입력하고 실행하면 .Renvion 파일이 열립니다. 
+usethis::edit_r_environ()
+
+# .Renvion 파일로 이동하여 아래 내용을 추가하고 저장합니다. 
+# 왼쪽에 환경설정 변수는 본인 마음대로 작성해도 되지만, 
+# 오른쪽 환경설정 값에는 'KakaoAK'를 앞에 넣고 한 칸 띄운 다음 본인의 API 키를 넣습니다.
+KAKAO_MAP_API_KEY = 'KakaoAK 본인의 REST API 키'
+```
+
+위와 같이 실행한 다음 **.Renvion** 파일을 저장하고 RStudio를 재시동합니다. 다음 지도 APP KEY가 제대로 저장되었는지 확인하려면 아래와 같이 합니다. 
+
+```{r eval=FALSE}
+Sys.getenv('KAKAO_MAP_API_KEY')
+```
+
+만약 제대로된 값이 출력되지 않는다면 재시도해보시기 바랍니다. 
+
+
+## 다음 지도 API로 수집 가능한 지리 정보의 종류 
+
+여기까지 따라오시느라 고생 많으셨습니다. 이제 다음 지도 API로 수집할 수 있는 다양한 지리정보 중에서 이번 포스팅을 통해 실습을 진행할 항목에 대해 살펴보겠습니다. 
+
+1. 주소로 위경도 좌표 얻기 
+
+1. 위경도 좌표로 주소 정보 얻기 
+
+1. 검색어로 장소 정보 얻기 
+
+API를 이용하여 데이터를 수집할 때 가장 쉽고 빠른 길은 API 서비스 제공자가 배포하는 **개발가이드**를 읽어보는 것입니다. [지도/로컬 개발가이드](https://developers.kakao.com/docs/restapi/local)를 읽어보시면 더 많은 정보를 얻을 수 있으니 참고하시기 바랍니다. 
+
+### 주소로 위경도 좌표 얻기 
+
+말 그대로 주소를 **query string**에 포함하여 HTTP 요청하고 응답 결과로 위경도 좌표를 제공받는 것입니다. 크롤링에 익숙하지 않은 분들은 먼저 코드 실행만 해보시고 세부적인 내용은 따로 공부하시기 바랍니다. 
+
+다음 지도 API은 응답 결과로 JSON 형태로 데이터를 제공합니다. 따라서 HTTP 응답 객체를 JSON으로 전환하면 기대하는 정보를 확인할 수 있습니다. 필요한 패키지를 먼저 불러오겠습니다. 만약 아래 패키지들이 설치되어 있지 않다면 먼저 패키지를 설치하시고 불러오시기 바랍니다. 
+
+```{r}
+# 필요한 패키지를 불러옵니다. 
+library(httr)
+library(tidyverse)
+library(jsonlite)
+```
+
+**httr** 패키지는 HTTP 요청과 응답 관련한 함수를 제공합니다. **tidyverse** 패키지를 불러오면 주요 패키지들을 한 번에 불러올 수 있어 편리한데 특히 **stringr**과 **dplyr** 패키지를 동시에 불러올 수 있으므로 텍스트 전처리나 파이프 연산자를 사용할 수 있습니다. **jsonlite** 패키지는 JSON 형태의 데이터를 다루기 위해 불러옵니다. 
+
+제가 얼마 전까지 다니던 회사 주소로 위경도 좌표를 수집해보도록 하겠습니다. 
+
+```{r}
+# 주소를 지정합니다. 
+addr <- '서울특별시 영등포구 의사당대로 82' 
+
+# HTTP 요청을 실행합니다. 
+res <- GET(url = 'https://dapi.kakao.com/v2/local/search/address.json',
+           query = list(query = addr),
+           add_headers(Authorization = Sys.getenv('KAKAO_MAP_API_KEY')))
+
+# HTTP 응답 결과를 확인합니다. 
+print(x = res)
+```
+
+응답 결과를 출력했을 때 **상태코드(Stats)**가 `200`이면 정상입니다. **콘텐츠형태(Content-Type)**이 `json`이므로 JSON 형태의 데이터를 추출해야 합니다. 
+
+```{r}
+# coord 객체에 저장합니다. 
+coord <- res %>% content(as = 'text') %>% fromJSON()
+
+# coord 객체는 원소의 수가 2인 리스트입니다. 
+# 두 번째 원소인 documents이 결과가 저장되어 있는 데이터프레임입니다. 
+coord$documents
+```
+
+결과를 확인해보니 `coord$documents`이 1행 6열을 갖는 데이터프레임이고, 첫 번째 컬럼인 `road_address`도 1행 13열을 갖는 데이터프레임입니다. 세 번째 컬럼인 `address`는 1행 15열을 갖는 데이터프레임인데 이것이 지번주소로 보입니다. 그리고 별도로 `y`, `x` 원소가 추가되어 있는데 각각 위도와 경도를 의미합니다. 하나씩 출력해보겠습니다. 
+
+```{r}
+# 도로명 주소 정보를 출력합니다. 
+coord$documents$road_address
+
+# 지번 주소 정보를 출력합니다. 
+coord$documents$address
+
+# 위도를 출력합니다. 
+coord$documents$y
+
+# 경도를 출력합니다. 
+coord$documents$x
+```
+
+다음 지도 API로 지리 정보를 얻는 것이 어렵지 않죠? 지금 제가 소개하는 코드는 완성된 코드이므로 실행이 잘 되는 것입니다. 저도 **개발가이드**를 보고 하나씩 만든 것이구요. 제가 소개해드리는 것 외에 궁금한 사항은 개발가이드를 참고하시면 되겠습니다. 
+
+### 위경도 좌표로 주소 정보 얻기 
+
+이번에는 반대로 위경도 좌표를 알고 있다고 가정하고 도로명 주소를 얻는 방법을 알아보겠습니다. 위도와 경도 정보는 방금 알게된 좌표로 지정하겠습니다. 
+
+```{r}
+# 위경도 좌표를 지정합니다. 
+y <- coord$documents$y
+x <- coord$documents$x
+
+# HTTP 요청을 실행합니다. 
+res <- GET(url = 'https://dapi.kakao.com/v2/local/geo/coord2address.json',
+           query = list(x = x,
+                        y = y),
+           add_headers(Authorization = Sys.getenv('KAKAO_MAP_API_KEY')))
+
+# HTTP 응답 결과를 확인합니다. 
+print(x = res)
+
+# addrs 객체에 저장합니다. 
+addrs <- res %>% content(as = 'text') %>% fromJSON()
+
+# addrs 객체는 원소의 수가 2인 리스트입니다. 
+# 두 번째 원소인 documents이 결과가 저장되어 있는 데이터프레임입니다. 
+addrs$documents
+```
+
+이번에도 원하는 정보를 얻을 수 있었습니다. 특히 도로명 주소와 지번주소, 우편번호를 한 번에 받을 수 있다는 장점이 있습니다. 
+
+### 검색어로 장소 정보 얻기 
+
+다음에서 검색어를 입력했을 때 제공되는 **장소** 정보를 API로도 손쉽게 받을 수 있습니다. 위경도 좌표를 함께 지정해주어야 하므로 원하는 지역의 중심 좌표를 첫 번째 코드로 얻은 다음, 검색어를 추가하면 해당 지역의 장소 정보를 받을 수 있습니다. 이번 실습에서는 저의 예전 직장의 위경도 좌표를 기준으로 '일식'을 검색해보겠습니다. 
+
+```{r}
+# 중심 좌표와 검색어를 지정합니다. 
+y <- coord$documents$y
+x <- coord$documents$x
+keyword <- '일식'
+
+# HTTP 요청을 실행합니다. 
+res <- GET(url = 'https://dapi.kakao.com/v2/local/search/keyword.json',
+           query = list(query = keyword, 
+                        x = x,
+                        y = y,
+                        radius = 1000,       # 중심점으로부터 반경 (단위:미터)
+                        page = 1,            # 이동 가능한 페이지 : 1 ~ 45
+                        size = 15,           # 페이지당 검색 결과 : 1 ~ 15
+                        sort = 'distance'    # 'accuracy' or 'distance'
+                        ),
+           add_headers(Authorization = Sys.getenv('KAKAO_MAP_API_KEY')))
+
+# HTTP 응답 결과를 확인합니다. 
+print(x = res)
+
+# place 객체에 저장합니다. 
+place <- content(x = res, as = 'text') %>% fromJSON()
+
+# place 객체는 원소의 수가 2인 리스트입니다. 
+# 두 번째 원소인 documents이 결과가 저장되어 있는 데이터프레임입니다. 
+place$documents
+```
+
+중심 좌표로부터 15개의 일식당의 위치 정보를 제공받았습니다. 다음 지도 API는 검색어로 장소를 탐색할 때 최대 45페이지까지 검색할 수 있고, 한 페이지당 최대 15건을 결과로 제공하므로 하나의 중심 좌표로부터 최대 675건까지 받을 수 있습니다. 
+
+## 지도 위 시각화 
+
+이제 이렇게 수집한 지리 정보를 지도 위에 출력하는 것으로 마무리하겠습니다. **ggmap** 패키지의 `qmap`() 함수를 사용하면 위경도 좌표를 중심으로 구글 지도를 불러올 수 있습니다. 또한 불러온 지도 위에 역시 위경도 좌표를 이용하여 다양한 시각화 처리가 가능합니다. 
+
+이번 예제에서는 방금 수집한 15개 장소의 위경도 좌표 중앙값(median)을 기준으로 구글 지도를 불러오고, 지도 위에 일식당의 위치를 표시하는 시각화 작업을 실행해보겠습니다. 
+
+```{r}
+# 필요한 패키지를 불러옵니다. 
+library(ggmap)
+
+# 구글 지도 API 인증키를 등록합니다. 
+register_google(key = Sys.getenv('GOOGLE_MAP_KEY'))
+```
+
+문제는 구글 지도 API를 사용하려면 역시 인증키를 발급받아야 하는데, 이 과정이 조금 복잡합니다. 저는 다음 지도 API와 같이 발급받은 KEY를 환경변수로 저장해두었습니다. 구글 지도 API KEY 발급 과정은 [제 블로그](https://mrkevinna.github.io/R-%EC%8B%9C%EA%B0%81%ED%99%94-3/)에서 확인하시기 바랍니다. 
+
+방금 수집한 15개 식당의 지리 정보를 이용하여 중앙값을 계산하고, 중앙값을 중심점으로 하는 지도를 불러오겠습니다. `qmap`() 함수의 `location` 인자는 숫자 데이터를 할당받기 때문에 현재 문자인 좌표를 숫자로 바꿔주어야 합니다. 
+
+```{r}
+# 15개 식당의 위경도 좌표로부터 중앙값을 계산합니다. 
+# 수집한 좌표가 문자 벡터이므로 숫자로 변경한 다음 중앙값을 계산합니다. 
+place$documents[c('x', 'y')] <- data.matrix(frame = place$documents[c('x', 'y')])
+
+# 중심좌표를 중앙값으로 지정합니다. 
+center <- c(lon = median(x = place$documents$x), 
+            lat = median(x = place$documents$y))
+
+# 중심점을 기점으로 구글 지도를 불러옵니다. 
+qmap(location = c(lon = center[1],
+                  lat = center[2]),
+     zoom = 16,
+     maptype = 'satellite',
+     source = 'google')
+```
+
+지도가 선명하게 잘 보입니다. 이제 식당 위치에 이름을 출력해보겠습니다. 
+
+```{r}
+# 필요한 패키지를 불러옵니다. 
+library(ggrepel)
+
+# 중심 좌표를 기준으로 지도를 불러오고, 그 위에 식당명을 추가합니다. 
+qmap(location = c(lon = as.numeric(x = x),
+                  lat = as.numeric(x = y)),
+     zoom = 17,
+     maptype = 'satellite',
+     source = 'google') + 
+  geom_point(
+    data = place$documents,
+    mapping = aes(x = x,
+                  y = y), 
+    shape = 1,
+    color = 'yellow',
+    stroke = 2, 
+    size = 2) + 
+  geom_label_repel(
+    data = place$documents,
+    mapping = aes(x = x,
+                  y = y, 
+                  label = place_name), 
+    size = 4, 
+    family = 'NanumGothic', 
+    segment.size = 0.5, 
+    segment.color = 'yellow')
+```
+
+이로써 15개 일식당의 위치와 이름을 지도 위체 출력할 수 있었습니다. 해당 지역의 지리 정보를 많이 수집하면 할수록 더 많은 내용을 지도 위에 표시할 수 있으므로 지도 시각화 측면에서 유용한 정보를 담을 수 있습니다. 
+
+이번 포스팅과 관련하여 궁금하신 점 있으시면 댓글로 남겨주시기 바랍니다. 감사합니다! 
+
