@@ -40,7 +40,7 @@ Dr.Kevin
 예쁜 이름으로 추가해주시면 됩니다. 중복 체크를 하지 않으니 마음에 드는 이름으로 입력하면 되구요. **사용 API**는
 **Papago NMT 번역**을 선택하도록 하겠습니다. Papago 번역 서비스가 2개인데요. **NMT**는 **Neural
 Machine Translation**의 머리글자로 인공신경망을 활용한, 그러니까 딥러닝 기반의 번역 서비스인 것 같습니다.
-참고로 **SMT**는 **Statixtical Machine Translation**의 머리글자로 통계 기반의 번역
+참고로 **SMT**는 **Statistical Machine Translation**의 머리글자로 통계 기반의 번역
 기술이구요. 그래서 속도가 빠르고 번역할 수 있는 어휘 수가 많아서 신조어 번역에 장점을 갖는다라고 설명되어 있습니다.
 
 다시 본론으로 돌아와서, 예전과 다르게 네이버 API가 좀 더 편리해졌다고 느껴지는 지점은 하나의 애플리케이션에 네이버에서
@@ -94,7 +94,7 @@ Machine Translation**의 머리글자로 인공신경망을 활용한, 그러니
 
 ![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_11.png)
 
-화면을 아래로 내려 차례로 4번과 5번 항목을 확인할 차례하겠습니다. 4번 항목은 HTTP 요청 결과로 **응답받게 될 내용**이
+화면을 아래로 내려 차례로 4번과 5번 항목을 확인할 차례입니다. 4번 항목은 HTTP 요청 결과로 **응답받게 될 내용**이
 무엇인지 확인할 수 있습니다. `translatedText`에 번역된 결과가 저장되어 있을 것입니다. 그리고 5번 항목은 HTTP
 요청이 정상이 아닐 때 확인해야 하는 에러 코드 목록입니다. 이 에러 코드를 보고 Naver Papago API가 요구하는 요청
 변수를 제대로 할당해주어야
