@@ -160,7 +160,7 @@ library(httr)
 
 ``` r
 # 번역하려는 문장을 설정합니다. 
-string <- '어제 저녁에 부장에게 갈굼 당하고 홧김에 술을 많이 마셨더니 머리가 깨질듯 아프다.'
+string <- '어제 저녁에 부장에게 갈굼당하고 홧김에 술을 많이 마셨더니 머리가 깨질듯 아프다.'
 
 # 위 문장을 text 요청 변수에 추가하여 영문으로 번역합니다. 
 res <- POST(url = 'https://openapi.naver.com/v1/papago/n2mt',
@@ -182,10 +182,10 @@ print(x = res)
 ```
 
     ## Response [https://openapi.naver.com/v1/papago/n2mt]
-    ##   Date: 2019-04-18 01:07
+    ##   Date: 2019-04-18 01:12
     ##   Status: 200
     ##   Content-Type: application/json; charset=UTF-8
-    ##   Size: 265 B
+    ##   Size: 253 B
 
 출력된 내용을 보면 HTTP 요청 일시, 응답 상태코드, 콘텐츠 형식 및 인코딩 방식 등을 확인할 수 있습니다. 응답 받는 내용이
 **JSON** 타입이므로 `content()` 함수를 이용하여 JSON 타입의 데이터를 추출해보겠습니다.
@@ -206,7 +206,7 @@ str(object = json)
     ##   ..$ result  :List of 3
     ##   .. ..$ srcLangType   : chr "ko"
     ##   .. ..$ tarLangType   : chr "en"
-    ##   .. ..$ translatedText: chr "My head hurts like a crack because I drank a lot last night because I was thirsty and ruffled by the manager."
+    ##   .. ..$ translatedText: chr "My head hurts like a crack because I drank a lot last night because I was pressed by the manager."
 
 새로 만들어진 `json` 객체는 리스트이며, 맨 마지막 원소에 `translatedText`가 있음을 알 수 있습니다. 번역
 결과를 확인해볼까요?
@@ -216,7 +216,7 @@ str(object = json)
 print(x = json$message$result$translatedText)
 ```
 
-    ## [1] "My head hurts like a crack because I drank a lot last night because I was thirsty and ruffled by the manager."
+    ## [1] "My head hurts like a crack because I drank a lot last night because I was pressed by the manager."
 
 어떤가요? 번역 품질이 괜찮은가요? **갈굼당하다**라는 표현이 조금 이상하군요. 하하하\! 한영 번역도 갈 길이 좀 있군요.
 
