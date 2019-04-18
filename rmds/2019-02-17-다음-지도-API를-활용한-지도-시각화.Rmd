@@ -2,7 +2,7 @@
 title: '다음 지도 API 활용법 #1'
 subtitle: '지리 정보 수집 및 지도 시각화'
 author: 'Dr.Kevin'
-date: 2019-02-17T19:00:00-09:00
+date: '02/17/2019'
 categories: ['R']
 tags: ['R Markdown', 'Daum Map API', 'Visualization']
 output: github_document

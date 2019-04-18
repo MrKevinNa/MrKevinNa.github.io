@@ -1,0 +1,13 @@
+---
+title: '네이버 API 활용법 #2'
+subtitle: '블로그 검색'
+author: 'Dr.Kevin'
+date: '04/18/2019'
+categories: ['R']
+tags: ['R Markdown', 'Naver Search API', 'Blog']
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+```
