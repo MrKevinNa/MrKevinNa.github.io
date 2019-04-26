@@ -19,19 +19,19 @@ Dr.Kevin
 로그인**
 합니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_01.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_01.png)
 
 로그인을 하고 나서 가장 처음에 해야 할 일은 상단의 메뉴의 **Application** \> **계정 설정**을 클릭하여
 본인인증을 하는
 것입니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_02.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_02.png)
 
 **환영합니다**로 시작하는 alert에 **확인**을 클릭해주고, **이용약관에 동의합니다**에 체크한 다음 **확인**을
 클릭하면, 본인 인증 페이지로
 넘어갑니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_06.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_06.png)
 
 저는 **백수 알바 강사**이지만 **프리랜서**라는 좀 더 고급진 표현을 선택했습니다. 그 아래 체크박스를 선택하고 확인을
 누르면 마지막 과정인 **애플리케이션 등록**으로 넘어갑니다.
@@ -50,20 +50,20 @@ Machine Translation**의 머리글자로 인공신경망을 활용한, 그러니
 필요한 분은 여러 개의 API를 선택하셔도
 됩니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_07.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_07.png)
 
 **애플래케이션 등록**의 마지막 관문은 **환경 추가**입니다. 저는 **WEB 설정**을 선택하고 웹 서비스 URL로는
 **<http://naver.com>**으로 입력했습니다. 이 때 주의해야 할 점은 `www`를 제외해야 한다는 것입니다.
 **등록하기**를 클릭하면 모든 과정이
 끝납니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_08.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_08.png)
 
 아래 이미지에서 발급받은 **Naver API ID와 PW**를 확인할 수 있습니다. 절대로 다른 사람에게 노출되지 않도록
 주의하시기
 바랍니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_09.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_09.png)
 
 ## Papago NMT 번역 API 가이드 확인
 
@@ -74,7 +74,7 @@ Machine Translation**의 머리글자로 인공신경망을 활용한, 그러니
 클릭합니다. 그러면 아래 캡쳐 이미지와 같이 개발 가이드 문서가
 열립니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_10.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_10.png)
 
 이 문서에서 눈 여겨 봐야 할 것은 2~5번 항목입니다. 먼저 2번 항목은 **HTTP 요청**에 어떤 `방식(Method)`이
 사용되었고 `요청 URL`은 무엇인지 알려줍니다. 보이는 바와 같이 `POST` 방식이 사용되었습니다. 이런 경우에는,
@@ -92,7 +92,7 @@ Machine Translation**의 머리글자로 인공신경망을 활용한, 그러니
 참고하기
 바랍니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_11.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_11.png)
 
 화면을 아래로 내려 차례로 4번과 5번 항목을 확인할 차례입니다. 4번 항목은 HTTP 요청 결과로 **응답받게 될 내용**이
 무엇인지 확인할 수 있습니다. `translatedText`에 번역된 결과가 저장되어 있을 것입니다. 그리고 5번 항목은 HTTP
@@ -100,7 +100,7 @@ Machine Translation**의 머리글자로 인공신경망을 활용한, 그러니
 변수를 제대로 할당해주어야
 합니다.
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_12.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_12.png)
 
 지금까지 살펴본 내용을 바탕으로 실제로 어떻게 R코드를 작성하여 결과를 얻을 수 있는지 확인해보겠습니다.
 
@@ -126,9 +126,9 @@ NAVER_API_ID = 여기에 발급받은 네이버 API ID를 붙여넣으세요
 NAVER_API_PW = 여기에 발급받은 네이버 API PW를 붙여넣으세요
 ```
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_13.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_13.png)
 
-![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-번역/Naver_API_14.png)
+![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-04-17-Naver-Papago-API를-활용한-NMT-번역/Naver_API_14.png)
 
 위와 같이 실행한 다음 **.Renviron** 파일을 저장하고 RStudio를 재시동합니다. **Naver Papago APP
 ID와 PW**가 제대로 저장되었는지 확인하려면 아래와 같이 합니다.
