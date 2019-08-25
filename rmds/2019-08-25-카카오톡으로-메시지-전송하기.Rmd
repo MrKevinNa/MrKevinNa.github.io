@@ -97,7 +97,7 @@ print(x = res$url)
 
 ![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-08-25-카카오톡으로-메시지-전송하기/Kakao_Login_09.png)
 
-`res` 객체의 요청 URL을 복사하여 웹 브라우저 주소창에 붙여넣고 엔터를 누르면 카카오 계정 로그인 화면으로 이동합니다. **로봇이 아닙니다** 체크박스에 에크하고 **로그인** 버튼을 누릅니다. 간혹 캡챠 이미지가 팝업으로 뜨기도 합니다. 로그인에 성공하면 **사용자 동의를 받는 과정**이 진행돱니다. 즉, 아래 이미지와 같은 화면이 열립니다. 
+`res` 객체의 요청 URL을 복사하여 웹 브라우저 주소창에 붙여넣고 엔터를 누르면 카카오 계정 로그인 화면으로 이동합니다. **로봇이 아닙니다** 체크박스에 체크하고 **로그인** 버튼을 누릅니다. 간혹 캡챠 이미지가 팝업으로 뜨기도 합니다. 로그인에 성공하면 **사용자 동의를 받는 과정**이 진행됩니다. 즉, 아래 이미지와 같은 화면이 열립니다. 
 
 ![](https://raw.githubusercontent.com/MrKevinNa/MrKevinNa.github.io/master/images/2019-08-25-카카오톡으로-메시지-전송하기/Kakao_Login_10.png)
 
