@@ -1,5 +1,5 @@
 ---
-title: '다음 지도 API 활용법 #1'
+title: '다음 카카오 API 활용법 #1'
 subtitle: '지리 정보 수집 및 지도 시각화'
 author: 'Dr.Kevin'
 date: '02/17/2019'
