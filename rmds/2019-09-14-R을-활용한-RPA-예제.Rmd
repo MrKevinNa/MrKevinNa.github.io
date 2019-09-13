@@ -1,5 +1,5 @@
 ---
-title: "R을 활용한 RPA 예제"
+title: "네이버 금융 주요 시장지표 수집 및 발송 자동화"
 subtitle: '주요 시장지표 수집 후 이메일 발송 자동화'
 author: 'Dr.Kevin'
 date: '09/14/2019'
